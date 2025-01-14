@@ -7,6 +7,12 @@ class RosePaths:
     output_path: str = "../rose/rose_datasets.json.gz"
 
 
+@dataclass
+class RosePathsSmall:
+    dataset_path: str = "../rose/rose_datasets_small.json.gz"
+    output_path: str = "../rose/rose_datasets_small.json.gz"
+
+
 @dataclass(frozen=True)
 class DatasetName:
     CNNDM_TEST: str = "cnndm_test"
@@ -28,4 +34,3 @@ MODELS = {
     #     "claims_field": "system_claims_other",
     # },
 }
-

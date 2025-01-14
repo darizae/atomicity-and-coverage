@@ -3,7 +3,7 @@ import argparse
 from claim_generator import ClaimGenerator
 from src.rose.rose_loader import RoseDatasetLoader
 
-from config import RosePaths, MODELS
+from config import RosePaths, MODELS, RosePathsSmall
 from device_selector import check_or_select_device
 
 
@@ -15,6 +15,7 @@ def get_args():
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for processing claims.")
     parser.add_argument("--max_length", type=int, default=512, help="Max tokens if truncation is enabled.")
     parser.add_argument("--no_truncation", action="store_true", help="Disable truncation entirely.")
+    parser.add_argument("--small_test", action="store_true", help="Use the small dataset (1 entry) for quick testing.")
     return parser.parse_args()
 
 
@@ -24,7 +25,8 @@ def main(
     device: str = None,
     batch_size: int = 32,
     max_length: int = 512,
-    truncation: bool = True
+    truncation: bool = True,
+    small_test: bool = False,
 ) -> None:
     """
     Main entry point for generating claims.
@@ -37,6 +39,7 @@ def main(
         max_length (int, optional): Maximum number of tokens per input sequence.
                                     Inputs longer than this will be truncated if truncation is enabled. Defaults to 512.
         truncation (bool, optional): Whether to truncate inputs that exceed `max_length`. Defaults to True.
+        small_test (bool): Whether to use the small dataset (1 entry) for quick tests.
 
     Raises:
         KeyError: If the specified dataset is not found in the loaded datasets.
@@ -47,7 +50,13 @@ def main(
     print(f"Using device: {device}")
 
     # 2. Initialize paths
-    paths = RosePaths()
+    print("Determining dataset variant to use...")
+    if small_test:
+        paths = RosePathsSmall()
+        print("Using small test dataset path...")
+    else:
+        paths = RosePaths()
+        print("Using full test dataset path...")
 
     # 3. Load dataset
     loader = RoseDatasetLoader()
@@ -119,5 +128,6 @@ if __name__ == "__main__":
         device=args.device,
         batch_size=args.batch_size,
         max_length=args.max_length,
-        truncation=truncation_flag
+        truncation=truncation_flag,
+        small_test=args.small_test
     )

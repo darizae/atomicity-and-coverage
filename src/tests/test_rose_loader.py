@@ -30,8 +30,9 @@ def test_dataset_loading(rose_loader):
     Test that all datasets are loaded successfully.
     """
     loader, all_datasets = rose_loader
-    for dataset_name in loader.DATASETS_CONFIG:
-        assert dataset_name["name"] in all_datasets, f"{dataset_name['name']} not loaded."
+    for config in loader.DATASETS_CONFIG:
+        dataset_name = config["name"]
+        assert dataset_name in all_datasets, f"{dataset_name} not loaded."
 
 
 def test_total_counts(rose_loader):
@@ -111,3 +112,16 @@ def test_save_and_load_empty_datasets(test_file):
     # Load the empty dataset
     loaded_datasets = loader.load_datasets_compressed(test_file)
     assert loaded_datasets == {}, "Loaded datasets should be empty."
+
+
+def test_load_with_max_entries():
+    """
+    Test that loading datasets with a max_entries limit returns at most that many entries per dataset.
+    """
+    loader = RoseDatasetLoader()
+    max_entries = 1
+    datasets = loader.load_all_datasets(max_entries=max_entries)
+    for dataset_name, dataset in datasets.items():
+        # Each dataset should have at most 'max_entries' items.
+        assert len(dataset) <= max_entries, f"{dataset_name} has more than {max_entries} entries."
+

@@ -1,13 +1,14 @@
 import os
 import json
 import gzip
-from typing import List
+from typing import List, Optional
 from datasets import load_dataset
 
 
 class RoseDatasetLoader:
     """
-    A loader for the RoSE dataset and its subsets with functionality to save and load compressed datasets.
+    A loader for the RoSE dataset and its subsets with functionality
+    to save and load compressed datasets.
     """
 
     DATASETS_CONFIG = [
@@ -20,11 +21,14 @@ class RoseDatasetLoader:
     def __init__(self):
         self.datasets = {}
 
-    def load_all_datasets(self):
+    def load_all_datasets(self, max_entries: Optional[int] = None):
         """
-        Loads all configured datasets into memory.
-        """
+        Loads all configured datasets into memory, optionally limiting the number of entries.
 
+        Args:
+            max_entries (int, optional): If provided, only load up to this many entries
+                                         per dataset for testing.
+        """
         for config in self.DATASETS_CONFIG:
             dataset_name = config["name"]
             hf_name = config["hf_name"]
@@ -32,7 +36,10 @@ class RoseDatasetLoader:
             print(f"Loading dataset: {dataset_name}...")
             dataset = load_dataset("Salesforce/rose", hf_name)["data"]
 
-            # Structure the data
+            # Structure the data, optionally slicing if max_entries is specified
+            if max_entries is not None:
+                dataset = dataset.select(range(min(max_entries, len(dataset))))
+
             structured_data = [
                 {
                     "source": entry["source"],
@@ -99,15 +106,14 @@ class RoseDatasetLoader:
 
 
 if __name__ == "__main__":
-    # Example usage
     loader = RoseDatasetLoader()
 
-    # Load datasets
+    # 1. Load the full datasets
     all_datasets = loader.load_all_datasets()
-
-    # Save datasets in compressed format
     loader.save_datasets_compressed("rose_datasets.json.gz")
 
-    # Load datasets back
-    loaded_datasets = loader.load_datasets_compressed("rose_datasets.json.gz")
-    print(f"Example dataset (cnndm_test): {loaded_datasets['cnndm_test'][0]}")
+    # 2. Load a SMALL version of each dataset (e.g., 1 entry)
+    all_datasets_small = loader.load_all_datasets(max_entries=1)
+    loader.save_datasets_compressed("rose_datasets_small.json.gz")
+
+    print("Done generating both full and small datasets.")
