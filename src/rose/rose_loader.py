@@ -1,3 +1,4 @@
+import os
 import json
 import gzip
 from typing import List
@@ -79,6 +80,7 @@ class RoseDatasetLoader:
         Returns:
             dict: The loaded datasets.
         """
+        print(f"Current working directory: {os.getcwd()}")
         with gzip.open(filepath, "rt", encoding="utf-8") as f:
             self.datasets = json.load(f)
         print(f"Datasets loaded from {filepath}.")
