@@ -8,7 +8,7 @@ from datasets import load_dataset
 class RoseDatasetLoader:
     """
     A loader for the RoSE dataset and its subsets with functionality
-    to save and load compressed datasets.
+    to save and load compressed and regular JSON datasets.
     """
 
     DATASETS_CONFIG = [
@@ -93,6 +93,33 @@ class RoseDatasetLoader:
         print(f"Datasets loaded from {filepath}.")
         return self.datasets
 
+    def save_datasets_json(self, filepath):
+        """
+        Saves all datasets to a regular (non-compressed) JSON file.
+
+        Args:
+            filepath (str): The path to the JSON file.
+        """
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(self.datasets, f, ensure_ascii=False, indent=2)
+        print(f"Datasets saved to {filepath} in JSON format.")
+
+    def load_datasets_json(self, filepath):
+        """
+        Loads datasets from a regular (non-compressed) JSON file.
+
+        Args:
+            filepath (str): The path to the JSON file.
+
+        Returns:
+            dict: The loaded datasets.
+        """
+        print(f"Current working directory: {os.getcwd()}")
+        with open(filepath, "r", encoding="utf-8") as f:
+            self.datasets = json.load(f)
+        print(f"Datasets loaded from {filepath}.")
+        return self.datasets
+
     def add_claims(self, dataset_name: str, claims_field: str, claims: List[List[str]]):
         """
         Add system-generated claims to a specific dataset.
@@ -111,9 +138,11 @@ if __name__ == "__main__":
     # 1. Load the full datasets
     all_datasets = loader.load_all_datasets()
     loader.save_datasets_compressed("rose_datasets.json.gz")
+    loader.save_datasets_json("rose_datasets.json")
 
     # 2. Load a SMALL version of each dataset (e.g., 1 entry)
-    all_datasets_small = loader.load_all_datasets(max_entries=1)
+    all_datasets_small = loader.load_all_datasets(max_entries=3)
     loader.save_datasets_compressed("rose_datasets_small.json.gz")
+    loader.save_datasets_json("rose_datasets_small.json")
 
     print("Done generating both full and small datasets.")

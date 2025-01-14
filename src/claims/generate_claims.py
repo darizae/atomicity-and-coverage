@@ -112,6 +112,7 @@ def main(
     print(f"Saving claims for dataset '{dataset_name}', as '{claims_field}'.")
     loader.add_claims(dataset_name, claims_field, claims)
     loader.save_datasets_compressed(paths.output_path)
+    loader.save_datasets_json("../rose/rose_datasets_small.json")
 
     print(f"Claims generated and saved for dataset '{dataset_name}' using model '{model_name}' on device '{device}'.")
 
