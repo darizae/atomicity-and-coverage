@@ -1,5 +1,6 @@
 import json
 import gzip
+from typing import List
 
 
 class RoseDatasetLoader:
@@ -82,6 +83,17 @@ class RoseDatasetLoader:
             self.datasets = json.load(f)
         print(f"Datasets loaded from {filepath}.")
         return self.datasets
+
+    def add_claims(self, dataset_name: str, claims_field: str, claims: List[List[str]]):
+        """
+        Add system-generated claims to a specific dataset.
+        """
+        if dataset_name not in self.datasets:
+            raise ValueError(f"Dataset '{dataset_name}' not found. Load it first.")
+
+        dataset = self.datasets[dataset_name]
+        for i, entry in enumerate(dataset):
+            entry[claims_field] = claims[i]
 
 
 if __name__ == "__main__":
