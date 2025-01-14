@@ -1,0 +1,99 @@
+import json
+import gzip
+
+
+class RoseDatasetLoader:
+    """
+    A loader for the RoSE dataset and its subsets with functionality to save and load compressed datasets.
+    """
+
+    DATASETS_CONFIG = [
+        {"name": "cnndm_test", "hf_name": "cnndm_test"},
+        {"name": "cnndm_validation", "hf_name": "cnndm_validation"},
+        {"name": "xsum", "hf_name": "xsum"},
+        {"name": "samsum", "hf_name": "samsum"},
+    ]
+
+    def __init__(self):
+        self.datasets = {}
+
+    def load_all_datasets(self):
+        """
+        Loads all configured datasets into memory.
+        """
+        from datasets import load_dataset
+
+        for config in self.DATASETS_CONFIG:
+            dataset_name = config["name"]
+            hf_name = config["hf_name"]
+
+            print(f"Loading dataset: {dataset_name}...")
+            dataset = load_dataset("Salesforce/rose", hf_name)["data"]
+
+            # Structure the data
+            structured_data = [
+                {
+                    "source": entry["source"],
+                    "reference": entry["reference"],
+                    "reference_acus": entry["reference_acus"],
+                }
+                for entry in dataset
+            ]
+
+            self.datasets[dataset_name] = structured_data
+        return self.datasets
+
+    def get_dataset(self, name):
+        """
+        Fetches a specific dataset by name.
+
+        Args:
+            name (str): The name of the dataset to fetch.
+
+        Returns:
+            list: The requested dataset.
+        """
+        if name not in self.datasets:
+            raise ValueError(f"Dataset '{name}' has not been loaded. Use 'load_all_datasets()' first.")
+        return self.datasets[name]
+
+    def save_datasets_compressed(self, filepath):
+        """
+        Saves all datasets to a compressed file in gzip format.
+
+        Args:
+            filepath (str): The path to the compressed file.
+        """
+        with gzip.open(filepath, "wt", encoding="utf-8") as f:
+            json.dump(self.datasets, f)
+        print(f"Datasets saved to {filepath} in compressed format.")
+
+    def load_datasets_compressed(self, filepath):
+        """
+        Loads datasets from a compressed gzip file.
+
+        Args:
+            filepath (str): The path to the compressed file.
+
+        Returns:
+            dict: The loaded datasets.
+        """
+        with gzip.open(filepath, "rt", encoding="utf-8") as f:
+            self.datasets = json.load(f)
+        print(f"Datasets loaded from {filepath}.")
+        return self.datasets
+
+
+if __name__ == "__main__":
+    # Example usage
+    loader = RoseDatasetLoader()
+
+    # Load datasets
+    all_datasets = loader.load_all_datasets()
+
+    # Save datasets in compressed format
+    loader.save_datasets_compressed("rose_datasets.json.gz")
+
+    # Load datasets back
+    loaded_datasets = loader.load_datasets_compressed("rose_datasets.json.gz")
+    print(f"Example dataset (cnndm_test): {loaded_datasets['cnndm_test'][0]}")
