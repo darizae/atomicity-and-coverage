@@ -2,7 +2,7 @@ import argparse
 import torch
 
 from claim_generator import ClaimGenerator
-from src.datasets.rose_loader import RoseDatasetLoader
+from src.rose.rose_loader import RoseDatasetLoader
 
 from config import RosePaths, MODELS
 from device_selector import select_best_device

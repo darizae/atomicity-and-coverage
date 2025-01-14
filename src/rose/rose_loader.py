@@ -1,6 +1,7 @@
 import json
 import gzip
 from typing import List
+from datasets import load_dataset
 
 
 class RoseDatasetLoader:
@@ -22,7 +23,6 @@ class RoseDatasetLoader:
         """
         Loads all configured datasets into memory.
         """
-        from datasets import load_dataset
 
         for config in self.DATASETS_CONFIG:
             dataset_name = config["name"]
