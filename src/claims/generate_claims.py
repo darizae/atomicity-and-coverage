@@ -1,11 +1,10 @@
 import argparse
-import torch
 
 from claim_generator import ClaimGenerator
 from src.rose.rose_loader import RoseDatasetLoader
 
 from config import RosePaths, MODELS
-from device_selector import select_best_device
+from device_selector import check_or_select_device
 
 
 def main(dataset_name: str, model_key: str, device: str = None) -> None:
@@ -16,8 +15,7 @@ def main(dataset_name: str, model_key: str, device: str = None) -> None:
     :param device: Optional. If provided, use this device; otherwise auto-detect.
     """
     # 1. Determine device
-    if device is None:
-        device = select_best_device()
+    device = check_or_select_device(args.device)
     print(f"Using device: {device}")
 
     # 2. Initialize paths
