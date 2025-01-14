@@ -7,15 +7,43 @@ from config import RosePaths, MODELS
 from device_selector import check_or_select_device
 
 
-def main(dataset_name: str, model_key: str, device: str = None) -> None:
+def get_args():
+    parser = argparse.ArgumentParser(description="Generate claims from a dataset using a model.")
+    parser.add_argument("--dataset_name", type=str, default="cnndm_test", help="Dataset to process.")
+    parser.add_argument("--model_key", type=str, default="distilled_t5", help="Model key to use.")
+    parser.add_argument("--device", type=str, default=None, help="Device to use (e.g. 'cuda', 'cpu', 'mps').")
+    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for processing claims.")
+    parser.add_argument("--max_length", type=int, default=512, help="Max tokens if truncation is enabled.")
+    parser.add_argument("--no_truncation", action="store_true", help="Disable truncation entirely.")
+    return parser.parse_args()
+
+
+def main(
+    dataset_name: str,
+    model_key: str,
+    device: str = None,
+    batch_size: int = 32,
+    max_length: int = 512,
+    truncation: bool = True
+) -> None:
     """
-    Main entry point to generate claims for a chosen dataset using a chosen model.
-    :param dataset_name: The dataset key to process (e.g., "cnndm_test").
-    :param model_key: The model key (e.g., "distilled_t5").
-    :param device: Optional. If provided, use this device; otherwise auto-detect.
+    Main entry point for generating claims.
+
+    Args:
+        dataset_name (str): The dataset key to process (e.g., "cnndm_test").
+        model_key (str): The model key as specified in the MODELS config.
+        device (str, optional): Device to run the model on (e.g., "cpu", "cuda", or "mps"). Defaults to None.
+        batch_size (int, optional): Batch size for processing claims. Defaults to 32.
+        max_length (int, optional): Maximum number of tokens per input sequence.
+                                    Inputs longer than this will be truncated if truncation is enabled. Defaults to 512.
+        truncation (bool, optional): Whether to truncate inputs that exceed `max_length`. Defaults to True.
+
+    Raises:
+        KeyError: If the specified dataset is not found in the loaded datasets.
+        ValueError: If an unknown model_key is provided.
     """
     # 1. Determine device
-    device = check_or_select_device(args.device)
+    device = check_or_select_device(device)
     print(f"Using device: {device}")
 
     # 2. Initialize paths
@@ -23,13 +51,18 @@ def main(dataset_name: str, model_key: str, device: str = None) -> None:
 
     # 3. Load dataset
     loader = RoseDatasetLoader()
+
+    print("Loading datasets...")
     loader.load_datasets_compressed(paths.dataset_path)
+    print("Datasets loaded!")
 
     # 4. Check if dataset exists
     if dataset_name not in loader.datasets:
         raise KeyError(f"Dataset '{dataset_name}' not found in loaded datasets.")
 
     # 5. Retrieve model info
+    print("Initializing claim generator model...")
+
     if model_key not in MODELS:
         raise ValueError(f"Unknown model key '{model_key}'. "
                          f"Supported keys: {list(MODELS.keys())}")
@@ -38,17 +71,36 @@ def main(dataset_name: str, model_key: str, device: str = None) -> None:
     model_name = model_info["name"]
     claims_field = model_info["claims_field"]
 
+    # If you provided custom classes:
+    tokenizer_class = model_info.get("tokenizer_class", "transformers.AutoTokenizer")
+    model_class = model_info.get("model_class", "transformers.AutoModelForSeq2SeqLM")
+
     # 6. Initialize claim generator
-    generator = ClaimGenerator(model_name=model_name, device=device)
+    generator = ClaimGenerator(
+        model_name=model_name,
+        tokenizer_class_path=tokenizer_class,
+        model_class_path=model_class,
+        device=device,
+        batch_size=batch_size,
+        max_length=max_length,
+        truncation=truncation
+    )
+
+    print("Claim generator model initialized!")
 
     # 7. Retrieve sources
     dataset = loader.datasets[dataset_name]
     sources = [entry["reference"] for entry in dataset]
 
     # 8. Generate claims
+    print("Starting claim generation...")
+
     claims = generator.generate_claims(sources)
 
+    print("Claim generation finished!")
+
     # 9. Add claims and save
+    print(f"Saving claims for dataset '{dataset_name}', as '{claims_field}'.")
     loader.add_claims(dataset_name, claims_field, claims)
     loader.save_datasets_compressed(paths.output_path)
 
@@ -56,33 +108,16 @@ def main(dataset_name: str, model_key: str, device: str = None) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate claims from a dataset using a T5 model.")
-    parser.add_argument(
-        "--dataset_name",
-        type=str,
-        default="cnndm_test",
-        help="Name of the dataset to process (e.g. 'cnndm_test')."
-    )
-    parser.add_argument(
-        "--model_key",
-        type=str,
-        default="distilled_t5",
-        help="Key of the model to use (e.g. 'distilled_t5')."
-    )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default=None,
-        help=(
-            "Device to use (e.g. 'cuda', 'cpu', 'mps'). If not provided, the script "
-            "will auto-detect the best available device."
-        )
-    )
+    args = get_args()
 
-    args = parser.parse_args()
+    # Notice how we flip the no_truncation flag:
+    truncation_flag = not args.no_truncation
 
     main(
         dataset_name=args.dataset_name,
         model_key=args.model_key,
-        device=args.device
+        device=args.device,
+        batch_size=args.batch_size,
+        max_length=args.max_length,
+        truncation=truncation_flag
     )

@@ -1,11 +1,10 @@
-from enum import StrEnum
 from dataclasses import dataclass
 
 
 @dataclass
 class RosePaths:
-    dataset_path: str = "src/rose/rose_datasets.json.gz"
-    output_path: str = "src/rose/enhanced_rose_datasets.json.gz"
+    dataset_path: str = "../rose/rose_datasets.json.gz"
+    output_path: str = "../rose/rose_datasets.json.gz"
 
 
 @dataclass(frozen=True)
@@ -20,6 +19,8 @@ MODELS = {
     "distilled_t5": {
         "name": "Babelscape/t5-base-summarization-claim-extractor",
         "claims_field": "system_claims_t5",
+        "tokenizer_class": "transformers.T5Tokenizer",
+        "model_class": "transformers.T5ForConditionalGeneration",
     },
     # Add more models as needed
     # "another_model": {
