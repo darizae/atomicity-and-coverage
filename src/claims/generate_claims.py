@@ -1,9 +1,9 @@
 import argparse
 
 from claim_generator import ClaimGenerator
+from src.config import RosePathsSmall, RosePaths, MODELS
 from src.rose.rose_loader import RoseDatasetLoader
 
-from config import RosePaths, MODELS, RosePathsSmall
 from device_selector import check_or_select_device
 
 
