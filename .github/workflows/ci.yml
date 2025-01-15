@@ -1,8 +1,12 @@
 name: CI
 
 on:
-  push:       # Trigger on push to any branch
-  pull_request:  # Trigger on pull requests for any branch
+  push:
+    branches:
+      - main       # Only trigger on pushes to the main branch
+  pull_request:
+    branches:
+      - main       # Only trigger on pull requests targeting the main branch
 
 jobs:
   test:
