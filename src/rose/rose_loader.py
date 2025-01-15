@@ -103,7 +103,7 @@ class RoseDatasetLoader:
         Args:
             filepath (str): The path to the JSON file.
         """
-        with open(filepath.name, "w", encoding="utf-8") as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             json.dump(self.datasets, f, ensure_ascii=False, indent=2)
         print(f"Datasets saved to {filepath} in JSON format.")
 
