@@ -37,7 +37,7 @@ class RoseDatasetLoader:
             hf_name = config["hf_name"]
 
             print(f"Loading dataset: {dataset_name}...")
-            dataset = load_dataset("Salesforce/rose", hf_name)["data"]
+            dataset = load_dataset("Salesforce/rose", hf_name, trust_remote_code=True)["data"]
 
             # Structure the data, optionally slicing if max_entries is specified
             if max_entries is not None:
