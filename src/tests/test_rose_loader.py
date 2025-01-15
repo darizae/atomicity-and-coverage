@@ -4,6 +4,25 @@ import pytest
 from src.rose.rose_loader import RoseDatasetLoader
 
 
+@pytest.fixture(scope="session")
+def cached_rose_data():
+    """
+    Session-scoped fixture to load datasets once, saving and reusing a local compressed file.
+    """
+    loader = RoseDatasetLoader()
+    compressed_file = "local_rose_datasets.json.gz"
+
+    # If compressed file exists, load from it; otherwise, download and save.
+    if os.path.exists(compressed_file):
+        all_datasets = loader.load_datasets_compressed(compressed_file)
+    else:
+        all_datasets = loader.load_all_datasets()
+        # Save for future test runs
+        loader.save_datasets_compressed(compressed_file)
+
+    return loader, all_datasets
+
+
 @pytest.fixture
 def rose_loader():
     """
@@ -25,38 +44,25 @@ def test_file():
         os.remove(filename)
 
 
-def test_dataset_loading(rose_loader):
-    """
-    Test that all datasets are loaded successfully.
-    """
-    loader, all_datasets = rose_loader
+def test_dataset_loading(cached_rose_data):
+    loader, all_datasets = cached_rose_data
     for config in loader.DATASETS_CONFIG:
         dataset_name = config["name"]
         assert dataset_name in all_datasets, f"{dataset_name} not loaded."
 
 
-def test_total_counts(rose_loader):
-    """
-    Verify the total number of sources and ACUs in each dataset.
-    """
-    _, all_datasets = rose_loader
+def test_total_counts(cached_rose_data):
+    _, all_datasets = cached_rose_data
     for dataset_name, dataset in all_datasets.items():
         total_sources = len(dataset)
         total_acus = sum(len(entry["reference_acus"]) for entry in dataset)
-
-        # Check that there are sources and ACUs
         assert total_sources > 0, f"{dataset_name} has no sources."
         assert total_acus > 0, f"{dataset_name} has no ACUs."
-        print(f"{dataset_name}: {total_sources} sources, {total_acus} ACUs.")
 
 
-def test_key_consistency(rose_loader):
-    """
-    Ensure each dataset entry has all required keys.
-    """
-    _, all_datasets = rose_loader
+def test_key_consistency(cached_rose_data):
+    _, all_datasets = cached_rose_data
     required_keys = {"source", "reference", "reference_acus"}
-
     for dataset_name, dataset in all_datasets.items():
         for entry in dataset:
             assert required_keys.issubset(entry.keys()), \
@@ -124,4 +130,3 @@ def test_load_with_max_entries():
     for dataset_name, dataset in datasets.items():
         # Each dataset should have at most 'max_entries' items.
         assert len(dataset) <= max_entries, f"{dataset_name} has more than {max_entries} entries."
-
