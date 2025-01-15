@@ -1,9 +1,9 @@
 import argparse
 
 from claim_generator import ClaimGenerator
+from src.config import RosePathsSmall, RosePaths, MODELS
 from src.rose.rose_loader import RoseDatasetLoader
 
-from config import RosePaths, MODELS, RosePathsSmall
 from device_selector import check_or_select_device
 
 
@@ -62,7 +62,7 @@ def main(
     loader = RoseDatasetLoader()
 
     print("Loading datasets...")
-    loader.load_datasets_compressed(paths.dataset_path)
+    loader.load_datasets_compressed(paths.compressed_dataset_path)
     print("Datasets loaded!")
 
     # 4. Check if dataset exists
@@ -111,8 +111,8 @@ def main(
     # 9. Add claims and save
     print(f"Saving claims for dataset '{dataset_name}', as '{claims_field}'.")
     loader.add_claims(dataset_name, claims_field, claims)
-    loader.save_datasets_compressed(paths.output_path)
-    loader.save_datasets_json("../rose/rose_datasets_small.json")
+    loader.save_datasets_compressed(paths.compressed_output_path)
+    loader.save_datasets_json(RosePathsSmall.output_path)
 
     print(f"Claims generated and saved for dataset '{dataset_name}' using model '{model_name}' on device '{device}'.")
 

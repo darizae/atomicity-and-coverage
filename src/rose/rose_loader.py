@@ -1,8 +1,11 @@
 import os
 import json
 import gzip
+from pathlib import Path
 from typing import List, Optional
 from datasets import load_dataset
+
+from src.config import RosePaths, RosePathsSmall
 
 
 class RoseDatasetLoader:
@@ -34,7 +37,7 @@ class RoseDatasetLoader:
             hf_name = config["hf_name"]
 
             print(f"Loading dataset: {dataset_name}...")
-            dataset = load_dataset("Salesforce/rose", hf_name)["data"]
+            dataset = load_dataset("Salesforce/rose", hf_name, trust_remote_code=True)["data"]
 
             # Structure the data, optionally slicing if max_entries is specified
             if max_entries is not None:
@@ -66,7 +69,7 @@ class RoseDatasetLoader:
             raise ValueError(f"Dataset '{name}' has not been loaded. Use 'load_all_datasets()' first.")
         return self.datasets[name]
 
-    def save_datasets_compressed(self, filepath):
+    def save_datasets_compressed(self, filepath: Path):
         """
         Saves all datasets to a compressed file in gzip format.
 
@@ -77,7 +80,7 @@ class RoseDatasetLoader:
             json.dump(self.datasets, f)
         print(f"Datasets saved to {filepath} in compressed format.")
 
-    def load_datasets_compressed(self, filepath):
+    def load_datasets_compressed(self, filepath: Path):
         """
         Loads datasets from a compressed gzip file.
 
@@ -93,18 +96,18 @@ class RoseDatasetLoader:
         print(f"Datasets loaded from {filepath}.")
         return self.datasets
 
-    def save_datasets_json(self, filepath):
+    def save_datasets_json(self, filepath: Path):
         """
         Saves all datasets to a regular (non-compressed) JSON file.
 
         Args:
             filepath (str): The path to the JSON file.
         """
-        with open(filepath, "w", encoding="utf-8") as f:
+        with open(filepath.name, "w", encoding="utf-8") as f:
             json.dump(self.datasets, f, ensure_ascii=False, indent=2)
         print(f"Datasets saved to {filepath} in JSON format.")
 
-    def load_datasets_json(self, filepath):
+    def load_datasets_json(self, filepath: Path):
         """
         Loads datasets from a regular (non-compressed) JSON file.
 
@@ -135,14 +138,14 @@ class RoseDatasetLoader:
 if __name__ == "__main__":
     loader = RoseDatasetLoader()
 
-    # 1. Load the full datasets
+    # 1. Load the full datasets and save them
     all_datasets = loader.load_all_datasets()
-    loader.save_datasets_compressed("rose_datasets.json.gz")
-    loader.save_datasets_json("rose_datasets.json")
+    loader.save_datasets_compressed(RosePaths.compressed_dataset_path)
+    loader.save_datasets_json(RosePaths.dataset_path)
 
-    # 2. Load a SMALL version of each dataset (e.g., 1 entry)
+    # 2. Load a SMALL version of each dataset (e.g., 3 entries) and save them
     all_datasets_small = loader.load_all_datasets(max_entries=3)
-    loader.save_datasets_compressed("rose_datasets_small.json.gz")
-    loader.save_datasets_json("rose_datasets_small.json")
+    loader.save_datasets_compressed(RosePathsSmall.compressed_dataset_path)
+    loader.save_datasets_json(RosePathsSmall.dataset_path)
 
     print("Done generating both full and small datasets.")
