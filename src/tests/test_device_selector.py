@@ -14,8 +14,8 @@ def test_select_device_cuda(mock_mps, mock_cuda):
 
 @patch("torch.cuda.is_available", return_value=False)
 @patch("torch.backends.mps.is_available", return_value=True)
-@patch("platform.system", return_value="Darwin")  # Add this line to simulate macOS
-def test_select_device_mps(mock_mps, mock_cuda):
+@patch("platform.system", return_value="Darwin")  # Simulate macOS
+def test_select_device_mps(mock_platform, mock_mps, mock_cuda):
     device = select_best_device()
     assert device == "mps", "Should select mps when cuda is not available but mps is."
 
