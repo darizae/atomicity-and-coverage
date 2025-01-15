@@ -111,8 +111,8 @@ def main(
     # 9. Add claims and save
     print(f"Saving claims for dataset '{dataset_name}', as '{claims_field}'.")
     loader.add_claims(dataset_name, claims_field, claims)
-    loader.save_datasets_compressed(paths.compressed_output_path)
-    loader.save_datasets_json(paths.output_path)
+    loader.save_datasets_compressed(paths.compressed_dataset_with_system_claims_path)
+    loader.save_datasets_json(paths.dataset_with_system_claims_path)
 
     print(f"Claims generated and saved for dataset '{dataset_name}' using model '{model_name}' on device '{device}'.")
 

@@ -52,9 +52,9 @@ def main():
 
     # Save results
     # Get the current filename and perform string replacement
-    new_filename = dataset_config.compressed_output_path.name.replace(".json.gz", "_metrics.json")
+    new_filename = dataset_config.compressed_dataset_with_system_claims_path.name.replace(".json.gz", "_metrics.json")
     # Create a new Path with the modified filename in the same directory
-    output_path = dataset_config.compressed_output_path.with_name(new_filename)
+    output_path = dataset_config.compressed_dataset_with_system_claims_path.with_name(new_filename)
 
     with open(output_path, "w", encoding="utf-8") as f:
         import json
