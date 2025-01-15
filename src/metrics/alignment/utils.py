@@ -8,11 +8,6 @@ from src.rose.rose_loader import RoseDatasetLoader
 from src.metrics.atomicity_coverage import compute_atomicity, compute_coverage
 
 
-def load_config(config_path="configs/alignment_config.json"):
-    with open(config_path, "r") as f:
-        return json.load(f)
-
-
 def load_dataset(small_test: bool = False):
     # Determine the path based on dataset subset
     paths = RosePathsSmall() if small_test else RosePaths()
