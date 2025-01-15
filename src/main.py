@@ -11,7 +11,7 @@ def main():
 
     # Initialize the loader and load datasets
     loader = RoseDatasetLoader()
-    datasets = loader.load_datasets_compressed(dataset_config.dataset_path)
+    datasets = loader.load_datasets_compressed(dataset_config.compressed_dataset_path)
 
     # Choose dataset
     dataset_name = DatasetName.CNNDM_TEST
@@ -52,9 +52,9 @@ def main():
 
     # Save results
     # Get the current filename and perform string replacement
-    new_filename = dataset_config.output_path.name.replace(".json.gz", "_metrics.json")
+    new_filename = dataset_config.compressed_output_path.name.replace(".json.gz", "_metrics.json")
     # Create a new Path with the modified filename in the same directory
-    output_path = dataset_config.output_path.with_name(new_filename)
+    output_path = dataset_config.compressed_output_path.with_name(new_filename)
 
     with open(output_path, "w", encoding="utf-8") as f:
         import json
