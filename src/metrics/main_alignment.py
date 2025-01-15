@@ -1,16 +1,8 @@
 import argparse
-import os
-import json
+
 from src.claims.device_selector import check_or_select_device
-from src.config import RosePaths, RosePathsSmall
-from src.rose.rose_loader import RoseDatasetLoader
-from src.metrics.atomicity_coverage import compute_atomicity, compute_coverage
 from src.metrics.alignment.alignment_factory import create_aligner
-
-
-def load_config(config_path="configs/alignment_config.json"):
-    with open(config_path, "r") as f:
-        return json.load(f)
+from src.metrics.alignment.utils import load_config, load_dataset, process_dataset, save_results
 
 
 def get_args():
@@ -22,40 +14,6 @@ def get_args():
     parser.add_argument("--small_test", action="store_true", help="Run a small dataset for quick testing.")
     parser.add_argument("--output", type=str, default="alignment_results.json", help="Output JSON file path.")
     return parser.parse_args()
-
-
-def load_dataset(small_test=False):
-    # Determine the path based on dataset subset
-    paths = RosePathsSmall() if small_test else RosePaths()
-    dataset_path = paths.compressed_dataset_path
-
-    loader = RoseDatasetLoader()
-    if not os.path.exists(dataset_path):
-        raise FileNotFoundError(f"Dataset file {dataset_path} not found.")
-    loader.load_datasets_compressed(dataset_path)
-
-    return loader.datasets if not small_test else {k: v[:1] for k, v in loader.datasets.items()}
-
-
-def process_dataset(dataset, aligner):
-    results = []
-    for record in dataset:
-        system_claims = record.get("system_claims_t5", [])
-        reference_acus = record.get("reference_acus", [])
-        if not system_claims or not reference_acus:
-            continue
-
-        alignment_map = aligner.align(system_claims, reference_acus)
-        coverage = compute_coverage(alignment_map, len(reference_acus))
-        atomicity = compute_atomicity(alignment_map, len(system_claims))
-
-        results.append({
-            "source": record.get("source", "")[:80] + "...",
-            "coverage": coverage,
-            "atomicity": atomicity,
-            "alignment_map": alignment_map
-        })
-    return results
 
 
 def main():
@@ -84,9 +42,10 @@ def main():
     )
 
     # Save results
-    with open(args.output, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
-    print(f"Results saved to {args.output}")
+    save_results(
+        results=results,
+        small_test=args.small_test
+    )
 
 
 if __name__ == "__main__":
