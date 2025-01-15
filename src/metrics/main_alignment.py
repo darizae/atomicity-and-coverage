@@ -12,7 +12,6 @@ def get_args():
     parser.add_argument("--device", type=str, default=None, help="Device to use (e.g. 'cuda', 'cpu', 'mps').")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for processing.")
     parser.add_argument("--small_test", action="store_true", help="Run a small dataset for quick testing.")
-    parser.add_argument("--output", type=str, default="alignment_results.json", help="Output JSON file path.")
     return parser.parse_args()
 
 
