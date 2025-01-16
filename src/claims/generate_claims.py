@@ -2,18 +2,10 @@ import argparse
 import time
 
 from claim_generator import ClaimGenerator
-from src.config import RosePathsSmall, RosePaths, MODELS
+from src.config import RosePathsSmall, RosePaths, MODELS, DATASET_ALIASES
 from src.rose.rose_loader import RoseDatasetLoader
 
 from device_selector import check_or_select_device
-
-# Dataset configuration
-DATASETS_CONFIG = [
-    {"name": "cnndm_test", "hf_name": "cnndm_test"},
-    {"name": "cnndm_validation", "hf_name": "cnndm_validation"},
-    {"name": "xsum", "hf_name": "xsum"},
-    {"name": "samsum", "hf_name": "samsum"},
-]
 
 
 def get_args():
@@ -151,8 +143,8 @@ def main(
         process_dataset(dataset_name, model_key, device, batch_size, max_length, truncation, small_test)
     else:
         print("Processing all datasets...")
-        for dataset_config in DATASETS_CONFIG:
-            process_dataset(dataset_config["name"], model_key, device, batch_size, max_length, truncation, small_test)
+        for alias, hf_name in DATASET_ALIASES.items():
+            process_dataset(alias, model_key, device, batch_size, max_length, truncation, small_test)
 
 
 if __name__ == "__main__":
