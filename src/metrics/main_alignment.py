@@ -4,6 +4,7 @@ from src.config import AlignmentConfig, DatasetName
 from src.metrics.alignment.alignment_factory import create_aligner
 from src.metrics.alignment.utils import save_results, process_single_dataset, \
     process_all_datasets, save_all_results
+from src.utils.timer import Timer
 
 
 def get_args():
@@ -59,6 +60,10 @@ def get_args():
 def main():
     args = get_args()
 
+    # Initialize timer
+    timer = Timer()
+    timer.start()
+
     # Initialize configuration with overrides if provided
     config = AlignmentConfig(
         method=args.method if args.method else AlignmentConfig().method,
@@ -90,6 +95,9 @@ def main():
         # Process all datasets
         combined_results = process_all_datasets(all_datasets, aligner, small_test=args.small_test)
         save_all_results(combined_results, small_test=args.small_test)
+
+    timer.stop()
+    print(f"Alignment processing completed in {timer.format_elapsed_time()}")
 
 
 if __name__ == "__main__":

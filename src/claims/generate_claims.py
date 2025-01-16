@@ -1,10 +1,9 @@
 import argparse
-import time
-from typing import Tuple
 
 from claim_generator import ClaimGenerator
 from src.config import RosePathsSmall, RosePaths, MODELS, DATASET_ALIASES
 from src.rose.rose_loader import RoseDatasetLoader
+from src.utils.timer import Timer
 
 from device_selector import check_or_select_device
 
@@ -31,7 +30,9 @@ def process_dataset(
         small_test: bool,
 ) -> None:
     """Processes a single dataset and generates claims."""
-    start_time = time.time()
+    # Initialize timer
+    timer = Timer()
+    timer.start()
 
     # 1. Determine device
     device = check_or_select_device(device)
@@ -107,12 +108,12 @@ def process_dataset(
     num_total_claims = sum(
         len(claim) for claim in claims if isinstance(claim, list))  # Assumes claims is a list of lists
 
-    end_time = time.time()
-    hours, minutes, seconds = _compute_elapsed_time(start_time, end_time)
+    # Stop timer and print elapsed time
+    timer.stop()
 
     print(f"Number of claim arrays generated: {num_arrays}")
     print(f"Total number of claims generated: {num_total_claims}")
-    print(f"Time taken for dataset '{dataset_name}': {hours} hours, {minutes} minutes, and {seconds:.2f} seconds\n")
+    print(f"Time taken for dataset '{dataset_name}': {timer.format_elapsed_time()}\n")
 
 
 def main(
