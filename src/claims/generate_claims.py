@@ -1,4 +1,5 @@
 import argparse
+import time
 
 from claim_generator import ClaimGenerator
 from src.config import RosePathsSmall, RosePaths, MODELS
@@ -45,6 +46,8 @@ def main(
         KeyError: If the specified dataset is not found in the loaded datasets.
         ValueError: If an unknown model_key is provided.
     """
+    start_time = time.time()
+    
     # 1. Determine device
     device = check_or_select_device(device)
     print(f"Using device: {device}")
@@ -115,6 +118,20 @@ def main(
     loader.save_datasets_json(paths.dataset_with_system_claims_path)
 
     print(f"Claims generated and saved for dataset '{dataset_name}' using model '{model_name}' on device '{device}'.")
+
+    # Log the number of claim arrays and total claims
+    num_arrays = len(claims)
+    num_total_claims = sum(len(claim) for claim in claims if isinstance(claim, list))  # Assumes claims is a list of lists
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    hours = int(elapsed_time // 3600)
+    minutes = int((elapsed_time % 3600) // 60)
+    seconds = elapsed_time % 60
+    
+    print(f"Number of claim arrays generated: {num_arrays}")
+    print(f"Total number of claims generated: {num_total_claims}")
+    print(f"Time taken: {hours} hours, {minutes} minutes, and {seconds:.2f} seconds")
 
 
 if __name__ == "__main__":
