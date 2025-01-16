@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Optional
 from datasets import load_dataset
 
-from src.config import RosePaths, RosePathsSmall
+from src.config import RosePaths, RosePathsSmall, DATASET_ALIASES
 
 
 class RoseDatasetLoader:
@@ -13,13 +13,6 @@ class RoseDatasetLoader:
     A loader for the RoSE dataset and its subsets with functionality
     to save and load compressed and regular JSON datasets.
     """
-
-    DATASETS_CONFIG = [
-        {"name": "cnndm_test", "hf_name": "cnndm_test"},
-        {"name": "cnndm_validation", "hf_name": "cnndm_validation"},
-        {"name": "xsum", "hf_name": "xsum"},
-        {"name": "samsum", "hf_name": "samsum"},
-    ]
 
     def __init__(self):
         self.datasets = {}
@@ -32,12 +25,9 @@ class RoseDatasetLoader:
             max_entries (int, optional): If provided, only load up to this many entries
                                          per dataset for testing.
         """
-        for config in self.DATASETS_CONFIG:
-            dataset_name = config["name"]
-            hf_name = config["hf_name"]
-
-            print(f"Loading dataset: {dataset_name}...")
-            dataset = load_dataset("Salesforce/rose", hf_name, trust_remote_code=True)["data"]
+        for alias, dataset_name in DATASET_ALIASES.items():
+            print(f"Loading dataset: {alias}...")
+            dataset = load_dataset("Salesforce/rose", dataset_name, trust_remote_code=True)["data"]
 
             # Structure the data, optionally slicing if max_entries is specified
             if max_entries is not None:
@@ -52,7 +42,7 @@ class RoseDatasetLoader:
                 for entry in dataset
             ]
 
-            self.datasets[dataset_name] = structured_data
+            self.datasets[alias] = structured_data
         return self.datasets
 
     def get_dataset(self, name):
