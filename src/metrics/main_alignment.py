@@ -54,6 +54,13 @@ def get_args():
         help="Run a small dataset for quick testing."
     )
 
+    parser.add_argument(
+        "--cache_path",
+        type=str,
+        default=None,
+        help="Path to load/save the embedding cache."
+    )
+
     return parser.parse_args()
 
 
@@ -68,7 +75,8 @@ def main():
     config = AlignmentConfig(
         method=args.method if args.method else AlignmentConfig().method,
         threshold=args.threshold if args.threshold is not None else AlignmentConfig().threshold,
-        device=check_or_select_device(args.device)
+        device=check_or_select_device(args.device),
+        cache_path=args.cache_path
     )
 
     # Log configuration for debugging
@@ -95,6 +103,9 @@ def main():
         # Process all datasets
         combined_results = process_all_datasets(all_datasets, aligner, small_test=args.small_test)
         save_all_results(combined_results, small_test=args.small_test)
+
+    if hasattr(aligner, "save_alignment_cache"):
+        aligner.save_alignment_cache()
 
     timer.stop()
     print(f"Alignment processing completed in {timer.format_elapsed_time()}")

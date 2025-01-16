@@ -22,7 +22,8 @@ def create_aligner(config: AlignmentConfig):
             return EmbeddingAligner(
                 model=config.embedding_config.model_name,
                 threshold=config.embedding_config.threshold,
-                device=config.device
+                device=config.device,
+                cache_path=config.cache_path
             )
 
         case AlignmentMethods.ENTAILMENT:

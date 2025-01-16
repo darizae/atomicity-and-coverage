@@ -27,3 +27,4 @@ class AlignmentConfig:
     device: str = "cpu"
     embedding_config: EmbeddingModelConfig = field(default_factory=EmbeddingModelConfig)
     entailment_config: EntailmentModelConfig = field(default_factory=EntailmentModelConfig)
+    cache_path: str = None
