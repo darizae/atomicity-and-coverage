@@ -34,7 +34,7 @@ def _process_dataset(dataset, aligner):
         atomicity = compute_atomicity(alignment_map, len(system_claims))
 
         results.append({
-            "source": record.get("source", "")[:80] + "...",
+            "reference summary": record.get("reference", ""),
             "coverage": coverage,
             "atomicity": atomicity,
             "alignment_map": alignment_map
