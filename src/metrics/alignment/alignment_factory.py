@@ -1,37 +1,39 @@
 from .rouge_alignment import RougeAligner
 from .embedding_alignment import EmbeddingAligner
 from .entailment_alignment import EntailmentAligner
+from src.config import AlignmentConfig
+from ...config.alignment_config import AlignmentMethods
 
 
-def create_aligner(
-        method: str,
-        threshold: float = 0.3,
-        model=None,
-        tokenizer=None,
-        device: str = "cpu"
-):
+def create_aligner(config: AlignmentConfig):
     """
-    Factory to instantiate the correct alignment object
-    based on method string.
+    Factory to instantiate the correct alignment object based on the AlignmentConfig.
 
-    :param method: "rouge", "embedding", or "entailment"
-    :param threshold: matching threshold
-    :param model: embedding or NLI model, if required
-    :param tokenizer: for NLI, if required
-    :param device: "cpu" or "cuda"
-    :return: an instance of BaseAligner
+    :param config: An instance of AlignmentConfig.
+    :return: An instance of BaseAligner.
     """
-    method = method.lower()
+    match config.method.lower():
+        case AlignmentMethods.ROUGE:
+            return RougeAligner(threshold=config.threshold)
 
-    if method == "rouge":
-        return RougeAligner(threshold=threshold)
-    elif method == "embedding":
-        if model is None:
-            raise ValueError("EmbeddingAligner requires an embedding model.")
-        return EmbeddingAligner(model=model, threshold=threshold, device=device)
-    elif method == "entailment":
-        if model is None or tokenizer is None:
-            raise ValueError("EntailmentAligner requires an NLI model and tokenizer.")
-        return EntailmentAligner(nli_model=model, tokenizer=tokenizer, threshold=threshold, device=device)
-    else:
-        raise ValueError(f"Unknown alignment method: {method}")
+        case AlignmentMethods.EMBEDDING:
+            if not config.embedding_config.model_name:
+                raise ValueError("EmbeddingAligner requires a valid embedding model name.")
+            return EmbeddingAligner(
+                model=config.embedding_config.model_name,
+                threshold=config.embedding_config.threshold,
+                device=config.device
+            )
+
+        case AlignmentMethods.ENTAILMENT:
+            if not config.entailment_config.model_name:
+                raise ValueError("EntailmentAligner requires a valid NLI model name.")
+            return EntailmentAligner(
+                nli_model=config.entailment_config.model_name,
+                tokenizer=None,  # Replace with tokenizer loading logic if needed
+                threshold=config.entailment_config.threshold,
+                device=config.device
+            )
+
+        case _:
+            raise ValueError(f"Unknown alignment method: {config.method}")
