@@ -21,7 +21,8 @@ df -h .
 # --- Enhanced Logging End ---
 
 # Activate the environment
-source ~/envs/atomicity/bin/activate
+eval "$(conda shell.bash hook)"
+conda activate atomicity
 
 # Set PYTHONPATH to include the project root
 export PYTHONPATH=$(pwd)
