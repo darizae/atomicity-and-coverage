@@ -1,5 +1,6 @@
 import argparse
 import time
+from typing import Tuple
 
 from claim_generator import ClaimGenerator
 from src.config import RosePathsSmall, RosePaths, MODELS, DATASET_ALIASES
@@ -107,10 +108,7 @@ def process_dataset(
         len(claim) for claim in claims if isinstance(claim, list))  # Assumes claims is a list of lists
 
     end_time = time.time()
-    elapsed_time = end_time - start_time
-    hours = int(elapsed_time // 3600)
-    minutes = int((elapsed_time % 3600) // 60)
-    seconds = elapsed_time % 60
+    hours, minutes, seconds = _compute_elapsed_time(start_time, end_time)
 
     print(f"Number of claim arrays generated: {num_arrays}")
     print(f"Total number of claims generated: {num_total_claims}")
@@ -145,6 +143,14 @@ def main(
         print("Processing all datasets...")
         for alias, hf_name in DATASET_ALIASES.items():
             process_dataset(alias, model_key, device, batch_size, max_length, truncation, small_test)
+
+
+def _compute_elapsed_time(start_time: float, end_time: float) -> tuple[int, int, float]:
+    elapsed_time = end_time - start_time
+    hours = int(elapsed_time // 3600)
+    minutes = int((elapsed_time % 3600) // 60)
+    seconds = elapsed_time % 60
+    return hours, minutes, seconds
 
 
 if __name__ == "__main__":
