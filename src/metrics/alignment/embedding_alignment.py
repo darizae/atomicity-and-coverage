@@ -64,7 +64,7 @@ class EmbeddingAligner(BaseAligner):
             batch_embs = self.model.encode(
                 texts_to_encode,
                 device=self.device,
-                show_progress_bar=False
+                show_progress_bar=True
             )
             for i, emb in enumerate(batch_embs):
                 txt = texts_to_encode[i]
