@@ -25,10 +25,11 @@ eval "$(conda shell.bash hook)"
 conda activate atomicity
 
 # Set PYTHONPATH to include the project root
-export PYTHONPATH=$(pwd)
+export PYTHONPATH=$(pwd):$(pwd)/src
+export PYTHONUNBUFFERED=1
 
 # Define the datasets and model
-datasets=("cnndm_test" "cnndm_validation" "xsum" "samsum")
+datasets=("cnndm_test")
 model_key="distilled_t5"
 
 # Iterate over the datasets
