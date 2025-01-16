@@ -1,37 +1,28 @@
-import os
-
+from src.config import RosePathsSmall, AlignmentConfig, DatasetName
 from src.metrics.atomicity_coverage import compute_coverage, compute_atomicity
 from src.rose.rose_loader import RoseDatasetLoader
 from src.metrics.alignment import match_claims
 
 
 def main():
-    """
-    Main function to load datasets, align claims, and compute metrics.
-    """
+    # Load configurations
+    dataset_config = RosePathsSmall()
+    alignment_config = AlignmentConfig()
 
-    # Step 1: Initialize the loader and load a small dataset for testing
+    # Initialize the loader and load datasets
     loader = RoseDatasetLoader()
-    dataset_path = "rose/rose_datasets_small.json.gz"
-    if not os.path.exists(dataset_path):
-        print(f"{dataset_path} not found. Generating small datasets...")
-        loader.load_all_datasets(max_entries=3)
-        loader.save_datasets_compressed(dataset_path)
+    datasets = loader.load_datasets_compressed(dataset_config.compressed_dataset_path)
 
-    # Load the dataset
-    datasets = loader.load_datasets_compressed(dataset_path)
-
-    # Choose a dataset (e.g., "cnndm_test")
-    dataset_name = "cnndm_test"
+    # Choose dataset
+    dataset_name = DatasetName.CNNDM_TEST
     if dataset_name not in datasets:
         print(f"Dataset '{dataset_name}' not found in loaded datasets.")
         return
     dataset = datasets[dataset_name]
 
-    # Step 2: Iterate through the dataset and align claims
+    # Process each record
     results = []
     for record in dataset:
-        source_text = record.get("source", "")
         reference_acus = record.get("reference_acus", [])
         system_claims = record.get("system_claims_t5", [])
 
@@ -43,31 +34,33 @@ def main():
         alignment_map = match_claims(
             system_claims=system_claims,
             reference_acus=reference_acus,
-            threshold=0.3,  # example threshold
-            method="rouge"  # choose "rouge", "embedding", or "entailment"
+            threshold=alignment_config.threshold,
+            method=alignment_config.method,
+            device=alignment_config.device
         )
 
         # Compute metrics
         coverage_score = compute_coverage(alignment_map, len(reference_acus))
         atomicity_score = compute_atomicity(alignment_map, len(system_claims))
 
-        # Log results
+        # Store results
         results.append({
-            "source": source_text[:80] + "...",  # Truncate for display
             "coverage": coverage_score,
             "atomicity": atomicity_score,
             "alignment_map": alignment_map
         })
 
-        print(f"Processed record. Coverage: {coverage_score}, Atomicity: {atomicity_score}")
+    # Save results
+    # Get the current filename and perform string replacement
+    new_filename = dataset_config.compressed_dataset_with_system_claims_path.name.replace(".json.gz", "_metrics.json")
+    # Create a new Path with the modified filename in the same directory
+    output_path = dataset_config.compressed_dataset_with_system_claims_path.with_name(new_filename)
 
-    # Step 3: Save or display results
-    results_path = "metrics_results.json"
-    with open(results_path, "w", encoding="utf-8") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         import json
         json.dump(results, f, ensure_ascii=False, indent=2)
 
-    print(f"Metrics results saved to {results_path}")
+    print(f"Metrics results saved to {output_path}")
 
 
 if __name__ == "__main__":

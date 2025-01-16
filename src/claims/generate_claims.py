@@ -1,15 +1,16 @@
 import argparse
 
 from claim_generator import ClaimGenerator
+from src.config import RosePathsSmall, RosePaths, MODELS, DATASET_ALIASES
 from src.rose.rose_loader import RoseDatasetLoader
+from src.utils.timer import Timer
 
-from config import RosePaths, MODELS, RosePathsSmall
 from device_selector import check_or_select_device
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="Generate claims from a dataset using a model.")
-    parser.add_argument("--dataset_name", type=str, default="cnndm_test", help="Dataset to process.")
+    parser = argparse.ArgumentParser(description="Generate claims from datasets using a model.")
+    parser.add_argument("--dataset_name", type=str, default=None, help="Dataset to process (or leave empty for all).")
     parser.add_argument("--model_key", type=str, default="distilled_t5", help="Model key to use.")
     parser.add_argument("--device", type=str, default=None, help="Device to use (e.g. 'cuda', 'cpu', 'mps').")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for processing claims.")
@@ -19,32 +20,20 @@ def get_args():
     return parser.parse_args()
 
 
-def main(
-    dataset_name: str,
-    model_key: str,
-    device: str = None,
-    batch_size: int = 32,
-    max_length: int = 512,
-    truncation: bool = True,
-    small_test: bool = False,
+def process_dataset(
+        dataset_name: str,
+        model_key: str,
+        device: str,
+        batch_size: int,
+        max_length: int,
+        truncation: bool,
+        small_test: bool,
 ) -> None:
-    """
-    Main entry point for generating claims.
+    """Processes a single dataset and generates claims."""
+    # Initialize timer
+    timer = Timer()
+    timer.start()
 
-    Args:
-        dataset_name (str): The dataset key to process (e.g., "cnndm_test").
-        model_key (str): The model key as specified in the MODELS config.
-        device (str, optional): Device to run the model on (e.g., "cpu", "cuda", or "mps"). Defaults to None.
-        batch_size (int, optional): Batch size for processing claims. Defaults to 32.
-        max_length (int, optional): Maximum number of tokens per input sequence.
-                                    Inputs longer than this will be truncated if truncation is enabled. Defaults to 512.
-        truncation (bool, optional): Whether to truncate inputs that exceed `max_length`. Defaults to True.
-        small_test (bool): Whether to use the small dataset (1 entry) for quick tests.
-
-    Raises:
-        KeyError: If the specified dataset is not found in the loaded datasets.
-        ValueError: If an unknown model_key is provided.
-    """
     # 1. Determine device
     device = check_or_select_device(device)
     print(f"Using device: {device}")
@@ -62,7 +51,7 @@ def main(
     loader = RoseDatasetLoader()
 
     print("Loading datasets...")
-    loader.load_datasets_compressed(paths.dataset_path)
+    loader.load_datasets_compressed(paths.compressed_dataset_path)
     print("Datasets loaded!")
 
     # 4. Check if dataset exists
@@ -102,7 +91,7 @@ def main(
     sources = [entry["reference"] for entry in dataset]
 
     # 8. Generate claims
-    print("Starting claim generation...")
+    print(f"Starting claim generation for dataset '{dataset_name}'...")
 
     claims = generator.generate_claims(sources)
 
@@ -111,10 +100,58 @@ def main(
     # 9. Add claims and save
     print(f"Saving claims for dataset '{dataset_name}', as '{claims_field}'.")
     loader.add_claims(dataset_name, claims_field, claims)
-    loader.save_datasets_compressed(paths.output_path)
-    loader.save_datasets_json("../rose/rose_datasets_small.json")
+    loader.save_datasets_compressed(paths.compressed_dataset_with_system_claims_path)
+    loader.save_datasets_json(paths.dataset_with_system_claims_path)
 
-    print(f"Claims generated and saved for dataset '{dataset_name}' using model '{model_name}' on device '{device}'.")
+    # Log the number of claim arrays and total claims
+    num_arrays = len(claims)
+    num_total_claims = sum(
+        len(claim) for claim in claims if isinstance(claim, list))  # Assumes claims is a list of lists
+
+    # Stop timer and print elapsed time
+    timer.stop()
+
+    print(f"Number of claim arrays generated: {num_arrays}")
+    print(f"Total number of claims generated: {num_total_claims}")
+    print(f"Time taken for dataset '{dataset_name}': {timer.format_elapsed_time()}\n")
+
+
+def main(
+        model_key: str,
+        device: str,
+        batch_size: int,
+        max_length: int,
+        truncation: bool,
+        small_test: bool,
+        dataset_name: str = None,
+) -> None:
+    """
+    Main function to process one or all datasets based on arguments.
+
+    Args:
+        model_key (str): Model key to use.
+        device (str): Device to run the model on.
+        batch_size (int): Batch size for processing claims.
+        max_length (int): Maximum number of tokens per input sequence.
+        truncation (bool): Whether to truncate inputs that exceed `max_length`.
+        small_test (bool): Whether to use the small dataset (1 entry) for quick tests.
+        dataset_name (str, optional): Process a specific dataset. If None, process all datasets in DATASETS_CONFIG.
+    """
+    if dataset_name:
+        print(f"Processing dataset: {dataset_name}")
+        process_dataset(dataset_name, model_key, device, batch_size, max_length, truncation, small_test)
+    else:
+        print("Processing all datasets...")
+        for alias, hf_name in DATASET_ALIASES.items():
+            process_dataset(alias, model_key, device, batch_size, max_length, truncation, small_test)
+
+
+def _compute_elapsed_time(start_time: float, end_time: float) -> tuple[int, int, float]:
+    elapsed_time = end_time - start_time
+    hours = int(elapsed_time // 3600)
+    minutes = int((elapsed_time % 3600) // 60)
+    seconds = elapsed_time % 60
+    return hours, minutes, seconds
 
 
 if __name__ == "__main__":
@@ -124,11 +161,11 @@ if __name__ == "__main__":
     truncation_flag = not args.no_truncation
 
     main(
-        dataset_name=args.dataset_name,
         model_key=args.model_key,
         device=args.device,
         batch_size=args.batch_size,
         max_length=args.max_length,
         truncation=truncation_flag,
-        small_test=args.small_test
+        small_test=args.small_test,
+        dataset_name=args.dataset_name,
     )
