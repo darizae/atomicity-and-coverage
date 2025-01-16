@@ -64,6 +64,7 @@ def process_all_datasets(
         dataset = _load_dataset(small_test=small_test).get(dataset_name, [])
         results = _process_dataset(dataset, aligner)
         combined_results[dataset_name] = results
+        print(f"Finished processing dataset: {dataset_name}")
     return combined_results
 
 
