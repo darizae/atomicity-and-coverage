@@ -63,7 +63,7 @@ class EmbeddingAligner(BaseAligner):
 
         # Perform batch encoding for all unknown texts at once
         if texts_to_encode:
-            batch_embs = self.model.encode(texts_to_encode, device=self.device, show_progress_bar=False)
+            batch_embs = self.model.encode(texts_to_encode, device=self.device, show_progress_bar=True)
             for i, emb in enumerate(batch_embs):
                 EMBED_CACHE[texts_to_encode[i]] = emb
                 embeddings[idx_to_encode[i]] = emb
