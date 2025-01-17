@@ -67,9 +67,9 @@ class EmbeddingAligner(BaseAligner):
         embeddings, texts_to_encode, idx_to_encode = self._retrieve_cached_embeddings(texts)
 
         # Step 2: Perform batch encoding if necessary
-        batch_embs = self._encode_texts_in_batch(texts_to_encode)
+        batch_embs = self._encode_texts_in_batch(texts_to_encode) if texts_to_encode else []
 
-        # Step 3: Update cache and assign embeddings
+        # Step 3: Update cache and assign embeddings (file will be expanded over time if necessary)
         self._update_cache_and_assign_embeddings(embeddings, texts_to_encode, idx_to_encode, batch_embs)
 
         return embeddings

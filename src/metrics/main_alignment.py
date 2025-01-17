@@ -100,9 +100,6 @@ def main():
     # Create the aligner based on the configuration
     aligner = create_aligner(config)
 
-    if hasattr(aligner, "save_alignment_cache"):
-        aligner.save_alignment_cache()
-
     # List of all datasets
     all_datasets = [
         DatasetName.CNNDM_TEST,
@@ -121,6 +118,9 @@ def main():
         # Process all datasets
         combined_results = process_all_datasets(all_datasets, aligner, small_test=args.small_test)
         save_all_results(combined_results, small_test=args.small_test)
+
+    if hasattr(aligner, "save_alignment_cache"):
+        aligner.save_alignment_cache()
 
     timer.stop()
     print(f"Alignment processing completed in {timer.format_elapsed_time()}")
