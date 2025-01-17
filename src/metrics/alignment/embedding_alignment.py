@@ -5,23 +5,38 @@ import numpy as np
 from .base_aligner import BaseAligner
 from .embeddings_cache import EmbeddingCache
 
+from sentence_transformers import SentenceTransformer
+
 
 class EmbeddingAligner(BaseAligner):
-    """
-    Handles batch retrieval of embeddings with caching to avoid redundant computations.
-    Alignment via embedding-based similarity, e.g. sentence-transformers.
-    """
+    def __init__(
+        self,
+        model_name: str,           # e.g. "sentence-transformers/all-MiniLM-L6-v2"
+        threshold: float = 0.7,
+        device: str = "cpu",
+        cache_path: str = None
+    ):
+        """
+        :param model_name: The sentence-transformers model name or path.
+        :param threshold: Cosine similarity threshold for alignment.
+        :param device: 'cpu' or 'cuda'.
+        :param cache_path: If given, path to load/save the embedding cache.
+        """
+        # 1) Actually load the model (rather than storing just a string):
+        self.model = SentenceTransformer(model_name, device=device)
 
-    def __init__(self, model, threshold: float = 0.7, device: str = "cpu", cache_path: str = None):
-        """
-        :param model: A model with a `.encode()` method that returns embeddings.
-        :param threshold: Minimum cosine similarity for a match.
-        :param device: 'cpu' or 'cuda' for inference.
-        :param cache_path: Path to load/save embeddings cache.
-        """
-        self.model = model
+        # 2) Store the alignment threshold, device, etc.
         self.threshold = threshold
         self.device = device
+
+        # 3) If user didn’t specify a cache path, create a default
+        #    that depends on the model name. So each model has its own file.
+        #    E.g. "metrics/cache/embedding_cache_sentence-transformers_all-MiniLM-L6-v2.pkl"
+        if cache_path is None:
+            safe_name = model_name.replace("/", "_")
+            cache_path = f"metrics/alignment/cache/embedding_cache_{safe_name}.pkl"
+
+        # 4) Initialize cache
         self.cache = EmbeddingCache(cache_path)
 
     def align(

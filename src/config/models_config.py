@@ -11,3 +11,18 @@ MODELS = {
     #     "claims_field": "system_claims_other",
     # },
 }
+
+EMBEDDING_MODELS = {
+    "miniLM": {
+        "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+        "cache_file": "embedding_cache_all_MiniLM.pkl",
+        "threshold": 0.7
+    },
+    "mpnet": {
+        "model_name": "sentence-transformers/all-mpnet-base-v2",
+        "cache_file": "embedding_cache_mpnet.pkl",
+        "threshold": 0.65
+    },
+    # Add more if needed...
+}
+
