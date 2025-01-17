@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from collections import defaultdict
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -64,6 +64,47 @@ class EntailmentAligner(BaseAligner):
                     alignment_map[i].append(j)
 
         return dict(alignment_map)
+
+    def _batch_infer_entailment(self, pairs: List[Tuple[str, str]], batch_size: int = 32):
+        """
+        Given a list of (premise, hypothesis) pairs,
+        batch them up in chunks, run them through the model,
+        and store probabilities in the cache.
+        """
+        premises = [p for (p, _) in pairs]
+        hypoths = [h for (_, h) in pairs]
+
+        # We'll do range-based batching
+        for start_i in range(0, len(pairs), batch_size):
+            end_i = start_i + batch_size
+            batch_premises = premises[start_i:end_i]
+            batch_hypoths = hypoths[start_i:end_i]
+
+            # 1) Tokenize in batch
+            inputs = self.tokenizer(
+                batch_premises,
+                batch_hypoths,
+                return_tensors="pt",
+                truncation=True,
+                padding="longest"
+            ).to(self.device)
+
+            # 2) Forward pass
+            with torch.no_grad():
+                outputs = self.nli_model(**inputs)
+                # shape: (batch_size, 3) for MNLI-like models
+                logits = outputs.logits
+                probs = torch.softmax(logits, dim=-1)
+                entail_probs = probs[:, 2]  # entailment index
+
+            # 3) Store results in cache
+            for idx_in_batch, entail_prob in enumerate(entail_probs):
+                # Map back to the global 'pairs' index
+                global_idx = start_i + idx_in_batch
+                premise, hypothesis = pairs[global_idx]
+                self.cache.set_entailment_probability(
+                    premise, hypothesis, float(entail_prob.item())
+                )
 
     def _compute_entailment_probability(self, premise: str, hypothesis: str) -> float:
 
