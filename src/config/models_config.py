@@ -1,5 +1,7 @@
 from src.config.paths import AlignmentPaths
 
+ALIGNMENT_PATHS = AlignmentPaths()
+
 MODELS = {
     "distilled_t5": {
         "name": "Babelscape/t5-base-summarization-claim-extractor",
@@ -17,12 +19,12 @@ MODELS = {
 EMBEDDING_MODELS = {
     "miniLM": {
         "model_name": "sentence-transformers/all-MiniLM-L6-v2",
-        "cache_file": AlignmentPaths().miniLM_cache_file,
+        "cache_file": ALIGNMENT_PATHS.miniLM_cache_file,
         "threshold": 0.7
     },
     "mpnet": {
         "model_name": "sentence-transformers/all-mpnet-base-v2",
-        "cache_file": AlignmentPaths().mpnet_cache_file,
+        "cache_file": ALIGNMENT_PATHS.mpnet_cache_file,
         "threshold": 0.65
     },
     # Add more if needed...
