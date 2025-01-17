@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+from src.config.models_config import EMBEDDING_MODELS
+
 
 @dataclass(frozen=True)
 class AlignmentMethods:
@@ -10,7 +12,7 @@ class AlignmentMethods:
 
 @dataclass
 class EmbeddingModelConfig:
-    model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
+    model_name: str = EMBEDDING_MODELS["miniLM"]["model_name"]
     threshold: float = 0.7
 
 

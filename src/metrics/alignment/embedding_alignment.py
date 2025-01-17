@@ -29,14 +29,7 @@ class EmbeddingAligner(BaseAligner):
         self.threshold = threshold
         self.device = device
 
-        # 3) If user didn’t specify a cache path, create a default
-        #    that depends on the model name. So each model has its own file.
-        #    E.g. "metrics/cache/embedding_cache_sentence-transformers_all-MiniLM-L6-v2.pkl"
-        if cache_path is None:
-            safe_name = model_name.replace("/", "_")
-            cache_path = f"metrics/alignment/cache/embedding_cache_{safe_name}.pkl"
-
-        # 4) Initialize cache
+        # 3) Initialize cache
         self.cache = EmbeddingCache(cache_path)
 
     def align(

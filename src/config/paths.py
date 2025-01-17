@@ -21,3 +21,15 @@ class RosePathsSmall:
     dataset_path: Path = BASE_DIR / "rose" / "rose_datasets_small.json"
     dataset_with_system_claims_path: Path = BASE_DIR / "rose" / "rose_datasets_small.json"
     alignment_metrics_results: Path = BASE_DIR / "metrics" / "alignment_metrics_results_small.json"
+
+
+@dataclass
+class AlignmentPaths:
+    # Put the cache file in metrics/alignment/cache
+    alignment_cache_dir: Path = BASE_DIR / "metrics" / "alignment" / "cache"
+
+    # For MiniLM
+    miniLM_cache_file: Path = alignment_cache_dir / "embedding_cache_all_MiniLM.pkl"
+
+    # If you have other caches for other models, define them similarly
+    mpnet_cache_file: Path = alignment_cache_dir / "embedding_cache_mpnet.pkl"

@@ -63,13 +63,6 @@ def get_args():
         help="Which embedding model key to use. Must be one of: miniLM, mpnet, etc."
     )
 
-    parser.add_argument(
-        "--cache_path",
-        type=str,
-        default=None,
-        help="Path to load/save the embedding cache."
-    )
-
     return parser.parse_args()
 
 
@@ -89,10 +82,6 @@ def main():
 
     model_info = EMBEDDING_MODELS[args.embedding_model_key]
 
-    # If the user didn't explicitly pass --cache_path,
-    # we can set it automatically from the model info
-    cache_path = args.cache_path if args.cache_path else f"metrics/alignment/cache/{model_info['cache_file']}"
-
     # Initialize configuration with overrides if provided
     config = AlignmentConfig(
         method=args.method if args.method else default_config.method,
@@ -102,7 +91,7 @@ def main():
             model_name=model_info["model_name"],
             threshold=model_info["threshold"]
         ),
-        cache_path=cache_path
+        cache_path=model_info["cache_file"]
     )
 
     # Log configuration for debugging
@@ -110,6 +99,9 @@ def main():
 
     # Create the aligner based on the configuration
     aligner = create_aligner(config)
+
+    if hasattr(aligner, "save_alignment_cache"):
+        aligner.save_alignment_cache()
 
     # List of all datasets
     all_datasets = [
@@ -129,9 +121,6 @@ def main():
         # Process all datasets
         combined_results = process_all_datasets(all_datasets, aligner, small_test=args.small_test)
         save_all_results(combined_results, small_test=args.small_test)
-
-    if hasattr(aligner, "save_alignment_cache"):
-        aligner.save_alignment_cache()
 
     timer.stop()
     print(f"Alignment processing completed in {timer.format_elapsed_time()}")
