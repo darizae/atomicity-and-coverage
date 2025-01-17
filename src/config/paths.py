@@ -28,8 +28,10 @@ class AlignmentPaths:
     # Put the cache file in metrics/alignment/cache
     alignment_cache_dir: Path = BASE_DIR / "metrics" / "alignment" / "cache"
 
-    # For MiniLM
+    # embeddings
     miniLM_cache_file: Path = alignment_cache_dir / "embedding_cache_all_MiniLM.pkl"
-
-    # If you have other caches for other models, define them similarly
     mpnet_cache_file: Path = alignment_cache_dir / "embedding_cache_mpnet.pkl"
+
+    # entailment
+    roberta_mnli_cache_file: Path = alignment_cache_dir / "entailment_cache_roberta_mnli.pkl"
+    bart_mnli_cache_file: Path = alignment_cache_dir / "entailment_cache_bart_mnli.pkl"

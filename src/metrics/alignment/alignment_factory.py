@@ -30,10 +30,10 @@ def create_aligner(config: AlignmentConfig):
             if not config.entailment_config.model_name:
                 raise ValueError("EntailmentAligner requires a valid NLI model name.")
             return EntailmentAligner(
-                nli_model=config.entailment_config.model_name,
-                tokenizer=None,  # Replace with tokenizer loading logic if needed
+                model_name=config.entailment_config.model_name,
                 threshold=config.entailment_config.threshold,
-                device=config.device
+                device=config.device,
+                cache_path=config.cache_path
             )
 
         case _:
