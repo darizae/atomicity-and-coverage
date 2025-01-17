@@ -146,14 +146,6 @@ def main(
             process_dataset(alias, model_key, device, batch_size, max_length, truncation, small_test)
 
 
-def _compute_elapsed_time(start_time: float, end_time: float) -> tuple[int, int, float]:
-    elapsed_time = end_time - start_time
-    hours = int(elapsed_time // 3600)
-    minutes = int((elapsed_time % 3600) // 60)
-    seconds = elapsed_time % 60
-    return hours, minutes, seconds
-
-
 if __name__ == "__main__":
     args = get_args()
 
