@@ -18,7 +18,7 @@ class EmbeddingModelConfig:
 
 @dataclass
 class EntailmentModelConfig:
-    model_name: str = ENTAILMENT_MODELS["roberta-large-mnli"]["model_name"]
+    model_name: str = ENTAILMENT_MODELS["roberta"]["model_name"]
     threshold: float = 0.9
 
 

@@ -31,12 +31,12 @@ EMBEDDING_MODELS = {
 }
 
 ENTAILMENT_MODELS = {
-    "roberta-large-mnli": {
+    "roberta": {
         "model_name": "roberta-large-mnli",
         "cache_file": ALIGNMENT_PATHS.roberta_mnli_cache_file,
         "threshold": 0.9
     },
-    "bart-large-mnli": {
+    "bart": {
         "model_name": "facebook/bart-large-mnli",
         "cache_file": ALIGNMENT_PATHS.bart_mnli_cache_file,
         "threshold": 0.9
