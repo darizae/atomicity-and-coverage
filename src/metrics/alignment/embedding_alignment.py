@@ -8,6 +8,7 @@ from .embeddings_cache import EmbeddingCache
 
 class EmbeddingAligner(BaseAligner):
     """
+    Handles batch retrieval of embeddings with caching to avoid redundant computations.
     Alignment via embedding-based similarity, e.g. sentence-transformers.
     """
 
@@ -45,7 +46,14 @@ class EmbeddingAligner(BaseAligner):
         return dict(alignment_map)
 
     def _batch_get_embeddings(self, texts: List[str]) -> List[np.ndarray]:
-        """Retrieves or computes embeddings for a batch of texts while leveraging caching."""
+        """
+        Retrieves or computes embeddings for a batch of texts while leveraging caching.
+
+        Workflow:
+        1. Retrieve cached embeddings and collect texts that need encoding.
+        2. Encode the uncached texts in batch.
+        3. Store new embeddings in cache and assign them back to the final list.
+        """
 
         # Step 1: Retrieve cached embeddings & collect texts to encode
         embeddings, texts_to_encode, idx_to_encode = self._retrieve_cached_embeddings(texts)
@@ -59,7 +67,15 @@ class EmbeddingAligner(BaseAligner):
         return embeddings
 
     def _retrieve_cached_embeddings(self, texts: List[str]):
-        """Retrieves cached embeddings and prepares a list of texts that need encoding."""
+        """
+        Retrieves cached embeddings and prepares a list of texts that need encoding.
+
+        Returns:
+        - embeddings: List with cached embeddings (or None if not cached)
+        - texts_to_encode: List of texts that need encoding
+        - idx_to_encode: Indices corresponding to the texts_to_encode
+        """
+
         embeddings = []
         texts_to_encode = []
         idx_to_encode = []
@@ -77,7 +93,15 @@ class EmbeddingAligner(BaseAligner):
         return embeddings, texts_to_encode, idx_to_encode
 
     def _encode_texts_in_batch(self, texts_to_encode: List[str]) -> List[np.ndarray]:
-        """Encodes a batch of texts using the model."""
+        """
+        Retrieves cached embeddings and prepares a list of texts that need encoding.
+
+        Returns:
+        - embeddings: List with cached embeddings (or None if not cached)
+        - texts_to_encode: List of texts that need encoding
+        - idx_to_encode: Indices corresponding to the texts_to_encode
+        """
+
         return self.model.encode(
             texts_to_encode,
             device=self.device,
@@ -91,8 +115,6 @@ class EmbeddingAligner(BaseAligner):
             txt = texts_to_encode[i]
             self.cache.set_embedding(txt, emb)
             embeddings[idx_to_encode[i]] = emb
-
-
 
     @staticmethod
     def _cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
