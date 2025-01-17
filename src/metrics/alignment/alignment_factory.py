@@ -20,19 +20,20 @@ def create_aligner(config: AlignmentConfig):
             if not config.embedding_config.model_name:
                 raise ValueError("EmbeddingAligner requires a valid embedding model name.")
             return EmbeddingAligner(
-                model=config.embedding_config.model_name,
+                model_name=config.embedding_config.model_name,
                 threshold=config.embedding_config.threshold,
-                device=config.device
+                device=config.device,
+                cache_path=config.cache_path
             )
 
         case AlignmentMethods.ENTAILMENT:
             if not config.entailment_config.model_name:
                 raise ValueError("EntailmentAligner requires a valid NLI model name.")
             return EntailmentAligner(
-                nli_model=config.entailment_config.model_name,
-                tokenizer=None,  # Replace with tokenizer loading logic if needed
+                model_name=config.entailment_config.model_name,
                 threshold=config.entailment_config.threshold,
-                device=config.device
+                device=config.device,
+                cache_path=config.cache_path
             )
 
         case _:

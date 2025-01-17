@@ -122,6 +122,9 @@
         "The main suspect in a massacre has gone on trial",
         "The main suspect in the most brutal massacre in recent Philippine history has gone on trial",
         "The main suspect in the massacre in Philippine has gone on trial"
+      ],
+      "system_claims_t5": [
+        "The main suspect in the most brutal massacre in recent Philippine history has gone on trial."
       ]
     },
     {
@@ -132,6 +135,9 @@
         "The government says it will increase the levy on banks",
         "The government says it will increase the levy from 0.078% to 0.088%",
         "The government says it will increase the levy from 1 January"
+      ],
+      "system_claims_t5": [
+        "The government says it will increase the levy on banks from 0.078% to 0.088% from 1 January."
       ]
     },
     {
@@ -142,6 +148,9 @@
         "The controversial plans have been given the go ahead",
         "The controversial plans are for an eco-friendly \"Teletubbies\" house",
         "The controversial plans have been given the go ahead by Bolton Council."
+      ],
+      "system_claims_t5": [
+        "Footballer Gary Neville's controversial plans for an eco-friendly 'Teletubbies' house have been given the go ahead by Bolton Council."
       ]
     }
   ],

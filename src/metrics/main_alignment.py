@@ -1,9 +1,6 @@
 import argparse
-from src.claims.device_selector import check_or_select_device
-from src.config import AlignmentConfig, DatasetName
 from src.metrics.alignment.alignment_factory import create_aligner
-from src.metrics.alignment.utils import save_results, process_single_dataset, \
-    process_all_datasets, save_all_results
+from src.metrics.alignment.utils import build_config, do_alignment
 from src.utils.timer import Timer
 
 
@@ -54,6 +51,20 @@ def get_args():
         help="Run a small dataset for quick testing."
     )
 
+    parser.add_argument(
+        "--embedding_model_key",
+        type=str,
+        default="miniLM",
+        help="Which embedding model key to use. Must be one of: miniLM, mpnet, etc."
+    )
+
+    parser.add_argument(
+        "--entailment_model_key",
+        type=str,
+        default="roberta",
+        help="Which entailment model key to use. Must be one of: roberta, bart, etc."
+    )
+
     return parser.parse_args()
 
 
@@ -64,12 +75,8 @@ def main():
     timer = Timer()
     timer.start()
 
-    # Initialize configuration with overrides if provided
-    config = AlignmentConfig(
-        method=args.method if args.method else AlignmentConfig().method,
-        threshold=args.threshold if args.threshold is not None else AlignmentConfig().threshold,
-        device=check_or_select_device(args.device)
-    )
+    # Build the alignment config
+    config = build_config(args)
 
     # Log configuration for debugging
     print(f"Using Configuration: {config}")
@@ -77,24 +84,11 @@ def main():
     # Create the aligner based on the configuration
     aligner = create_aligner(config)
 
-    # List of all datasets
-    all_datasets = [
-        DatasetName.CNNDM_TEST,
-        DatasetName.CNNDM_VALIDATION,
-        DatasetName.XSUM,
-        DatasetName.SAMSUM,
-    ]
-
-    if args.dataset_name:
-        # Process a single dataset
-        if args.dataset_name not in all_datasets:
-            raise ValueError(f"Unknown dataset name: {args.dataset_name}. Must be one of {all_datasets}.")
-        results = process_single_dataset(args.dataset_name, aligner, small_test=args.small_test)
-        save_results({args.dataset_name: results}, small_test=args.small_test)
-    else:
-        # Process all datasets
-        combined_results = process_all_datasets(all_datasets, aligner, small_test=args.small_test)
-        save_all_results(combined_results, small_test=args.small_test)
+    do_alignment(
+        dataset_name=args.dataset_name,
+        aligner=aligner,
+        small_test=args.small_test
+    )
 
     timer.stop()
     print(f"Alignment processing completed in {timer.format_elapsed_time()}")

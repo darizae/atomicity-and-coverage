@@ -1,11 +1,120 @@
 import json
 import os
-from pathlib import Path
 from typing import List, Dict, Any
 
-from src.config import RosePaths, RosePathsSmall
+from src.claims.device_selector import check_or_select_device
+from src.config import RosePaths, RosePathsSmall, AlignmentConfig, DatasetName
+from src.config.alignment_config import EmbeddingModelConfig, EntailmentModelConfig
+from src.config.models_config import EMBEDDING_MODELS, ENTAILMENT_MODELS
 from src.rose.rose_loader import RoseDatasetLoader
 from src.metrics.atomicity_coverage import compute_atomicity, compute_coverage
+
+
+def build_config(args) -> AlignmentConfig:
+    """
+    Builds an AlignmentConfig based on the user-specified arguments and defaults.
+    """
+    default_config = AlignmentConfig()
+    # If the user didn't specify any method, fall back to what's in default_config
+    method = args.method.lower() if args.method else default_config.method
+
+    # We use Python 3.10+ match statement to route logic
+    match method:
+        case "embedding":
+            # Validate the model key
+            if args.embedding_model_key not in EMBEDDING_MODELS:
+                raise ValueError(f"Unknown embedding model key: {args.embedding_model_key}. "
+                                 f"Must be one of {list(EMBEDDING_MODELS.keys())}")
+            model_info = EMBEDDING_MODELS[args.embedding_model_key]
+
+            config = AlignmentConfig(
+                method=method,
+                threshold=args.threshold if args.threshold is not None else model_info["threshold"],
+                device=check_or_select_device(args.device),
+                embedding_config=EmbeddingModelConfig(
+                    model_name=model_info["model_name"],
+                    threshold=model_info["threshold"]
+                ),
+                cache_path=model_info["cache_file"]
+            )
+            return config
+
+        case "entailment":
+            # Validate the model key
+            if args.entailment_model_key not in ENTAILMENT_MODELS:
+                raise ValueError(f"Unknown entailment model key: {args.entailment_model_key}. "
+                                 f"Must be one of {list(ENTAILMENT_MODELS.keys())}")
+            model_info = ENTAILMENT_MODELS[args.entailment_model_key]
+
+            config = AlignmentConfig(
+                method=method,
+                threshold=args.threshold if args.threshold is not None else model_info["threshold"],
+                device=check_or_select_device(args.device),
+                entailment_config=EntailmentModelConfig(
+                    model_name=model_info["model_name"],
+                    threshold=model_info["threshold"]
+                ),
+                cache_path=model_info["cache_file"]
+            )
+            return config
+
+        case "rouge":
+            # Possibly ignore threshold or device?
+            config = AlignmentConfig(
+                method=method,
+                threshold=args.threshold if args.threshold is not None else default_config.threshold,
+                device=check_or_select_device(args.device),
+            )
+            return config
+
+        case _:
+            # Fallback if user typed a method not recognized
+            # or you can treat it as 'rouge' or throw an error
+            raise ValueError(f"Unknown method: {method}. Options: 'embedding', 'entailment', 'rouge'.")
+
+
+def do_alignment(
+    dataset_name: str,
+    aligner: Any,
+    small_test: bool
+) -> None:
+    """
+    Handles either a single dataset or all datasets. If dataset_name is provided, we process that
+    specific dataset; otherwise we process them all.
+    """
+    # The list of all datasets
+    all_datasets = [
+        DatasetName.CNNDM_TEST,
+        DatasetName.CNNDM_VALIDATION,
+        DatasetName.XSUM,
+        DatasetName.SAMSUM,
+    ]
+
+    if dataset_name:
+        # Single dataset
+        if dataset_name not in all_datasets:
+            raise ValueError(
+                f"Unknown dataset name: {dataset_name}. "
+                f"Must be one of {all_datasets}."
+            )
+        results = process_single_dataset(
+            dataset_name,
+            aligner,
+            small_test=small_test
+        )
+        save_results({dataset_name: results}, small_test=small_test)
+    else:
+        # All datasets
+        combined_results = process_all_datasets(
+            all_datasets,
+            aligner,
+            small_test=small_test
+        )
+        save_all_results(combined_results, small_test=small_test)
+
+    # Save alignment cache if supported
+    if hasattr(aligner, "save_alignment_cache"):
+        aligner.save_alignment_cache()
 
 
 def _load_dataset(small_test: bool = False):
@@ -34,7 +143,7 @@ def _process_dataset(dataset, aligner):
         atomicity = compute_atomicity(alignment_map, len(system_claims))
 
         results.append({
-            "source": record.get("source", "")[:80] + "...",
+            "reference summary": record.get("reference", ""),
             "coverage": coverage,
             "atomicity": atomicity,
             "alignment_map": alignment_map
