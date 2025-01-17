@@ -38,33 +38,29 @@ class EntailmentAligner(BaseAligner):
         self.cache = NLIPredictionCache(cache_path)
 
     def align(
-        self,
-        system_claims: List[str],
-        reference_acus: List[str],
-        **kwargs
+            self,
+            system_claims: List[str],
+            reference_acus: List[str],
+            **kwargs
     ) -> Dict[int, List[int]]:
-        # We can do pairwise, or we can do a batched approach. For simplicity, we’ll do a batched approach next.
+        # 1) Gather all pairs (system_claim, reference_ACU)
+        pairs_to_infer = []
+        for s_claim in system_claims:
+            for r_acu in reference_acus:
+                # If not in cache, we need to compute
+                if self.cache.get_entailment_probability(s_claim, r_acu) is None:
+                    pairs_to_infer.append((s_claim, r_acu))
 
+        # 2) Perform batch inference on all unknown pairs
+        if pairs_to_infer:
+            self._batch_infer_entailment(pairs_to_infer)
+
+        # 3) Build alignment map using cached results
         alignment_map = defaultdict(list)
-
-        # We could gather all premise–hypothesis pairs in a big list for batch processing:
-        # But let's keep it conceptually simple: for each system_claim, compute probability to each reference_acu
-        # possibly in mini-batches.
-
         for i, s_claim in enumerate(system_claims):
             for j, r_acu in enumerate(reference_acus):
-                # 1) Check cache
-                cached_val = self.cache.get_entailment_probability(s_claim, r_acu)
-                if cached_val is not None:
-                    prob_entail = cached_val
-                else:
-                    # 2) compute the probability
-                    prob_entail = self._compute_entailment_probability(s_claim, r_acu)
-                    # 3) store it in cache
-                    self.cache.set_entailment_probability(s_claim, r_acu, prob_entail)
-
-                # 4) threshold check
-                if prob_entail >= self.threshold:
+                prob_entail = self.cache.get_entailment_probability(s_claim, r_acu)
+                if prob_entail is not None and prob_entail >= self.threshold:
                     alignment_map[i].append(j)
 
         return dict(alignment_map)
