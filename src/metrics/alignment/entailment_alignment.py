@@ -39,25 +39,51 @@ class EntailmentAligner(BaseAligner):
         self.cache = NLIPredictionCache(cache_path)
 
     def align(
-            self,
-            system_claims: List[str],
-            reference_acus: List[str],
-            **kwargs
+        self,
+        system_claims: List[str],
+        reference_acus: List[str],
+        **kwargs
     ) -> Dict[int, List[int]]:
-        # 1) Gather all pairs (system_claim, reference_ACU)
-        pairs_to_infer = []
-        for s_claim in system_claims:
-            for r_acu in reference_acus:
-                # If not in cache, we need to compute
-                if self.cache.get_entailment_probability(s_claim, r_acu) is None:
-                    pairs_to_infer.append((s_claim, r_acu))
+        """
+        Aligns system claims to reference ACUs based on entailment probability.
 
-        # 2) Perform batch inference on all unknown pairs
+        Returns:
+        - A dictionary mapping system claim indices to lists of reference ACU indices.
+        """
+
+        # Step 1: Gather all claim-ACU pairs that require inference
+        pairs_to_infer = self._get_pairs_to_infer(system_claims, reference_acus)
+
+        # Step 2: Perform batch inference if necessary
         if pairs_to_infer:
             self._batch_infer_entailment(pairs_to_infer)
 
-        # 3) Build alignment map using cached results
+        # Step 3: Compute and return the final alignment map
+        return self._compute_alignment_map(system_claims, reference_acus)
+
+    def _get_pairs_to_infer(self, system_claims: List[str], reference_acus: List[str]) -> List[tuple]:
+        """
+        Identifies system claim - reference ACU pairs that need entailment inference.
+
+        Returns:
+        - A list of (system_claim, reference_ACU) pairs that are not cached.
+        """
+        pairs_to_infer = []
+        for s_claim in system_claims:
+            for r_acu in reference_acus:
+                if self.cache.get_entailment_probability(s_claim, r_acu) is None:
+                    pairs_to_infer.append((s_claim, r_acu))
+        return pairs_to_infer
+
+    def _compute_alignment_map(self, system_claims: List[str], reference_acus: List[str]) -> Dict[int, List[int]]:
+        """
+        Constructs the alignment map by checking entailment probabilities in the cache.
+
+        Returns:
+        - A dictionary mapping system claim indices to lists of reference ACU indices.
+        """
         alignment_map = defaultdict(list)
+
         for i, s_claim in enumerate(system_claims):
             for j, r_acu in enumerate(reference_acus):
                 prob_entail = self.cache.get_entailment_probability(s_claim, r_acu)
