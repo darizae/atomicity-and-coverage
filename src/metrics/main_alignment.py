@@ -1,6 +1,8 @@
 import argparse
 from src.claims.device_selector import check_or_select_device
 from src.config import AlignmentConfig, DatasetName
+from src.config.alignment_config import EmbeddingModelConfig
+from src.config.models_config import EMBEDDING_MODELS
 from src.metrics.alignment.alignment_factory import create_aligner
 from src.metrics.alignment.utils import save_results, process_single_dataset, \
     process_all_datasets, save_all_results
@@ -54,6 +56,13 @@ def get_args():
         help="Run a small dataset for quick testing."
     )
 
+    parser.add_argument(
+        "--embedding_model_key",
+        type=str,
+        default="miniLM",  # or some default key
+        help="Which embedding model key to use. Must be one of: miniLM, mpnet, etc."
+    )
+
     return parser.parse_args()
 
 
@@ -64,11 +73,25 @@ def main():
     timer = Timer()
     timer.start()
 
+    # 1) Create default config object
+    default_config = AlignmentConfig()
+
+    if args.embedding_model_key not in EMBEDDING_MODELS:
+        raise ValueError(f"Unknown embedding model key: {args.embedding_model_key}. "
+                         f"Must be one of {list(EMBEDDING_MODELS.keys())}")
+
+    model_info = EMBEDDING_MODELS[args.embedding_model_key]
+
     # Initialize configuration with overrides if provided
     config = AlignmentConfig(
-        method=args.method if args.method else AlignmentConfig().method,
-        threshold=args.threshold if args.threshold is not None else AlignmentConfig().threshold,
-        device=check_or_select_device(args.device)
+        method=args.method if args.method else default_config.method,
+        threshold=args.threshold if args.threshold is not None else model_info["threshold"],
+        device=check_or_select_device(args.device),
+        embedding_config=EmbeddingModelConfig(
+            model_name=model_info["model_name"],
+            threshold=model_info["threshold"]
+        ),
+        cache_path=model_info["cache_file"]
     )
 
     # Log configuration for debugging
@@ -95,6 +118,9 @@ def main():
         # Process all datasets
         combined_results = process_all_datasets(all_datasets, aligner, small_test=args.small_test)
         save_all_results(combined_results, small_test=args.small_test)
+
+    if hasattr(aligner, "save_alignment_cache"):
+        aligner.save_alignment_cache()
 
     timer.stop()
     print(f"Alignment processing completed in {timer.format_elapsed_time()}")

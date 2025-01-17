@@ -20,9 +20,10 @@ def create_aligner(config: AlignmentConfig):
             if not config.embedding_config.model_name:
                 raise ValueError("EmbeddingAligner requires a valid embedding model name.")
             return EmbeddingAligner(
-                model=config.embedding_config.model_name,
+                model_name=config.embedding_config.model_name,
                 threshold=config.embedding_config.threshold,
-                device=config.device
+                device=config.device,
+                cache_path=config.cache_path
             )
 
         case AlignmentMethods.ENTAILMENT:
