@@ -45,6 +45,21 @@ class EmbeddingAligner(BaseAligner):
         return dict(alignment_map)
 
     def _batch_get_embeddings(self, texts: List[str]) -> List[np.ndarray]:
+        """Retrieves or computes embeddings for a batch of texts while leveraging caching."""
+
+        # Step 1: Retrieve cached embeddings & collect texts to encode
+        embeddings, texts_to_encode, idx_to_encode = self._retrieve_cached_embeddings(texts)
+
+        # Step 2: Perform batch encoding if necessary
+        batch_embs = self._encode_texts_in_batch(texts_to_encode)
+
+        # Step 3: Update cache and assign embeddings
+        self._update_cache_and_assign_embeddings(embeddings, texts_to_encode, idx_to_encode, batch_embs)
+
+        return embeddings
+
+    def _retrieve_cached_embeddings(self, texts: List[str]):
+        """Retrieves cached embeddings and prepares a list of texts that need encoding."""
         embeddings = []
         texts_to_encode = []
         idx_to_encode = []
@@ -59,19 +74,25 @@ class EmbeddingAligner(BaseAligner):
                 texts_to_encode.append(txt)
                 idx_to_encode.append(idx)
 
-        # Perform batch encoding for all unknown texts
-        if texts_to_encode:
-            batch_embs = self.model.encode(
-                texts_to_encode,
-                device=self.device,
-                show_progress_bar=True
-            )
-            for i, emb in enumerate(batch_embs):
-                txt = texts_to_encode[i]
-                self.cache.set_embedding(txt, emb)
-                embeddings[idx_to_encode[i]] = emb
+        return embeddings, texts_to_encode, idx_to_encode
 
-        return embeddings
+    def _encode_texts_in_batch(self, texts_to_encode: List[str]) -> List[np.ndarray]:
+        """Encodes a batch of texts using the model."""
+        return self.model.encode(
+            texts_to_encode,
+            device=self.device,
+            show_progress_bar=True
+        ) if texts_to_encode else []
+
+    def _update_cache_and_assign_embeddings(self, embeddings: List[np.ndarray], texts_to_encode: List[str],
+                                            idx_to_encode: List[int], batch_embs: List[np.ndarray]):
+        """Updates the cache with new embeddings and assigns them to the original list."""
+        for i, emb in enumerate(batch_embs):
+            txt = texts_to_encode[i]
+            self.cache.set_embedding(txt, emb)
+            embeddings[idx_to_encode[i]] = emb
+
+
 
     @staticmethod
     def _cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
