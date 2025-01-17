@@ -10,11 +10,11 @@ from sentence_transformers import SentenceTransformer
 
 class EmbeddingAligner(BaseAligner):
     def __init__(
-        self,
-        model_name: str,           # e.g. "sentence-transformers/all-MiniLM-L6-v2"
-        threshold: float = 0.7,
-        device: str = "cpu",
-        cache_path: str = None
+            self,
+            model_name: str,  # e.g. "sentence-transformers/all-MiniLM-L6-v2"
+            threshold: float = 0.7,
+            device: str = "cpu",
+            cache_path: str = None
     ):
         """
         :param model_name: The sentence-transformers model name or path.
@@ -38,20 +38,15 @@ class EmbeddingAligner(BaseAligner):
             reference_acus: List[str],
             **kwargs
     ) -> Dict[int, List[int]]:
-        alignment_map = defaultdict(list)
 
         # Batch encode both sets
         sys_embeddings = self._batch_get_embeddings(system_claims)
         ref_embeddings = self._batch_get_embeddings(reference_acus)
 
         # Compare each system claim embedding to each reference ACU embedding
-        for i, s_emb in enumerate(sys_embeddings):
-            for j, r_emb in enumerate(ref_embeddings):
-                sim = self._cosine_similarity(s_emb, r_emb)
-                if sim >= self.threshold:
-                    alignment_map[i].append(j)
+        alignment_map = self._compute_alignment(sys_embeddings, ref_embeddings)
 
-        return dict(alignment_map)
+        return alignment_map
 
     def _batch_get_embeddings(self, texts: List[str]) -> List[np.ndarray]:
         """
@@ -127,6 +122,26 @@ class EmbeddingAligner(BaseAligner):
     @staticmethod
     def _cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
         return float(np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2) + 1e-9))
+
+    def _compute_alignment(self, sys_embeddings: List[np.ndarray], ref_embeddings: List[np.ndarray]) -> Dict[
+        int, List[int]]:
+        """
+        Computes alignment between system claim embeddings and reference ACU embeddings
+        based on cosine similarity.
+
+        Returns:
+        - alignment_map: A dictionary where keys are system claim indices, and values are lists
+          of reference ACU indices that meet the similarity threshold.
+        """
+        alignment_map = defaultdict(list)
+
+        for i, s_emb in enumerate(sys_embeddings):
+            for j, r_emb in enumerate(ref_embeddings):
+                sim = self._cosine_similarity(s_emb, r_emb)
+                if sim >= self.threshold:
+                    alignment_map[i].append(j)
+
+        return dict(alignment_map)
 
     def save_alignment_cache(self):
         """
