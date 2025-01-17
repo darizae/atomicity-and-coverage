@@ -1,7 +1,7 @@
 import argparse
 
 from claim_generator import ClaimGenerator
-from src.config import RosePathsSmall, RosePaths, MODELS, DATASET_ALIASES
+from src.config import RosePathsSmall, RosePaths, CLAIM_GENERATION_MODELS, DATASET_ALIASES
 from src.rose.rose_loader import RoseDatasetLoader
 from src.utils.timer import Timer
 
@@ -61,11 +61,11 @@ def process_dataset(
     # 5. Retrieve model info
     print("Initializing claim generator model...")
 
-    if model_key not in MODELS:
+    if model_key not in CLAIM_GENERATION_MODELS:
         raise ValueError(f"Unknown model key '{model_key}'. "
-                         f"Supported keys: {list(MODELS.keys())}")
+                         f"Supported keys: {list(CLAIM_GENERATION_MODELS.keys())}")
 
-    model_info = MODELS[model_key]
+    model_info = CLAIM_GENERATION_MODELS[model_key]
     model_name = model_info["name"]
     claims_field = model_info["claims_field"]
 
@@ -144,14 +144,6 @@ def main(
         print("Processing all datasets...")
         for alias, hf_name in DATASET_ALIASES.items():
             process_dataset(alias, model_key, device, batch_size, max_length, truncation, small_test)
-
-
-def _compute_elapsed_time(start_time: float, end_time: float) -> tuple[int, int, float]:
-    elapsed_time = end_time - start_time
-    hours = int(elapsed_time // 3600)
-    minutes = int((elapsed_time % 3600) // 60)
-    seconds = elapsed_time % 60
-    return hours, minutes, seconds
 
 
 if __name__ == "__main__":

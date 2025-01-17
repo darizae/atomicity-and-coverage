@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from src.config.models_config import EMBEDDING_MODELS
+from src.config.models_config import EMBEDDING_MODELS, ENTAILMENT_MODELS
 
 
 @dataclass(frozen=True)
@@ -18,7 +18,7 @@ class EmbeddingModelConfig:
 
 @dataclass
 class EntailmentModelConfig:
-    model_name: str = "roberta-large-mnli"
+    model_name: str = ENTAILMENT_MODELS["roberta"]["model_name"]
     threshold: float = 0.9
 
 
