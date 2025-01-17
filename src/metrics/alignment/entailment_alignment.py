@@ -1,6 +1,7 @@
 from typing import List, Dict, Tuple
 from collections import defaultdict
 
+from datasets import tqdm
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 
@@ -74,8 +75,13 @@ class EntailmentAligner(BaseAligner):
         premises = [p for (p, _) in pairs]
         hypoths = [h for (_, h) in pairs]
 
-        # We'll do range-based batching
-        for start_i in range(0, len(pairs), batch_size):
+        # total number of batches
+        total_batches = (len(pairs) + batch_size - 1) // batch_size
+
+        # Wrap the range with tqdm
+        for start_i in tqdm(range(0, len(pairs), batch_size),
+                            desc="Infer Entailment Batches",
+                            total=total_batches):
             end_i = start_i + batch_size
             batch_premises = premises[start_i:end_i]
             batch_hypoths = hypoths[start_i:end_i]
@@ -95,7 +101,7 @@ class EntailmentAligner(BaseAligner):
                 # shape: (batch_size, 3) for MNLI-like models
                 logits = outputs.logits
                 probs = torch.softmax(logits, dim=-1)
-                entail_probs = probs[:, 2]  # entailment index
+                entail_probs = probs[:, 2]  # entailment index is 2
 
             # 3) Store results in cache
             for idx_in_batch, entail_prob in enumerate(entail_probs):
