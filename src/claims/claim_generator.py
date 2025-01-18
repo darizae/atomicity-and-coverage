@@ -116,9 +116,14 @@ class CausalLMClaimGenerator(BaseClaimGenerator):
         model_module = importlib.import_module(model_module_name)
         model_cls = getattr(model_module, model_cls_name)
 
-        self.tokenizer = tokenizer_cls.from_pretrained(model_name)
         self.model = model_cls.from_pretrained(model_name)
         self.model.to(device)
+
+        self.tokenizer = tokenizer_cls.from_pretrained(model_name)
+        if not self.tokenizer.pad_token:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+        self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
     def generate_claims(self, texts: List[str]) -> List[List[str]]:
         predictions = []
