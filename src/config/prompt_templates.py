@@ -28,7 +28,7 @@ Recommendations:
 Now do the same for this input:
 
 INPUT:
-{{SOURCE_TEXT}}
+{SOURCE_TEXT}
 
 OUTPUT:
 """
