@@ -15,12 +15,19 @@ CLAIM_GENERATION_MODELS = {
         "claims_field": "system_claims_gpt35",
         "type": "openai",  # Let's define a new type for “OpenAI-based calls”
     },
-    "llama2": {
-        "name": "meta-llama/Llama-2-7b-chat-hf",  # an example Hugging Face LLaMA
-        "claims_field": "system_claims_llama",
+    "llama2_7b_local": {
+        "name": "/works/data0/jiang/model/llama-2/llama-2-7b-chat",  # local path on your server
+        "claims_field": "system_claims_llama2_local",
         "tokenizer_class": "transformers.LlamaTokenizer",
         "model_class": "transformers.LlamaForCausalLM",
-        "type": "causal",  # Let’s define another type for “causal LM in huggingface”
+        "type": "causal"
+    },
+    "llama2_7b_hf": {
+        "name": "meta-llama/Llama-2-7b-chat-hf",  # huggingface ID
+        "claims_field": "system_claims_llama2_hf",
+        "tokenizer_class": "transformers.LlamaTokenizer",
+        "model_class": "transformers.LlamaForCausalLM",
+        "type": "causal"
     },
     # etc.
 }

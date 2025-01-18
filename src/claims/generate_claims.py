@@ -67,14 +67,14 @@ def process_dataset(
 
     model_info = CLAIM_GENERATION_MODELS[model_key]
     model_type = model_info.get("type", "seq2seq")  # default to seq2seq if unspecified
-    model_name = model_info["name"]
+    model_path_or_id = model_info["name"]
     tokenizer_class = model_info["tokenizer_class"]
     model_class = model_info["model_class"]
 
     # 6. Initialize claim generator
     if model_type == "seq2seq":
         generator = Seq2SeqClaimGenerator(
-            model_name=model_name,
+            model_name=model_path_or_id,
             tokenizer_class_path=tokenizer_class,
             model_class_path=model_class,
             device=device,
@@ -83,7 +83,7 @@ def process_dataset(
         )
     elif model_type == "causal":
         generator = CausalLMClaimGenerator(
-            model_name=model_name,
+            model_name=model_path_or_id,
             tokenizer_class_path=tokenizer_class,
             model_class_path=model_class,
             device=device,
