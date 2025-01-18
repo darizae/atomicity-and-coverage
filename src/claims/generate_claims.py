@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 from claim_generator import Seq2SeqClaimGenerator, CausalLMClaimGenerator, ModelConfig
 from src.config import RosePathsSmall, RosePaths, CLAIM_GENERATION_MODELS, DATASET_ALIASES
@@ -20,42 +21,25 @@ def get_args():
     return parser.parse_args()
 
 
-def process_dataset(
-        dataset_name: str,
-        model_key: str,
-        device: str,
-        batch_size: int,
-        max_length: int,
-        truncation: bool,
-        small_test: bool,
-) -> None:
-    """Processes a single dataset and generates claims."""
-    # Initialize timer
-    timer = Timer()
-    timer.start()
-
-    # 1. Determine device
-    device = check_or_select_device(device)
-    print(f"Using device: {device}")
-
-    paths = RosePathsSmall() if small_test else RosePaths()
-    print(f"Using {'small' if small_test else 'full'} test dataset path...")
-
-    # 3. Load dataset
+def load_datasets(compressed_path: Path) -> RoseDatasetLoader:
     loader = RoseDatasetLoader()
     print("Loading datasets...")
-    loader.load_datasets_compressed(paths.compressed_dataset_path)
-
-    # 4. Check if dataset exists
-    if dataset_name not in loader.datasets:
-        raise KeyError(f"Dataset '{dataset_name}' not found in loaded datasets.")
+    loader.load_datasets_compressed(compressed_path)
     print("Datasets loaded!")
+    return loader
 
-    # 5. Retrieve model info
-    print("Initializing claim generator model...")
+
+def initialize_model_generator(
+    model_key: str,
+    device: str,
+    batch_size: int,
+    max_length: int,
+    truncation: bool
+):
     if model_key not in CLAIM_GENERATION_MODELS:
-        raise ValueError(f"Unknown model key '{model_key}'. Supported keys: {list(CLAIM_GENERATION_MODELS.keys())}")
-
+        raise ValueError(
+            f"Unknown model key '{model_key}'. Supported keys: {list(CLAIM_GENERATION_MODELS.keys())}"
+        )
     model_info = CLAIM_GENERATION_MODELS[model_key]
     model_config = ModelConfig(
         model_name=model_info["name"],
@@ -66,36 +50,68 @@ def process_dataset(
         max_length=max_length,
         truncation=truncation
     )
-
     generator_cls = Seq2SeqClaimGenerator if model_info.get("type", "seq2seq") == "seq2seq" else CausalLMClaimGenerator
     generator = generator_cls(model_config)
+    return generator, model_info
 
-    print("Claim generator model initialized!")
 
-    # 7. Retrieve sources
-    dataset = loader.datasets[dataset_name]
-    sources = [entry["reference"] for entry in dataset]
-
-    # 8. Generate claims
-    print(f"Starting claim generation for dataset '{dataset_name}'...")
-
-    claims = generator.generate_claims(sources)
-
-    print("Claim generation finished!")
-
-    # 9. Add claims and save
-    claims_field = model_info["claims_field"]
+def save_generated_claims(loader: RoseDatasetLoader, dataset_name: str, claims_field: str, claims, paths) -> None:
     print(f"Saving claims for dataset '{dataset_name}', as '{claims_field}'.")
     loader.add_claims(dataset_name, claims_field, claims)
     loader.save_datasets_compressed(paths.compressed_dataset_with_system_claims_path)
     loader.save_datasets_json(paths.dataset_with_system_claims_path)
 
-    # Log the number of claim arrays and total claims
-    num_arrays = len(claims)
-    num_total_claims = sum(
-        len(claim) for claim in claims if isinstance(claim, list))  # Assumes claims is a list of lists
 
-    # Stop timer and print elapsed time
+def process_dataset(
+    dataset_name: str,
+    model_key: str,
+    device: str,
+    batch_size: int,
+    max_length: int,
+    truncation: bool,
+    small_test: bool,
+) -> None:
+    """Processes a single dataset and generates claims."""
+    timer = Timer()
+    timer.start()
+
+    # Device selection
+    device = check_or_select_device(device)
+    print(f"Using device: {device}")
+
+    # Determine dataset paths based on test size
+    paths = RosePathsSmall() if small_test else RosePaths()
+    print(f"Using {'small' if small_test else 'full'} test dataset path...")
+
+    # Load datasets
+    loader = load_datasets(paths.compressed_dataset_path)
+
+    # Check dataset existence
+    if dataset_name not in loader.datasets:
+        raise KeyError(f"Dataset '{dataset_name}' not found in loaded datasets.")
+
+    # Initialize model and claim generator
+    print("Initializing claim generator model...")
+    generator, model_info = initialize_model_generator(
+        model_key, device, batch_size, max_length, truncation
+    )
+    print("Claim generator model initialized!")
+
+    # Retrieve sources from dataset
+    dataset = loader.datasets[dataset_name]
+    sources = [entry["reference"] for entry in dataset]
+
+    # Generate claims
+    print(f"Starting claim generation for dataset '{dataset_name}'...")
+    claims = generator.generate_claims(sources)
+    print("Claim generation finished!")
+
+    # Save generated claims
+    save_generated_claims(loader, dataset_name, model_info["claims_field"], claims, paths)
+
+    # Log results and timing
+    num_arrays = len(claims)
+    num_total_claims = sum(len(claim) for claim in claims if isinstance(claim, list))
     timer.stop()
 
     print(f"Number of claim arrays generated: {num_arrays}")
@@ -104,13 +120,13 @@ def process_dataset(
 
 
 def main(
-        model_key: str,
-        device: str,
-        batch_size: int,
-        max_length: int,
-        truncation: bool,
-        small_test: bool,
-        dataset_name: str = None,
+    model_key: str,
+    device: str,
+    batch_size: int,
+    max_length: int,
+    truncation: bool,
+    small_test: bool,
+    dataset_name: str = None,
 ) -> None:
     """
     Main function to process one or all datasets based on arguments.
@@ -129,14 +145,12 @@ def main(
         process_dataset(dataset_name, model_key, device, batch_size, max_length, truncation, small_test)
     else:
         print("Processing all datasets...")
-        for alias, hf_name in DATASET_ALIASES.items():
+        for alias in DATASET_ALIASES.keys():
             process_dataset(alias, model_key, device, batch_size, max_length, truncation, small_test)
 
 
 if __name__ == "__main__":
     args = get_args()
-
-    # Notice how we flip the no_truncation flag:
     truncation_flag = not args.no_truncation
 
     main(
