@@ -16,7 +16,7 @@ CLAIM_GENERATION_MODELS = {
         "type": "openai",  # Let's define a new type for “OpenAI-based calls”
     },
     "llama2_7b_local": {
-        "name": "/works/data0/jiang/model/llama-2/llama-2-7b-chat",  # local path on your server
+        "name": "/works/data0/jiang/model/huggingface/llama-7b-hf",  # local path on your server
         "claims_field": "system_claims_llama2_local",
         "tokenizer_class": "transformers.LlamaTokenizer",
         "model_class": "transformers.LlamaForCausalLM",
