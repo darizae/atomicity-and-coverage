@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 
 # Adjust import paths to match your project structure
-from src.claims.device_selector import select_best_device, check_or_select_device
+from src.utils.device_selector import select_best_device, check_or_select_device
 
 
 @patch("torch.cuda.is_available", return_value=True)

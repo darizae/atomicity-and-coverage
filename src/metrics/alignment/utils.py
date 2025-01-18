@@ -2,7 +2,7 @@ import json
 import os
 from typing import List, Dict, Any
 
-from src.claims.device_selector import check_or_select_device
+from src.utils.device_selector import check_or_select_device
 from src.config import RosePaths, RosePathsSmall, AlignmentConfig, DatasetName
 from src.config.alignment_config import EmbeddingModelConfig, EntailmentModelConfig
 from src.config.models_config import EMBEDDING_MODELS, ENTAILMENT_MODELS

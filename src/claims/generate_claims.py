@@ -5,7 +5,7 @@ from src.config import RosePathsSmall, RosePaths, CLAIM_GENERATION_MODELS, DATAS
 from src.rose.rose_loader import RoseDatasetLoader
 from src.utils.timer import Timer
 
-from device_selector import check_or_select_device
+from src.utils.device_selector import check_or_select_device
 
 
 def get_args():
