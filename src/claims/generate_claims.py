@@ -1,6 +1,6 @@
 import argparse
 
-from claim_generator import Seq2SeqClaimGenerator
+from claim_generator import Seq2SeqClaimGenerator, CausalLMClaimGenerator
 from src.config import RosePathsSmall, RosePaths, CLAIM_GENERATION_MODELS, DATASET_ALIASES
 from src.rose.rose_loader import RoseDatasetLoader
 from src.utils.timer import Timer
@@ -66,23 +66,32 @@ def process_dataset(
                          f"Supported keys: {list(CLAIM_GENERATION_MODELS.keys())}")
 
     model_info = CLAIM_GENERATION_MODELS[model_key]
+    model_type = model_info.get("type", "seq2seq")  # default to seq2seq if unspecified
     model_name = model_info["name"]
-    claims_field = model_info["claims_field"]
-
-    # If you provided custom classes:
-    tokenizer_class = model_info.get("tokenizer_class", "transformers.AutoTokenizer")
-    model_class = model_info.get("model_class", "transformers.AutoModelForSeq2SeqLM")
+    tokenizer_class = model_info["tokenizer_class"]
+    model_class = model_info["model_class"]
 
     # 6. Initialize claim generator
-    generator = Seq2SeqClaimGenerator(
-        model_name=model_name,
-        tokenizer_class_path=tokenizer_class,
-        model_class_path=model_class,
-        device=device,
-        batch_size=batch_size,
-        max_length=max_length,
-        truncation=truncation
-    )
+    if model_type == "seq2seq":
+        generator = Seq2SeqClaimGenerator(
+            model_name=model_name,
+            tokenizer_class_path=tokenizer_class,
+            model_class_path=model_class,
+            device=device,
+            batch_size=batch_size,
+            max_length=max_length,
+        )
+    elif model_type == "causal":
+        generator = CausalLMClaimGenerator(
+            model_name=model_name,
+            tokenizer_class_path=tokenizer_class,
+            model_class_path=model_class,
+            device=device,
+            batch_size=batch_size,
+            max_length=max_length,
+        )
+    else:
+        raise ValueError(f"Unrecognized model type: {model_type}")
 
     print("Claim generator model initialized!")
 
@@ -98,6 +107,7 @@ def process_dataset(
     print("Claim generation finished!")
 
     # 9. Add claims and save
+    claims_field = model_info["claims_field"]
     print(f"Saving claims for dataset '{dataset_name}', as '{claims_field}'.")
     loader.add_claims(dataset_name, claims_field, claims)
     loader.save_datasets_compressed(paths.compressed_dataset_with_system_claims_path)
