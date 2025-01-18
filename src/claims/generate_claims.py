@@ -1,6 +1,6 @@
 import argparse
 
-from claim_generator import ClaimGenerator
+from claim_generator import Seq2SeqClaimGenerator
 from src.config import RosePathsSmall, RosePaths, CLAIM_GENERATION_MODELS, DATASET_ALIASES
 from src.rose.rose_loader import RoseDatasetLoader
 from src.utils.timer import Timer
@@ -74,7 +74,7 @@ def process_dataset(
     model_class = model_info.get("model_class", "transformers.AutoModelForSeq2SeqLM")
 
     # 6. Initialize claim generator
-    generator = ClaimGenerator(
+    generator = Seq2SeqClaimGenerator(
         model_name=model_name,
         tokenizer_class_path=tokenizer_class,
         model_class_path=model_class,

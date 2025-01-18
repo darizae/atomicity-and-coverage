@@ -3,7 +3,12 @@ from typing import List
 from tqdm import tqdm
 
 
-class ClaimGenerator:
+class BaseClaimGenerator:
+    def generate_claims(self, texts: List[str]) -> List[List[str]]:
+        raise NotImplementedError("Subclasses must implement generate_claims")
+
+
+class Seq2SeqClaimGenerator(BaseClaimGenerator):
     """
     A flexible claim generator that can handle different model architectures
     (T5, BART, etc.) based on config settings.
@@ -85,5 +90,74 @@ class ClaimGenerator:
     @staticmethod
     def _chunked(iterable, size):
         """Yield successive n-sized chunks from an iterable."""
+        for i in range(0, len(iterable), size):
+            yield iterable[i:i + size]
+
+
+class CausalLMClaimGenerator(BaseClaimGenerator):
+    def __init__(self,
+                 model_name: str,
+                 tokenizer_class_path: str,
+                 model_class_path: str,
+                 device: str = "cpu",
+                 batch_size: int = 4,  # smaller batch for big LLM
+                 max_length: int = 1024):
+        self.device = device
+        self.model_name = model_name
+        self.batch_size = batch_size
+        self.max_length = max_length
+
+        # Dynamically load classes
+        tokenizer_module_name, tokenizer_cls_name = tokenizer_class_path.rsplit(".", 1)
+        tokenizer_module = importlib.import_module(tokenizer_module_name)
+        tokenizer_cls = getattr(tokenizer_module, tokenizer_cls_name)
+
+        model_module_name, model_cls_name = model_class_path.rsplit(".", 1)
+        model_module = importlib.import_module(model_module_name)
+        model_cls = getattr(model_module, model_cls_name)
+
+        self.tokenizer = tokenizer_cls.from_pretrained(model_name)
+        self.model = model_cls.from_pretrained(model_name)
+        self.model.to(device)
+
+    def generate_claims(self, texts: List[str]) -> List[List[str]]:
+        predictions = []
+        for batch in tqdm(self._chunked(texts, self.batch_size),
+                          desc=f"Generating claims with {self.model_name} [CausalLM]"):
+            # We'll create a prompt for each text to instruct the model
+            prompts = [
+                f"Extract atomic claims from the following text:\n\n{text}\n\nClaims:"
+                for text in batch
+            ]
+            # Tokenize
+            inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to(self.device)
+
+            # Generate (we typically limit new tokens to avoid huge output)
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=200,
+                do_sample=False,  # or True, depends on your needs
+                eos_token_id=self.tokenizer.eos_token_id
+            )
+
+            decoded = [self.tokenizer.decode(o, skip_special_tokens=True) for o in outputs]
+
+            # Split the text by lines or by some delimiter to get claims
+            # This is up to you, here's a naive approach:
+            batch_claims = []
+            for d in decoded:
+                # remove the prompt portion if needed
+                # naive approach: just split after "Claims:"
+                # or do a more robust approach
+                if "Claims:" in d:
+                    d = d.split("Claims:")[-1]
+                claims_list = [c.strip() for c in d.split("\n") if c.strip()]
+                batch_claims.append(claims_list)
+
+            predictions.extend(batch_claims)
+        return predictions
+
+    @staticmethod
+    def _chunked(iterable, size):
         for i in range(0, len(iterable), size):
             yield iterable[i:i + size]
