@@ -129,6 +129,7 @@ class CausalLMClaimGenerator(BaseClaimGenerator):
         self.model.config.pad_token_id = self.tokenizer.eos_token_id
 
     def generate_claims(self, texts: List[str]) -> List[List[str]]:
+        global json
         predictions = []
         for batch in tqdm(self._chunked(texts, self.batch_size),
                           desc=f"Generating claims with {self.model_name} [CausalLM]"):
@@ -153,19 +154,26 @@ class CausalLMClaimGenerator(BaseClaimGenerator):
 
             decoded = [self.tokenizer.decode(o, skip_special_tokens=True) for o in outputs]
 
-            # Split the text by lines or by some delimiter to get claims
-            # This is up to you, here's a naive approach:
+            # Now parse the JSON result
             batch_claims = []
             for d in decoded:
-                # remove the prompt portion if needed
-                # naive approach: just split after "Claims:"
-                # or do a more robust approach
-                if "Claims:" in d:
-                    d = d.split("Claims:")[-1]
-                claims_list = [c.strip() for c in d.split("\n") if c.strip()]
-                batch_claims.append(claims_list)
+                # The user wants it to be pure JSON, so you can use `json.loads` if it's well-formed
+                # But watch out for edge cases if the model doesn't follow instructions
+                try:
+                    import json
+                    data = json.loads(d.strip())
+                    claims_list = data.get("claims", [])
+                    # Ensure it's a list of strings
+                    if isinstance(claims_list, list):
+                        batch_claims.append(claims_list)
+                    else:
+                        batch_claims.append([])
+                except json.JSONDecodeError:
+                    # fallback if the model output is not valid JSON
+                    batch_claims.append([])
 
             predictions.extend(batch_claims)
+
         return predictions
 
     @staticmethod
