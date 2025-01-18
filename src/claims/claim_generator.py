@@ -120,10 +120,11 @@ class CausalLMClaimGenerator(BaseClaimGenerator):
         self.model.to(device)
 
         self.tokenizer = tokenizer_cls.from_pretrained(model_name)
-        if not self.tokenizer.pad_token:
+        self.tokenizer.padding_side = "left"
+        if self.tokenizer.pad_token is None or self.tokenizer.pad_token_id is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
             self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
-        self.model.config.pad_token_id = self.tokenizer.pad_token_id
+        self.model.config.pad_token_id = self.tokenizer.eos_token_id
 
     def generate_claims(self, texts: List[str]) -> List[List[str]]:
         predictions = []
