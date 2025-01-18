@@ -160,7 +160,6 @@ class CausalLMClaimGenerator(BaseClaimGenerator):
                 # The user wants it to be pure JSON, so you can use `json.loads` if it's well-formed
                 # But watch out for edge cases if the model doesn't follow instructions
                 try:
-                    import json
                     data = json.loads(d.strip())
                     claims_list = data.get("claims", [])
                     # Ensure it's a list of strings
