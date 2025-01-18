@@ -2,6 +2,8 @@ import importlib
 from typing import List
 from tqdm import tqdm
 
+from src.config.prompt_templates import REFINED_CLAIM_PROMPT
+
 
 class BaseClaimGenerator:
     def generate_claims(self, texts: List[str]) -> List[List[str]]:
@@ -130,13 +132,16 @@ class CausalLMClaimGenerator(BaseClaimGenerator):
         predictions = []
         for batch in tqdm(self._chunked(texts, self.batch_size),
                           desc=f"Generating claims with {self.model_name} [CausalLM]"):
-            # We'll create a prompt for each text to instruct the model
-            prompts = [
-                f"Extract atomic claims from the following text:\n\n{text}\n\nClaims:"
-                for text in batch
-            ]
+
+            # Build refined prompts for each text
+            prompts = [self.build_claim_extraction_prompt(t) for t in batch]
+
             # Tokenize
-            inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to(self.device)
+            inputs = self.tokenizer(
+                prompts,
+                return_tensors="pt",
+                padding=True
+            ).to(self.device)
 
             # Generate (we typically limit new tokens to avoid huge output)
             outputs = self.model.generate(
@@ -167,3 +172,8 @@ class CausalLMClaimGenerator(BaseClaimGenerator):
     def _chunked(iterable, size):
         for i in range(0, len(iterable), size):
             yield iterable[i:i + size]
+
+    @staticmethod
+    def build_claim_extraction_prompt(text: str) -> str:
+        return REFINED_CLAIM_PROMPT.format(SOURCE_TEXT=text)
+
