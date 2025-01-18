@@ -64,6 +64,7 @@ class Seq2SeqClaimGenerator(BaseClaimGenerator):
                                     truncation=self.config.truncation,
                                     max_length=self.config.max_length).to(self.device)
             decoded = self._generate(inputs)
+            print(f"Decoded outputs: {decoded}")
             predictions.extend([text.split(". ") for text in decoded])
         return predictions
 
@@ -94,6 +95,7 @@ class CausalLMClaimGenerator(BaseClaimGenerator):
 
     @staticmethod
     def _parse_json_outputs(decoded_outputs: List[str]) -> List[List[str]]:
+        print(f"Decoded outputs: {decoded_outputs}")
         parsed_claims = []
         for output in decoded_outputs:
             try:
