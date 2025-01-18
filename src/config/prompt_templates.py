@@ -1,4 +1,5 @@
 # From FENICE paper
+# Use double curly braces to avoid string formatting issues
 REFINED_CLAIM_PROMPT = """ 
 We define a claim as an "elementary information unit in a sentence, 
 which no longer needs to be further split."
@@ -10,13 +11,13 @@ according to a recent study published in the journal Science.
 It established a set of new paradigms for space exploration"
 
 OUTPUT:
-{"claims": [
+{{"claims": [
   "NASA’s Perseverance rover discovered ancient microbial life.",
   "Ancient microbial life was discovered on Mars.",
   "The discovery was made according to a recent study.",
   "The study was published in the journal Science.",
   "The study established a set of new paradigms for space exploration."
-]}
+]}}
 
 Recommendations:
 1) If possible, use a noun as the subject in the claim (avoid pronouns).
@@ -27,7 +28,7 @@ Recommendations:
 Now do the same for this input:
 
 INPUT:
-{SOURCE_TEXT}
+{{SOURCE_TEXT}}
 
 OUTPUT:
 """

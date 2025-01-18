@@ -1,4 +1,5 @@
 import importlib
+import json
 from typing import List
 from tqdm import tqdm
 
@@ -129,7 +130,6 @@ class CausalLMClaimGenerator(BaseClaimGenerator):
         self.model.config.pad_token_id = self.tokenizer.eos_token_id
 
     def generate_claims(self, texts: List[str]) -> List[List[str]]:
-        global json
         predictions = []
         for batch in tqdm(self._chunked(texts, self.batch_size),
                           desc=f"Generating claims with {self.model_name} [CausalLM]"):
