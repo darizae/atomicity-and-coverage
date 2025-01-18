@@ -1,6 +1,6 @@
 import argparse
 
-from claim_generator import Seq2SeqClaimGenerator, CausalLMClaimGenerator
+from claim_generator import Seq2SeqClaimGenerator, CausalLMClaimGenerator, ModelConfig
 from src.config import RosePathsSmall, RosePaths, CLAIM_GENERATION_MODELS, DATASET_ALIASES
 from src.rose.rose_loader import RoseDatasetLoader
 from src.utils.timer import Timer
@@ -38,60 +38,37 @@ def process_dataset(
     device = check_or_select_device(device)
     print(f"Using device: {device}")
 
-    # 2. Initialize paths
-    print("Determining dataset variant to use...")
-    if small_test:
-        paths = RosePathsSmall()
-        print("Using small test dataset path...")
-    else:
-        paths = RosePaths()
-        print("Using full test dataset path...")
+    paths = RosePathsSmall() if small_test else RosePaths()
+    print(f"Using {'small' if small_test else 'full'} test dataset path...")
 
     # 3. Load dataset
     loader = RoseDatasetLoader()
-
     print("Loading datasets...")
     loader.load_datasets_compressed(paths.compressed_dataset_path)
-    print("Datasets loaded!")
 
     # 4. Check if dataset exists
     if dataset_name not in loader.datasets:
         raise KeyError(f"Dataset '{dataset_name}' not found in loaded datasets.")
+    print("Datasets loaded!")
 
     # 5. Retrieve model info
     print("Initializing claim generator model...")
-
     if model_key not in CLAIM_GENERATION_MODELS:
-        raise ValueError(f"Unknown model key '{model_key}'. "
-                         f"Supported keys: {list(CLAIM_GENERATION_MODELS.keys())}")
+        raise ValueError(f"Unknown model key '{model_key}'. Supported keys: {list(CLAIM_GENERATION_MODELS.keys())}")
 
     model_info = CLAIM_GENERATION_MODELS[model_key]
-    model_type = model_info.get("type", "seq2seq")  # default to seq2seq if unspecified
-    model_path_or_id = model_info["name"]
-    tokenizer_class = model_info["tokenizer_class"]
-    model_class = model_info["model_class"]
+    model_config = ModelConfig(
+        model_name=model_info["name"],
+        tokenizer_class_path=model_info["tokenizer_class"],
+        model_class_path=model_info["model_class"],
+        device=device,
+        batch_size=batch_size,
+        max_length=max_length,
+        truncation=truncation
+    )
 
-    # 6. Initialize claim generator
-    if model_type == "seq2seq":
-        generator = Seq2SeqClaimGenerator(
-            model_name=model_path_or_id,
-            tokenizer_class_path=tokenizer_class,
-            model_class_path=model_class,
-            device=device,
-            batch_size=batch_size,
-            max_length=max_length,
-        )
-    elif model_type == "causal":
-        generator = CausalLMClaimGenerator(
-            model_name=model_path_or_id,
-            tokenizer_class_path=tokenizer_class,
-            model_class_path=model_class,
-            device=device,
-            batch_size=batch_size,
-            max_length=max_length,
-        )
-    else:
-        raise ValueError(f"Unrecognized model type: {model_type}")
+    generator_cls = Seq2SeqClaimGenerator if model_info.get("type", "seq2seq") == "seq2seq" else CausalLMClaimGenerator
+    generator = generator_cls(model_config)
 
     print("Claim generator model initialized!")
 
