@@ -8,13 +8,23 @@ CLAIM_GENERATION_MODELS = {
         "claims_field": "system_claims_t5",
         "tokenizer_class": "transformers.T5Tokenizer",
         "model_class": "transformers.T5ForConditionalGeneration",
+        "type": "seq2seq"  # This is helpful to identify that it's a seq2seq pipeline
     },
-    # Add more models as needed
-    # "another_model": {
-    #     "name": "some/other-model",
-    #     "claims_field": "system_claims_other",
-    # },
+    "openai_gpt35": {
+        "name": "gpt-3.5-turbo",  # OpenAI model name
+        "claims_field": "system_claims_gpt35",
+        "type": "openai",  # Let's define a new type for “OpenAI-based calls”
+    },
+    "llama2": {
+        "name": "meta-llama/Llama-2-7b-chat-hf",  # an example Hugging Face LLaMA
+        "claims_field": "system_claims_llama",
+        "tokenizer_class": "transformers.LlamaTokenizer",
+        "model_class": "transformers.LlamaForCausalLM",
+        "type": "causal",  # Let’s define another type for “causal LM in huggingface”
+    },
+    # etc.
 }
+
 
 EMBEDDING_MODELS = {
     "miniLM": {
