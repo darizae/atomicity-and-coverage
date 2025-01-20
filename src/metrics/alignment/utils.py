@@ -10,7 +10,7 @@ from src.rose.rose_loader import RoseDatasetLoader
 from src.metrics.atomicity_coverage import compute_atomicity, compute_coverage
 from src.utils.path_utils import get_alignment_results_path
 
-from src.config.models_config import EMBEDDING_MODELS, ENTAILMENT_MODELS
+from src.config.models_config import EMBEDDING_MODELS, ENTAILMENT_MODELS, CLAIM_GENERATION_MODELS
 
 
 def build_config(args) -> AlignmentConfig:
@@ -116,6 +116,7 @@ def do_alignment(
         results = process_single_dataset(
             dataset_name,
             aligner,
+            config,
             small_test=small_test
         )
         save_results(config, results, dataset_name, small_test=small_test)
@@ -124,6 +125,7 @@ def do_alignment(
         combined_results = process_all_datasets(
             all_datasets,
             aligner,
+            config,
             small_test=small_test
         )
         save_all_results(config, combined_results, small_test=small_test)
@@ -146,33 +148,36 @@ def _load_dataset(small_test: bool = False):
     return loader.datasets if not small_test else {k: v[:1] for k, v in loader.datasets.items()}
 
 
-def _process_dataset(dataset, aligner):
+def _process_dataset(dataset, aligner, config):
     results = []
+
+    system_claims_key = CLAIM_GENERATION_MODELS[config.claim_gen_key]["claims_field"]
+
     for record in dataset:
-        system_claims = record.get("system_claims_t5", [])
+        # Grab system claims using the dynamic key
+        system_claims = record.get(system_claims_key, [])
         reference_acus = record.get("reference_acus", [])
 
         if not system_claims or not reference_acus:
-            # Skip any record that doesn't have both sets of claims
+            # If either is empty, skip this record
             continue
 
-        # 1) Obtain the raw alignment_map
+        # 1) Get the raw alignment map (indexes only)
         alignment_map = aligner.align(system_claims, reference_acus)
 
-        # 2) Expand alignment with strings
+        # 2) Expand it to a human-readable structure
         alignment_map_expanded = expand_alignment_map(system_claims, reference_acus, alignment_map)
 
-        # 3) Compute coverage & atomicity
+        # 3) Compute coverage & atomicity from the raw alignment_map
         coverage = compute_coverage(alignment_map, len(reference_acus))
         atomicity = compute_atomicity(alignment_map, len(system_claims))
 
-        # 4) Store both old & new forms in the results
+        # 4) Save final record results
         results.append({
             "reference summary": record.get("reference", ""),
             "coverage": coverage,
             "atomicity": atomicity,
-            "alignment_map": alignment_map,  # the original for debugging
-            "alignment_map_expanded": alignment_map_expanded  # the new human-readable version
+            "alignment_map_expanded": alignment_map_expanded
         })
 
     return results
@@ -181,6 +186,7 @@ def _process_dataset(dataset, aligner):
 def process_all_datasets(
         datasets: List[str],
         aligner,
+        config: AlignmentConfig,
         small_test: bool = False
 ) -> Dict[str, List[Dict[str, Any]]]:
     """
@@ -189,6 +195,7 @@ def process_all_datasets(
     Args:
         datasets (List[str]): List of dataset names to process.
         aligner: The alignment model.
+        config: AlignmentConfig instance.
         small_test (bool): Whether to use the small dataset variant.
 
     Returns:
@@ -198,7 +205,7 @@ def process_all_datasets(
     for dataset_name in datasets:
         print(f"Processing dataset: {dataset_name}")
         dataset = _load_dataset(small_test=small_test).get(dataset_name, [])
-        results = _process_dataset(dataset, aligner)
+        results = _process_dataset(dataset, aligner, config)
         combined_results[dataset_name] = results
         print(f"Finished processing dataset: {dataset_name}")
     return combined_results
@@ -207,6 +214,7 @@ def process_all_datasets(
 def process_single_dataset(
         dataset_name: str,
         aligner,
+        config: AlignmentConfig,
         small_test: bool = False
 ) -> List[Dict[str, Any]]:
     """
@@ -215,6 +223,7 @@ def process_single_dataset(
     Args:
         dataset_name (str): Name of the dataset to process.
         aligner: The alignment model.
+        config: AlignmentConfig instance.
         small_test (bool): Whether to use the small dataset variant.
 
     Returns:
@@ -222,7 +231,7 @@ def process_single_dataset(
     """
     print(f"Processing single dataset: {dataset_name}")
     dataset = _load_dataset(small_test=small_test).get(dataset_name, [])
-    return _process_dataset(dataset, aligner)
+    return _process_dataset(dataset, aligner, config)
 
 
 def save_results(
@@ -270,39 +279,22 @@ def expand_alignment_map(
     alignment_map: Dict[int, List[int]]
 ) -> List[Dict[str, Any]]:
     """
-    Expand the alignment map to include system claim text and matched reference text.
-
-    Returns a list of dicts like:
-    [
-      {
-        "system_claim_idx": i,
-        "system_claim_text": "...",
-        "matched_refs": [
-           {"ref_idx": r, "ref_claim": "..."},
-           ...
-        ]
-      },
-      ...
-    ]
+    Convert the raw alignment map {system_idx: [ref_idx, ...]}
+    into a list of dicts with both text and indexes.
     """
     expanded = []
     for s_idx, matched_ref_idxs in alignment_map.items():
-        # The text of the system claim
         sys_text = system_claims[s_idx]
-
-        # Build a list of reference claims that matched
         matched_refs = []
         for r_idx in matched_ref_idxs:
             matched_refs.append({
                 "ref_idx": r_idx,
                 "ref_claim": reference_acus[r_idx]
             })
-
         expanded.append({
             "system_claim_idx": s_idx,
             "system_claim_text": sys_text,
             "matched_refs": matched_refs
         })
-
     return expanded
 

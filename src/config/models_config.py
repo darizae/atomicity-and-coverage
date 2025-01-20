@@ -5,7 +5,7 @@ ALIGNMENT_PATHS = AlignmentPaths()
 CLAIM_GENERATION_MODELS = {
     "distilled_t5": {
         "name": "Babelscape/t5-base-summarization-claim-extractor",
-        "claims_field": "system_claims_t5",
+        "claims_field": "system_claims_distilled_t5",
         "tokenizer_class": "transformers.T5Tokenizer",
         "model_class": "transformers.T5ForConditionalGeneration",
         "type": "seq2seq"  # This is helpful to identify that it's a seq2seq pipeline
