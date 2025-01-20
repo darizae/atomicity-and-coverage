@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from claim_generator import Seq2SeqClaimGenerator, CausalLMClaimGenerator, ModelConfig
+from claim_generator import Seq2SeqClaimGenerator, CausalLMClaimGenerator, ModelConfig, APIClaimGenerator
 from src.config import RosePathsSmall, RosePaths, CLAIM_GENERATION_MODELS, DATASET_ALIASES
 from src.rose.rose_loader import RoseDatasetLoader
 from src.utils.timer import Timer
@@ -30,27 +30,40 @@ def load_datasets(compressed_path: Path) -> RoseDatasetLoader:
 
 
 def initialize_model_generator(
-    model_key: str,
-    device: str,
-    batch_size: int,
-    max_length: int,
-    truncation: bool
+        model_key: str,
+        device: str,
+        batch_size: int,
+        max_length: int,
+        truncation: bool
 ):
     if model_key not in CLAIM_GENERATION_MODELS:
-        raise ValueError(
-            f"Unknown model key '{model_key}'. Supported keys: {list(CLAIM_GENERATION_MODELS.keys())}"
-        )
+        raise ValueError(...)
+
     model_info = CLAIM_GENERATION_MODELS[model_key]
+
+    model_type = model_info.get("type", "seq2seq")
+
     model_config = ModelConfig(
-        model_name=model_info["name"],
-        tokenizer_class_path=model_info["tokenizer_class"],
-        model_class_path=model_info["model_class"],
+        model_name=model_info["name"],  # "http://127.0.0.1:1337/v1/chat/completions" or "gpt-3.5-turbo"
+        tokenizer_class_path=model_info.get("tokenizer_class", ""),  # might not exist for API-based
+        model_class_path=model_info.get("model_class", ""),  # might not exist for API-based
         device=device,
         batch_size=batch_size,
         max_length=max_length,
         truncation=truncation
     )
-    generator_cls = Seq2SeqClaimGenerator if model_info.get("type", "seq2seq") == "seq2seq" else CausalLMClaimGenerator
+    model_config.type = model_type  # Add a custom field if you like
+
+    # Decide which generator to instantiate
+    if model_type == "seq2seq":
+        generator_cls = Seq2SeqClaimGenerator
+    elif model_type == "causal":
+        generator_cls = CausalLMClaimGenerator
+    elif model_type in ("openai", "openai_local"):  # e.g. Jan's local server
+        generator_cls = APIClaimGenerator
+    else:
+        raise NotImplementedError(f"Model type '{model_type}' is not supported.")
+
     generator = generator_cls(model_config)
     return generator, model_info
 
