@@ -2,12 +2,14 @@ import json
 import os
 from typing import List, Dict, Any
 
+from src.metrics.alignment.base_aligner import BaseAligner
 from src.utils.device_selector import check_or_select_device
 from src.config import RosePaths, RosePathsSmall, AlignmentConfig, DatasetName
 from src.config.alignment_config import EmbeddingModelConfig, EntailmentModelConfig
 from src.config.models_config import EMBEDDING_MODELS, ENTAILMENT_MODELS
 from src.rose.rose_loader import RoseDatasetLoader
 from src.metrics.atomicity_coverage import compute_atomicity, compute_coverage
+from src.utils.path_utils import get_alignment_results_path
 
 
 def build_config(args) -> AlignmentConfig:
@@ -15,10 +17,8 @@ def build_config(args) -> AlignmentConfig:
     Builds an AlignmentConfig based on the user-specified arguments and defaults.
     """
     default_config = AlignmentConfig()
-    # If the user didn't specify any method, fall back to what's in default_config
     method = args.method.lower() if args.method else default_config.method
 
-    # We use Python 3.10+ match statement to route logic
     match method:
         case "embedding":
             # Validate the model key
@@ -37,7 +37,6 @@ def build_config(args) -> AlignmentConfig:
                 ),
                 cache_path=model_info["cache_file"]
             )
-            return config
 
         case "entailment":
             # Validate the model key
@@ -56,7 +55,6 @@ def build_config(args) -> AlignmentConfig:
                 ),
                 cache_path=model_info["cache_file"]
             )
-            return config
 
         case "rouge":
             # Possibly ignore threshold or device?
@@ -65,18 +63,23 @@ def build_config(args) -> AlignmentConfig:
                 threshold=args.threshold if args.threshold is not None else default_config.threshold,
                 device=check_or_select_device(args.device),
             )
-            return config
 
         case _:
             # Fallback if user typed a method not recognized
             # or you can treat it as 'rouge' or throw an error
             raise ValueError(f"Unknown method: {method}. Options: 'embedding', 'entailment', 'rouge'.")
 
+    claim_gen_key = args.claim_gen_key or default_config.claim_gen_key
+    config.claim_gen_key = claim_gen_key
+
+    return config
+
 
 def do_alignment(
     dataset_name: str,
-    aligner: Any,
-    small_test: bool
+    aligner: BaseAligner,
+    small_test: bool,
+    config: AlignmentConfig
 ) -> None:
     """
     Handles either a single dataset or all datasets. If dataset_name is provided, we process that
@@ -102,7 +105,7 @@ def do_alignment(
             aligner,
             small_test=small_test
         )
-        save_results({dataset_name: results}, small_test=small_test)
+        save_results(config, results, dataset_name, small_test=small_test)
     else:
         # All datasets
         combined_results = process_all_datasets(
@@ -110,9 +113,9 @@ def do_alignment(
             aligner,
             small_test=small_test
         )
-        save_all_results(combined_results, small_test=small_test)
+        save_all_results(config, combined_results, small_test=small_test)
 
-    # Save alignment cache if supported
+        # Save alignment cache if supported
     if hasattr(aligner, "save_alignment_cache"):
         aligner.save_alignment_cache()
 
@@ -198,36 +201,40 @@ def process_single_dataset(
     return _process_dataset(dataset, aligner)
 
 
-def save_results(results: List[Dict[str, Any]], small_test: bool = False) -> None:
+def save_results(
+        config,
+        results: List[Dict[str, Any]],
+        dataset_name: str,
+        small_test: bool = False
+) -> None:
     """
-    Save the results to a JSON file.
-
-    Args:
-        results (List[Dict[str, Any]]): The results to save.
-        small_test (str): Path to the output JSON file.
+    Save the results to a JSON file constructed by the experiment config & dataset name.
     """
+    output_path = get_alignment_results_path(
+        config=config,
+        dataset_name=dataset_name,
+        small_test=small_test
+    )
 
-    paths = RosePathsSmall() if small_test else RosePaths()
-    output_path = paths.alignment_metrics_results
-
-    output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
-    print(f"Results saved to {output_path}")
+    print(f"[save_results] Results saved to {output_path}")
 
 
-def save_all_results(all_results: Dict[str, List[Dict[str, Any]]], small_test: bool = False) -> None:
+def save_all_results(
+        config,
+        all_results: Dict[str, List[Dict[str, Any]]],
+        small_test: bool = False
+) -> None:
     """
-    Save all dataset results to a single JSON file.
-
-    Args:
-        all_results (Dict[str, List[Dict[str, Any]]]): The combined results from all datasets.
-        small_test (bool): Whether to use the small dataset path variant.
+    Save all dataset results to a single 'combined.json' path for the entire run config.
     """
-    paths = RosePathsSmall() if small_test else RosePaths()
-    output_path = paths.alignment_metrics_results.with_name("combined_alignment_results.json")
+    output_path = get_alignment_results_path(
+        config=config,
+        dataset_name=None,  # combined
+        small_test=small_test
+    )
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as f:
         json.dump(all_results, f, indent=2)
-    print(f"Combined results saved to {output_path}")
+    print(f"[save_all_results] Combined results saved to {output_path}")
