@@ -40,7 +40,7 @@ def build_config(args) -> AlignmentConfig:
             device=device,
             embedding_config=EmbeddingModelConfig(
                 model_name=model_info["model_name"],
-                threshold=model_info["threshold"],
+                threshold=threshold,
             ),
             cache_path=model_info["cache_file"],
             claim_gen_key=claim_gen_key,
@@ -62,7 +62,7 @@ def build_config(args) -> AlignmentConfig:
             device=device,
             entailment_config=EntailmentModelConfig(
                 model_name=model_info["model_name"],
-                threshold=model_info["threshold"],
+                threshold=threshold,
             ),
             cache_path=model_info["cache_file"],
             claim_gen_key=claim_gen_key,
