@@ -10,9 +10,9 @@ CLAIM_GENERATION_MODELS = {
         "model_class": "transformers.T5ForConditionalGeneration",
         "type": "seq2seq"  # This is helpful to identify that it's a seq2seq pipeline
     },
-    "jan_local_api": {
+    "llama3_1b": {
         "name": "http://127.0.0.1:1337/v1/chat/completions",
-        "claims_field": "system_claims_jan_local",
+        "claims_field": "system_claims_llama3.2-1b-instruct",
         "type": "openai_local",
     },
     "openai_gpt35": {

@@ -140,16 +140,6 @@ class APIClaimGenerator(BaseClaimGenerator):
 
         return predictions
 
-    def _build_prompt(self, text: str) -> dict:
-        """
-        For an OpenAI/Jan chat endpoint, you typically pass a "messages" list.
-        Adjust as needed for your local Jan or OpenAI format.
-        """
-        return {
-            "role": "user",
-            "content": f"Extract atomic factual claims from this text:\n\n{text}\n\nReturn JSON with a 'claims' key."
-        }
-
     def _send_api_request(self, prompts: List[dict]) -> dict:
 
         YOUR_OPENAI_API_KEY = "placeholder"

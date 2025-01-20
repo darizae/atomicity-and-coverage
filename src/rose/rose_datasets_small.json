@@ -149,6 +149,18 @@
       ],
       "system_claims_distilled_t5": [
         "The main suspect in the most brutal massacre in recent Philippine history has gone on trial."
+      ],
+      "system_claims_jan_local": [
+        [
+          "The main suspect was tried.",
+          "The suspect went on trial."
+        ]
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        [
+          "The main suspect was tried.",
+          "The suspect went on trial."
+        ]
       ]
     },
     {
@@ -162,6 +174,20 @@
       ],
       "system_claims_distilled_t5": [
         "The government says it will increase the levy on banks from 0.078% to 0.088% from 1 January."
+      ],
+      "system_claims_jan_local": [
+        [
+          "The government increased the levy on banks.",
+          "Banks will be subject to a new rate of 0.088% from 1 January.",
+          "The increase is effective from 1 January."
+        ]
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        [
+          "The government increased the levy on banks.",
+          "Banks will be subject to a new rate of 0.088% from 1 January.",
+          "The increase is effective from 1 January."
+        ]
       ]
     },
     {
@@ -175,6 +201,20 @@
       ],
       "system_claims_distilled_t5": [
         "Footballer Gary Neville's controversial plans for an eco-friendly 'Teletubbies' house have been given the go ahead by Bolton Council."
+      ],
+      "system_claims_jan_local": [
+        [
+          "Gary Neville's plans were approved.",
+          "The plans were given the go ahead by Bolton Council.",
+          "Bolton Council gave approval to Gary Neville's plans."
+        ]
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        [
+          "Gary Neville's plans were approved.",
+          "The plans were given the go ahead by Bolton Council.",
+          "Bolton Council gave approval to Gary Neville's plans."
+        ]
       ]
     }
   ],
