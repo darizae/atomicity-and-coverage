@@ -1,17 +1,16 @@
-from typing import List, Dict
-from collections import defaultdict
+from typing import List, Tuple
 import numpy as np
-
-from .base_aligner import BaseAligner
-from .embeddings_cache import EmbeddingCache
 
 from sentence_transformers import SentenceTransformer
 
+from .base_aligner import BaseModelAligner
+from .embeddings_cache import EmbeddingCache
 
-class EmbeddingAligner(BaseAligner):
+
+class EmbeddingAligner(BaseModelAligner):
     def __init__(
             self,
-            model_name: str,  # e.g. "sentence-transformers/all-MiniLM-L6-v2"
+            model_name: str,
             threshold: float = 0.7,
             device: str = "cpu",
             cache_path: str = None
@@ -22,129 +21,66 @@ class EmbeddingAligner(BaseAligner):
         :param device: 'cpu' or 'cuda'.
         :param cache_path: If given, path to load/save the embedding cache.
         """
-        # 1) Actually load the model (rather than storing just a string):
+        super().__init__(threshold, device, cache_path)
         self.model = SentenceTransformer(model_name, device=device)
 
-        # 2) Store the alignment threshold, device, etc.
-        self.threshold = threshold
-        self.device = device
-
-        # 3) Initialize cache
         self.cache = EmbeddingCache(cache_path)
 
-    def align(
-            self,
-            system_claims: List[str],
-            reference_acus: List[str],
-            **kwargs
-    ) -> Dict[int, List[int]]:
+    def _encode_items(
+        self,
+        system_claims: List[str],
+        reference_acus: List[str]
+    ) -> Tuple[List[np.ndarray], List[np.ndarray]]:
+        """
+        Produce or retrieve embeddings for each claim and reference.
+        """
 
         # Batch encode both sets
         sys_embeddings = self._batch_get_embeddings(system_claims)
         ref_embeddings = self._batch_get_embeddings(reference_acus)
+        return sys_embeddings, ref_embeddings
 
-        # Compare each system claim embedding to each reference ACU embedding
-        alignment_map = self._compute_alignment(sys_embeddings, ref_embeddings)
-
-        return alignment_map
+    def _compute_score(
+        self,
+        sys_rep: np.ndarray,
+        ref_rep: np.ndarray
+    ) -> float:
+        """Compute cosine similarity in [0..1] range."""
+        return float(
+            np.dot(sys_rep, ref_rep)
+            / (np.linalg.norm(sys_rep) * np.linalg.norm(ref_rep) + 1e-9)
+        )
 
     def _batch_get_embeddings(self, texts: List[str]) -> List[np.ndarray]:
         """
         Retrieves or computes embeddings for a batch of texts while leveraging caching.
-
-        Workflow:
-        1. Retrieve cached embeddings and collect texts that need encoding.
-        2. Encode the uncached texts in batch.
-        3. Store new embeddings in cache and assign them back to the final list.
         """
+        embeddings = []
+        to_encode = []
+        to_encode_idxs = []
 
-        # Step 1: Retrieve cached embeddings & collect texts to encode
-        embeddings, texts_to_encode, idx_to_encode = self._retrieve_cached_embeddings(texts)
+        # 1) Look up each text in cache
+        for idx, txt in enumerate(texts):
+            cached = self.cache.get_embedding(txt)
+            if cached is not None:
+                embeddings.append(cached)
+            else:
+                embeddings.append(None)
+                to_encode.append(txt)
+                to_encode_idxs.append(idx)
 
-        # Step 2: Perform batch encoding if necessary
-        batch_embs = self._encode_texts_in_batch(texts_to_encode) if texts_to_encode else []
-
-        # Step 3: Update cache and assign embeddings (file will be expanded over time if necessary)
-        self._update_cache_and_assign_embeddings(embeddings, texts_to_encode, idx_to_encode, batch_embs)
+        # 2) Encode in batch if needed
+        if to_encode:
+            new_embs = self.model.encode(to_encode, device=self.device, show_progress_bar=True)
+            # 3) Store them in cache
+            for i, emb in enumerate(new_embs):
+                actual_idx = to_encode_idxs[i]
+                txt = to_encode[i]
+                self.cache.set_embedding(txt, emb)
+                embeddings[actual_idx] = emb
 
         return embeddings
 
-    def _retrieve_cached_embeddings(self, texts: List[str]):
-        """
-        Retrieves cached embeddings and prepares a list of texts that need encoding.
-
-        Returns:
-        - embeddings: List with cached embeddings (or None if not cached)
-        - texts_to_encode: List of texts that need encoding
-        - idx_to_encode: Indices corresponding to the texts_to_encode
-        """
-
-        embeddings = []
-        texts_to_encode = []
-        idx_to_encode = []
-
-        for idx, txt in enumerate(texts):
-            # Check the cache
-            cached_emb = self.cache.get_embedding(txt)
-            if cached_emb is not None:
-                embeddings.append(cached_emb)
-            else:
-                embeddings.append(None)
-                texts_to_encode.append(txt)
-                idx_to_encode.append(idx)
-
-        return embeddings, texts_to_encode, idx_to_encode
-
-    def _encode_texts_in_batch(self, texts_to_encode: List[str]) -> List[np.ndarray]:
-        """
-        Retrieves cached embeddings and prepares a list of texts that need encoding.
-
-        Returns:
-        - embeddings: List with cached embeddings (or None if not cached)
-        - texts_to_encode: List of texts that need encoding
-        - idx_to_encode: Indices corresponding to the texts_to_encode
-        """
-
-        return self.model.encode(
-            texts_to_encode,
-            device=self.device,
-            show_progress_bar=True
-        ) if texts_to_encode else []
-
-    def _update_cache_and_assign_embeddings(self, embeddings: List[np.ndarray], texts_to_encode: List[str],
-                                            idx_to_encode: List[int], batch_embs: List[np.ndarray]):
-        """Updates the cache with new embeddings and assigns them to the original list."""
-        for i, emb in enumerate(batch_embs):
-            txt = texts_to_encode[i]
-            self.cache.set_embedding(txt, emb)
-            embeddings[idx_to_encode[i]] = emb
-
-    @staticmethod
-    def _cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
-        return float(np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2) + 1e-9))
-
-    def _compute_alignment(self, sys_embeddings: List[np.ndarray], ref_embeddings: List[np.ndarray]) -> Dict[
-        int, List[int]]:
-        """
-        Computes alignment between system claim embeddings and reference ACU embeddings
-        based on cosine similarity.
-
-        Returns:
-        - alignment_map: A dictionary where keys are system claim indices, and values are lists
-          of reference ACU indices that meet the similarity threshold.
-        """
-        alignment_map = defaultdict(list)
-
-        for i, s_emb in enumerate(sys_embeddings):
-            for j, r_emb in enumerate(ref_embeddings):
-                sim = self._cosine_similarity(s_emb, r_emb)
-                if sim >= self.threshold:
-                    alignment_map[i].append(j)
-
-        return dict(alignment_map)
-
     def save_alignment_cache(self):
-        """
-        Explicit method to allow saving the alignment cache on demand.
-        """
+        """Persist embedding cache to disk if needed."""
         self.cache.save_cache()
