@@ -4,94 +4,107 @@ from typing import List, Dict, Any
 
 from src.metrics.alignment.base_aligner import BaseAligner
 from src.utils.device_selector import check_or_select_device
-from src.config import RosePaths, RosePathsSmall, AlignmentConfig, DatasetName
-from src.config.alignment_config import EmbeddingModelConfig, EntailmentModelConfig
-from src.config.models_config import EMBEDDING_MODELS, ENTAILMENT_MODELS
+from src.config import RosePaths, RosePathsSmall, AlignmentConfig, DatasetName, DATASET_ALIASES
+from src.config.alignment_config import EmbeddingModelConfig, EntailmentModelConfig, AlignmentMethods
 from src.rose.rose_loader import RoseDatasetLoader
 from src.metrics.atomicity_coverage import compute_atomicity, compute_coverage
 from src.utils.path_utils import get_alignment_results_path
 
+from src.config.models_config import EMBEDDING_MODELS, ENTAILMENT_MODELS
+
 
 def build_config(args) -> AlignmentConfig:
     """
-    Builds an AlignmentConfig based on the user-specified arguments and defaults.
+    Build an AlignmentConfig based on user-specified arguments (args) and defaults.
     """
     default_config = AlignmentConfig()
-    method = args.method.lower() if args.method else default_config.method
 
-    match method:
-        case "embedding":
-            # Validate the model key
-            if args.embedding_model_key not in EMBEDDING_MODELS:
-                raise ValueError(f"Unknown embedding model key: {args.embedding_model_key}. "
-                                 f"Must be one of {list(EMBEDDING_MODELS.keys())}")
-            model_info = EMBEDDING_MODELS[args.embedding_model_key]
-
-            config = AlignmentConfig(
-                method=method,
-                threshold=args.threshold if args.threshold is not None else model_info["threshold"],
-                device=check_or_select_device(args.device),
-                embedding_config=EmbeddingModelConfig(
-                    model_name=model_info["model_name"],
-                    threshold=model_info["threshold"]
-                ),
-                cache_path=model_info["cache_file"]
-            )
-
-        case "entailment":
-            # Validate the model key
-            if args.entailment_model_key not in ENTAILMENT_MODELS:
-                raise ValueError(f"Unknown entailment model key: {args.entailment_model_key}. "
-                                 f"Must be one of {list(ENTAILMENT_MODELS.keys())}")
-            model_info = ENTAILMENT_MODELS[args.entailment_model_key]
-
-            config = AlignmentConfig(
-                method=method,
-                threshold=args.threshold if args.threshold is not None else model_info["threshold"],
-                device=check_or_select_device(args.device),
-                entailment_config=EntailmentModelConfig(
-                    model_name=model_info["model_name"],
-                    threshold=model_info["threshold"]
-                ),
-                cache_path=model_info["cache_file"]
-            )
-
-        case "rouge":
-            # Possibly ignore threshold or device?
-            config = AlignmentConfig(
-                method=method,
-                threshold=args.threshold if args.threshold is not None else default_config.threshold,
-                device=check_or_select_device(args.device),
-            )
-
-        case _:
-            # Fallback if user typed a method not recognized
-            # or you can treat it as 'rouge' or throw an error
-            raise ValueError(f"Unknown method: {method}. Options: 'embedding', 'entailment', 'rouge'.")
-
+    method = (args.method or default_config.method).lower()
+    raw_dataset_name = args.dataset_name or default_config.dataset_name
+    dataset_name = DATASET_ALIASES.get(raw_dataset_name, raw_dataset_name)
+    device = check_or_select_device(args.device)
     claim_gen_key = args.claim_gen_key or default_config.claim_gen_key
-    config.claim_gen_key = claim_gen_key
+
+    if method == AlignmentMethods.EMBEDDING:
+        if args.embedding_model_key not in EMBEDDING_MODELS:
+            raise ValueError(
+                f"Unknown embedding model key: {args.embedding_model_key}. "
+                f"Must be one of {list(EMBEDDING_MODELS.keys())}"
+            )
+        model_info = EMBEDDING_MODELS[args.embedding_model_key]
+        threshold = args.threshold if args.threshold is not None else model_info["threshold"]
+
+        config = AlignmentConfig(
+            method=method,
+            threshold=threshold,
+            device=device,
+            embedding_config=EmbeddingModelConfig(
+                model_name=model_info["model_name"],
+                threshold=model_info["threshold"],
+            ),
+            cache_path=model_info["cache_file"],
+            claim_gen_key=claim_gen_key,
+            dataset_name=dataset_name
+        )
+
+    elif method == AlignmentMethods.ENTAILMENT:
+        if args.entailment_model_key not in ENTAILMENT_MODELS:
+            raise ValueError(
+                f"Unknown entailment model key: {args.entailment_model_key}. "
+                f"Must be one of {list(ENTAILMENT_MODELS.keys())}"
+            )
+        model_info = ENTAILMENT_MODELS[args.entailment_model_key]
+        threshold = args.threshold if args.threshold is not None else model_info["threshold"]
+
+        config = AlignmentConfig(
+            method=method,
+            threshold=threshold,
+            device=device,
+            entailment_config=EntailmentModelConfig(
+                model_name=model_info["model_name"],
+                threshold=model_info["threshold"],
+            ),
+            cache_path=model_info["cache_file"],
+            claim_gen_key=claim_gen_key,
+            dataset_name=dataset_name
+        )
+
+    elif method == AlignmentMethods.ROUGE:
+        threshold = args.threshold if args.threshold is not None else default_config.threshold
+
+        config = AlignmentConfig(
+            method=method,
+            threshold=threshold,
+            device=device,
+            claim_gen_key=claim_gen_key,
+            dataset_name=dataset_name
+        )
+
+    else:
+        raise ValueError(
+            f"Unknown method: {method}. "
+            f"Options: '{AlignmentMethods.EMBEDDING}', '{AlignmentMethods.ENTAILMENT}', '{AlignmentMethods.ROUGE}'."
+        )
 
     return config
 
 
 def do_alignment(
-    dataset_name: str,
-    aligner: BaseAligner,
-    small_test: bool,
-    config: AlignmentConfig
+        aligner: BaseAligner,
+        small_test: bool,
+        config: AlignmentConfig
 ) -> None:
     """
     Handles either a single dataset or all datasets. If dataset_name is provided, we process that
     specific dataset; otherwise we process them all.
     """
-    # The list of all datasets
     all_datasets = [
         DatasetName.CNNDM_TEST,
         DatasetName.CNNDM_VALIDATION,
         DatasetName.XSUM,
         DatasetName.SAMSUM,
     ]
+    dataset_name = config.dataset_name
 
     if dataset_name:
         # Single dataset

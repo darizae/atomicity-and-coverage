@@ -92,7 +92,6 @@ def main():
     aligner = create_aligner(config)
 
     do_alignment(
-        dataset_name=args.dataset_name,
         aligner=aligner,
         small_test=args.small_test,
         config=config
