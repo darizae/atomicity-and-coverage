@@ -151,19 +151,30 @@ def _process_dataset(dataset, aligner):
     for record in dataset:
         system_claims = record.get("system_claims_t5", [])
         reference_acus = record.get("reference_acus", [])
+
         if not system_claims or not reference_acus:
+            # Skip any record that doesn't have both sets of claims
             continue
 
+        # 1) Obtain the raw alignment_map
         alignment_map = aligner.align(system_claims, reference_acus)
+
+        # 2) Expand alignment with strings
+        alignment_map_expanded = expand_alignment_map(system_claims, reference_acus, alignment_map)
+
+        # 3) Compute coverage & atomicity
         coverage = compute_coverage(alignment_map, len(reference_acus))
         atomicity = compute_atomicity(alignment_map, len(system_claims))
 
+        # 4) Store both old & new forms in the results
         results.append({
             "reference summary": record.get("reference", ""),
             "coverage": coverage,
             "atomicity": atomicity,
-            "alignment_map": alignment_map
+            "alignment_map": alignment_map,  # the original for debugging
+            "alignment_map_expanded": alignment_map_expanded  # the new human-readable version
         })
+
     return results
 
 
@@ -251,3 +262,47 @@ def save_all_results(
     with output_path.open("w", encoding="utf-8") as f:
         json.dump(all_results, f, indent=2)
     print(f"[save_all_results] Combined results saved to {output_path}")
+
+
+def expand_alignment_map(
+    system_claims: List[str],
+    reference_acus: List[str],
+    alignment_map: Dict[int, List[int]]
+) -> List[Dict[str, Any]]:
+    """
+    Expand the alignment map to include system claim text and matched reference text.
+
+    Returns a list of dicts like:
+    [
+      {
+        "system_claim_idx": i,
+        "system_claim_text": "...",
+        "matched_refs": [
+           {"ref_idx": r, "ref_claim": "..."},
+           ...
+        ]
+      },
+      ...
+    ]
+    """
+    expanded = []
+    for s_idx, matched_ref_idxs in alignment_map.items():
+        # The text of the system claim
+        sys_text = system_claims[s_idx]
+
+        # Build a list of reference claims that matched
+        matched_refs = []
+        for r_idx in matched_ref_idxs:
+            matched_refs.append({
+                "ref_idx": r_idx,
+                "ref_claim": reference_acus[r_idx]
+            })
+
+        expanded.append({
+            "system_claim_idx": s_idx,
+            "system_claim_text": sys_text,
+            "matched_refs": matched_refs
+        })
+
+    return expanded
+
