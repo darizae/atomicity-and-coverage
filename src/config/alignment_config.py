@@ -30,3 +30,5 @@ class AlignmentConfig:
     embedding_config: EmbeddingModelConfig = field(default_factory=EmbeddingModelConfig)
     entailment_config: EntailmentModelConfig = field(default_factory=EntailmentModelConfig)
     cache_path: str = None
+    claim_gen_key: str = "distilled_t5"
+    dataset_name: str = None

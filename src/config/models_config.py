@@ -5,15 +5,21 @@ ALIGNMENT_PATHS = AlignmentPaths()
 CLAIM_GENERATION_MODELS = {
     "distilled_t5": {
         "name": "Babelscape/t5-base-summarization-claim-extractor",
-        "claims_field": "system_claims_t5",
+        "claims_field": "system_claims_distilled_t5",
         "tokenizer_class": "transformers.T5Tokenizer",
         "model_class": "transformers.T5ForConditionalGeneration",
-        "type": "seq2seq"  # This is helpful to identify that it's a seq2seq pipeline
+        "type": "seq2seq"
     },
-    "openai_gpt35": {
-        "name": "gpt-3.5-turbo",  # OpenAI model name
+    "llama3_1b": {
+        "name": "llama3.2-1b-instruct",
+        "endpoint_url": "http://127.0.0.1:1337/v1/chat/completions",
+        "claims_field": "system_claims_llama3.2-1b-instruct",
+        "type": "local",
+    },
+    "gpt-3.5-turbo": {
+        "name": "gpt-3.5-turbo",
         "claims_field": "system_claims_gpt35",
-        "type": "openai",  # Let's define a new type for “OpenAI-based calls”
+        "type": "openai"
     },
     "llama2_7b_local": {
         "name": "/works/data0/jiang/model/huggingface/llama-7b-hf",  # local path on your server

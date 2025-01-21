@@ -1,66 +1,53 @@
-from src.config import RosePathsSmall, AlignmentConfig, DatasetName
-from src.metrics.atomicity_coverage import compute_coverage, compute_atomicity
-from src.rose.rose_loader import RoseDatasetLoader
-from src.metrics.alignment import match_claims
+import subprocess
+
+SMALL_TEST = False
 
 
 def main():
-    # Load configurations
-    dataset_config = RosePathsSmall()
-    alignment_config = AlignmentConfig()
+    # Define the experiments you want to run
+    # Only these four parameters vary: method, threshold, claim_gen_key, small_test
 
-    # Initialize the loader and load datasets
-    loader = RoseDatasetLoader()
-    datasets = loader.load_datasets_compressed(dataset_config.compressed_dataset_path)
+    experiment_configs = [
+        {
+            "method": "rouge",
+            "threshold": 0.3,
+            "claim_gen_key": "distilled_t5",
+        },
+        {
+            "method": "embedding",
+            "threshold": 0.7,
+            "claim_gen_key": "distilled_t5",
+        },
+        {
+            "method": "embedding",
+            "threshold": 0.8,
+            "claim_gen_key": "distilled_t5",
+        },
+        {
+            "method": "entailment",
+            "threshold": 0.9,
+            "claim_gen_key": "distilled_t5",
+        },
+        # Add more experiments if you like
+    ]
 
-    # Choose dataset
-    dataset_name = DatasetName.CNNDM_TEST
-    if dataset_name not in datasets:
-        print(f"Dataset '{dataset_name}' not found in loaded datasets.")
-        return
-    dataset = datasets[dataset_name]
+    for i, exp_conf in enumerate(experiment_configs, start=1):
+        print(f"\n[Experiment {i}] Params: {exp_conf}")
 
-    # Process each record
-    results = []
-    for record in dataset:
-        reference_acus = record.get("reference_acus", [])
-        system_claims = record.get("system_claims_t5", [])
+        # Build the CLI command for main_alignment.py
+        cmd = [
+            "python", "metrics/main_alignment.py",
+            "--method", exp_conf["method"],
+            "--threshold", str(exp_conf["threshold"]),
+            "--claim_gen_key", exp_conf["claim_gen_key"]
+        ]
+        # If small_test is True, we add the flag (no value needed)
+        if SMALL_TEST:
+            cmd.append("--small_test")
 
-        if not reference_acus or not system_claims:
-            print("Skipping record with missing claims or references.")
-            continue
+        subprocess.run(cmd, check=True)
 
-        # Perform alignment
-        alignment_map = match_claims(
-            system_claims=system_claims,
-            reference_acus=reference_acus,
-            threshold=alignment_config.threshold,
-            method=alignment_config.method,
-            device=alignment_config.device
-        )
-
-        # Compute metrics
-        coverage_score = compute_coverage(alignment_map, len(reference_acus))
-        atomicity_score = compute_atomicity(alignment_map, len(system_claims))
-
-        # Store results
-        results.append({
-            "coverage": coverage_score,
-            "atomicity": atomicity_score,
-            "alignment_map": alignment_map
-        })
-
-    # Save results
-    # Get the current filename and perform string replacement
-    new_filename = dataset_config.compressed_dataset_with_system_claims_path.name.replace(".json.gz", "_metrics.json")
-    # Create a new Path with the modified filename in the same directory
-    output_path = dataset_config.compressed_dataset_with_system_claims_path.with_name(new_filename)
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        import json
-        json.dump(results, f, ensure_ascii=False, indent=2)
-
-    print(f"Metrics results saved to {output_path}")
+    print("\nAll experiments completed!")
 
 
 if __name__ == "__main__":

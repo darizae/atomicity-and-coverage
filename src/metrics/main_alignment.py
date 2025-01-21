@@ -65,6 +65,13 @@ def get_args():
         help="Which entailment model key to use. Must be one of: roberta, bart, etc."
     )
 
+    parser.add_argument(
+        "--claim_gen_key",
+        type=str,
+        default="distilled_t5",
+        help="Which claims from which claim generation model to use. Must be one of: distilled_t5, etc."
+    )
+
     return parser.parse_args()
 
 
@@ -85,9 +92,9 @@ def main():
     aligner = create_aligner(config)
 
     do_alignment(
-        dataset_name=args.dataset_name,
         aligner=aligner,
-        small_test=args.small_test
+        small_test=args.small_test,
+        config=config
     )
 
     timer.stop()
