@@ -1,6 +1,7 @@
 import subprocess
 
 SMALL_TEST = False
+CLAIM_GEN_MODEL = "gpt-3.5-turbo"
 
 
 def main():
@@ -11,17 +12,17 @@ def main():
         {
             "method": "rouge",
             "threshold": 0.3,
-            "claim_gen_key": "distilled_t5",
+            "claim_gen_key": CLAIM_GEN_MODEL,
         },
         {
             "method": "embedding",
             "threshold": 0.7,
-            "claim_gen_key": "distilled_t5",
+            "claim_gen_key": CLAIM_GEN_MODEL,
         },
         {
             "method": "embedding",
             "threshold": 0.8,
-            "claim_gen_key": "distilled_t5",
+            "claim_gen_key": CLAIM_GEN_MODEL,
         },
         {
             "method": "entailment",

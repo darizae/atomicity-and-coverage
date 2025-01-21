@@ -1,8 +1,7 @@
+from .config import AlignmentConfig, AlignmentMethods
 from .rouge_alignment import RougeAligner
 from .embedding_alignment import EmbeddingAligner
 from .entailment_alignment import EntailmentAligner
-from src.config import AlignmentConfig
-from ...config.alignment_config import AlignmentMethods
 
 
 def create_aligner(config: AlignmentConfig):

@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import List, Optional
 from datasets import load_dataset
 
-from src.config import RosePaths, RosePathsSmall, DATASET_ALIASES
+from src.metrics.datasets_config import DATASET_ALIASES
+from src.utils.paths import RosePaths, RosePathsSmall
 
 
 class RoseDatasetLoader:

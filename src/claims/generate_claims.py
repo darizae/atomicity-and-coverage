@@ -1,15 +1,10 @@
 import argparse
 from pathlib import Path
 
-from claim_generator import (
-    ModelConfig,
-    HuggingFaceSeq2SeqGenerator,
-    HuggingFaceCausalGenerator,
-    OpenAIClaimGenerator,
-    JanLocalClaimGenerator
-)
-
-from src.config import RosePathsSmall, RosePaths, CLAIM_GENERATION_MODELS, DATASET_ALIASES
+from src.claims.claim_generator import ModelConfig
+from src.claims.config import get_claim_generation_model_config
+from src.metrics.datasets_config import DATASET_ALIASES
+from src.utils.paths import RosePathsSmall, RosePaths
 from src.rose.rose_loader import RoseDatasetLoader
 from src.utils.timer import Timer
 
@@ -60,36 +55,14 @@ def initialize_model_generator(
     Given a model_key from CLAIM_GENERATION_MODELS, build a ModelConfig
     and instantiate the appropriate generator class.
     """
-    if model_key not in CLAIM_GENERATION_MODELS:
-        raise ValueError(f"Model key '{model_key}' not found in CLAIM_GENERATION_MODELS.")
+    model_info = get_claim_generation_model_config(model_key)
 
-    model_info = CLAIM_GENERATION_MODELS[model_key]
-    model_type = model_info.get("type", "seq2seq")
-
-    name_or_path = model_info["name"]
-    tokenizer_class = model_info.get("tokenizer_class")
-    model_class = model_info.get("model_class")
-    endpoint_url = model_info.get("endpoint_url", None)
-
-    # Decide provider from type
-    if model_type in ("seq2seq", "causal"):
-        provider = "huggingface"
-    elif model_type == "openai":
-        provider = "openai"
-    elif model_type == "local":
-        # We'll treat "local" as a Jan local endpoint
-        provider = "jan"
-    else:
-        raise NotImplementedError(f"Model type '{model_type}' is not supported.")
-
-    # Build the ModelConfig
     config = ModelConfig(
-        provider=provider,
-        model_name_or_path=name_or_path,
-        tokenizer_class=tokenizer_class,
-        model_class=model_class,
-        endpoint_url=endpoint_url,
-        openai_api_key=openai_api_key,  # pass it if present
+        model_name_or_path=model_info.name,
+        tokenizer_class=model_info.tokenizer_class,
+        model_class=model_info.model_class,
+        endpoint_url=model_info.endpoint_url,
+        openai_api_key=openai_api_key,
         device=device,
         batch_size=batch_size,
         max_length=max_length,
@@ -97,17 +70,8 @@ def initialize_model_generator(
         temperature=temperature,
     )
 
-    # Instantiate the right generator
-    if model_type == "seq2seq":
-        generator = HuggingFaceSeq2SeqGenerator(config)
-    elif model_type == "causal":
-        generator = HuggingFaceCausalGenerator(config)
-    elif model_type == "openai":
-        generator = OpenAIClaimGenerator(config)
-    elif model_type == "local":
-        generator = JanLocalClaimGenerator(config)
-    else:
-        raise NotImplementedError(f"Model type '{model_type}' not supported.")
+    generator_class = model_info.generator_cls
+    generator = generator_class(config)
 
     return generator, model_info
 
@@ -176,8 +140,7 @@ def process_dataset(
     print("Claim generation complete.")
 
     # Save
-    claims_field = model_info["claims_field"]
-    save_generated_claims(loader, dataset_name, claims_field, claims, paths)
+    save_generated_claims(loader, dataset_name, model_info.claims_field, claims, paths)
 
     # Log
     num_arrays = len(claims)

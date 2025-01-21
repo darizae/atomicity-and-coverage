@@ -3,20 +3,16 @@ import os
 from typing import List, Dict, Any
 
 from src.metrics.alignment.base_aligner import BaseAligner
+from src.metrics.alignment.config import AlignmentConfig, AlignmentMethods, get_embedding_model_definition, \
+    EmbeddingModelConfig, get_entailment_model_definition, EntailmentModelConfig
+from src.metrics.datasets_config import DATASET_ALIASES, DatasetName
+from src.utils.paths import RosePathsSmall, RosePaths, get_alignment_results_path
 from src.utils.device_selector import check_or_select_device
-from src.config import RosePaths, RosePathsSmall, AlignmentConfig, DatasetName, DATASET_ALIASES
-from src.config.alignment_config import EmbeddingModelConfig, EntailmentModelConfig, AlignmentMethods
 from src.rose.rose_loader import RoseDatasetLoader
 from src.metrics.atomicity_coverage import compute_atomicity, compute_coverage
-from src.utils.path_utils import get_alignment_results_path
-
-from src.config.models_config import EMBEDDING_MODELS, ENTAILMENT_MODELS, CLAIM_GENERATION_MODELS
 
 
 def build_config(args) -> AlignmentConfig:
-    """
-    Build an AlignmentConfig based on user-specified arguments (args) and defaults.
-    """
     default_config = AlignmentConfig()
 
     method = (args.method or default_config.method).lower()
@@ -26,45 +22,46 @@ def build_config(args) -> AlignmentConfig:
     claim_gen_key = args.claim_gen_key or default_config.claim_gen_key
 
     if method == AlignmentMethods.EMBEDDING:
-        if args.embedding_model_key not in EMBEDDING_MODELS:
-            raise ValueError(
-                f"Unknown embedding model key: {args.embedding_model_key}. "
-                f"Must be one of {list(EMBEDDING_MODELS.keys())}"
-            )
-        model_info = EMBEDDING_MODELS[args.embedding_model_key]
-        threshold = args.threshold if args.threshold is not None else model_info["threshold"]
+        # 1) Get the typed definition
+        definition = get_embedding_model_definition(args.embedding_model_key)
 
+        # 2) Decide threshold (override if user-specified)
+        threshold = args.threshold if args.threshold is not None else definition.threshold
+
+        # 3) Build your final EmbeddingModelConfig
+        embedding_config = EmbeddingModelConfig(
+            model_name=definition.model_name,
+            cache_file=definition.cache_file,
+            threshold=threshold,
+        )
+
+        # 4) Populate the main AlignmentConfig
         config = AlignmentConfig(
             method=method,
             threshold=threshold,
             device=device,
-            embedding_config=EmbeddingModelConfig(
-                model_name=model_info["model_name"],
-                threshold=threshold,
-            ),
-            cache_path=model_info["cache_file"],
+            embedding_config=embedding_config,
+            cache_path=definition.cache_file,
             claim_gen_key=claim_gen_key,
             dataset_name=dataset_name
         )
 
     elif method == AlignmentMethods.ENTAILMENT:
-        if args.entailment_model_key not in ENTAILMENT_MODELS:
-            raise ValueError(
-                f"Unknown entailment model key: {args.entailment_model_key}. "
-                f"Must be one of {list(ENTAILMENT_MODELS.keys())}"
-            )
-        model_info = ENTAILMENT_MODELS[args.entailment_model_key]
-        threshold = args.threshold if args.threshold is not None else model_info["threshold"]
+        definition = get_entailment_model_definition(args.entailment_model_key)
+        threshold = args.threshold if args.threshold is not None else definition.threshold
+
+        entailment_config = EntailmentModelConfig(
+            model_name=definition.model_name,
+            cache_file=definition.cache_file,
+            threshold=threshold
+        )
 
         config = AlignmentConfig(
             method=method,
             threshold=threshold,
             device=device,
-            entailment_config=EntailmentModelConfig(
-                model_name=model_info["model_name"],
-                threshold=threshold,
-            ),
-            cache_path=model_info["cache_file"],
+            entailment_config=entailment_config,
+            cache_path=definition.cache_file,
             claim_gen_key=claim_gen_key,
             dataset_name=dataset_name
         )
@@ -151,7 +148,7 @@ def _load_dataset(small_test: bool = False):
 def _process_dataset(dataset, aligner, config):
     results = []
 
-    system_claims_key = CLAIM_GENERATION_MODELS[config.claim_gen_key]["claims_field"]
+    system_claims_key = config.claim_gen_config.claims_field
 
     for record in dataset:
         # Grab system claims using the dynamic key

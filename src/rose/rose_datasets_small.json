@@ -27,9 +27,9 @@
         "Arango could face a retrospective punishment."
       ],
       "system_claims_gpt35": [
-        "Juan Arango escaped punishment from the referee for biting Jesus Zavela.",
-        "He could face a retrospective punishment for the incident.",
-        "Arango had earlier scored a free kick in his team's 4-3 defeat."
+        "Juan Arango escaped punishment for biting Jesus Zavela.",
+        "Arango could face a retrospective punishment for the incident.",
+        "Arango scored a free kick in his team's 4-3 defeat."
       ]
     },
     {
@@ -66,7 +66,7 @@
         "The 22-year-old is out on loan at Championship side Nottingham Forest.",
         "Tim Sherwood is keen to assess Gardner ahead of next season.",
         "The midfielder would prefer a move back to Forest if Villa doesn't work out.",
-        "CLICK HERE for all the latest Aston Villa news."
+        "All the latest Aston Villa news can be found by clicking HERE."
       ]
     },
     {
@@ -99,7 +99,7 @@
         "Current federal government guidelines dictate people should limit their salt intake to 2,300 milligrams.",
         "Scientists believe a typical healthy person can consume as much as 6,000 milligrams per day without significantly raising health risks.",
         "The same skeptics warn of health risks associated with consuming less than 3,000 milligrams.",
-        "Average American ingests about 3,500 milligrams of salt per day."
+        "The average American ingests about 3,500 milligrams of salt per day."
       ]
     }
   ],
@@ -124,8 +124,21 @@
         "Ansel Elgort stars in the spread.",
         "Dylan Penn stars in the spread.",
         "Hopper stars in the spread.",
-        "Kendall appeared in Vogue for the fifth time.",
+        "Kendall's appearance in Vogue is her fifth time.",
         "Kendall is 19 years old."
+      ],
+      "system_claims_distilled_t5": [
+        "The spread was shot by photographer Mario Testino",
+        "The spread also stars Gigi Hadid, Ansel Elgort, Dylan Penn and her younger brother Hopper",
+        "Kendall is 19 years old",
+        "Kendall's fifth time appearing in the pages of Vogue"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "The spread was shot by photographer Mario Testino.",
+        "Gigi Hadid stars in The spread.",
+        "Mario Testino also stars Gigi Hadid.",
+        "Kendall appears in The spread for the fifth time.",
+        "19-year-old Kendall is featured in Vogue."
       ]
     },
     {
@@ -143,11 +156,20 @@
       ],
       "system_claims_gpt35": [
         "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'.",
-        "Paul Pogba is 22 years old.",
-        "Paul Pogba has seven goals in 22 Serie A appearances this season.",
+        "The 22-year-old has seven goals in 22 Serie A appearances this season.",
         "Paul Pogba has attracted interest from Manchester United.",
         "Paul Pogba has attracted interest from Chelsea.",
         "Paul Pogba has attracted interest from Manchester City."
+      ],
+      "system_claims_distilled_t5": [
+        "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'",
+        "The 22-year-old has seven goals in 22 Serie A appearances this season",
+        "Pogba has attracted interest from Manchester United, Chelsea and Manchester City"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "Zinedine Zidane said interest in Juventus star Paul Pogba is only logical.",
+        "Paul Pogba has seven goals in 22 Serie A appearances this season.",
+        "Pogba has also attracted interest from Manchester United, Chelsea and Manchester City."
       ]
     },
     {
@@ -174,6 +196,19 @@
         "Pearce said 'you could have told us' when he ran out of shot.",
         "Pearce took the incident in good spirits.",
         "Pearce later laughed off the incident on air."
+      ],
+      "system_claims_distilled_t5": [
+        "Jonathan Pearce was at the Emirates to commentate for Match of the Day",
+        "The 55-year-old was preparing a piece to camera when a sprinkler came on",
+        "Pearce was soaked and ran out of shot, saying 'you could have told us'",
+        "He took it in good spirits",
+        "He later laughed off the incident on air"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "Jonathan Pearce was at the Emirates.",
+        "The 55-year-old was preparing a piece to camera when a sprinkler came on.",
+        "Pearce was soaked and ran out of shot saying 'you could have told us'.",
+        "He took it in good spirits, later laughing off the incident on air."
       ]
     }
   ],
@@ -188,7 +223,14 @@
       ],
       "system_claims_gpt35": [
         "The main suspect has gone on trial.",
-        "The trial is for the most brutal massacre in recent Philippine history."
+        "The trial is related to the most brutal massacre in recent Philippine history."
+      ],
+      "system_claims_distilled_t5": [
+        "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "The main suspect was tried.",
+        "The suspect went on trial."
       ]
     },
     {
@@ -202,8 +244,18 @@
       ],
       "system_claims_gpt35": [
         "The government will increase the levy on banks.",
-        "The increase will be from 0.078% to 0.088%.",
+        "The increase in the levy will be from 0.078% to 0.088%.",
         "The increase will take effect from 1 January."
+      ],
+      "system_claims_distilled_t5": [
+        "The government says it will increase the levy on banks from 0",
+        "078% to 0",
+        "088% from 1 January"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "The government increased the levy on banks.",
+        "Banks will be subject to a new rate of 0.088% from 1 January.",
+        "The increase is effective from 1 January."
       ]
     },
     {
@@ -218,6 +270,14 @@
       "system_claims_gpt35": [
         "Footballer Gary Neville has controversial plans for an eco-friendly 'Teletubbies' house.",
         "The plans have been given the go ahead by Bolton Council."
+      ],
+      "system_claims_distilled_t5": [
+        "Footballer Gary Neville's controversial plans for an eco-friendly 'Teletubbies' house have been given the go ahead by Bolton Council"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "Gary Neville's plans were approved.",
+        "The plans were given the go ahead by Bolton Council.",
+        "Bolton Council gave approval to Gary Neville's plans."
       ]
     }
   ],
@@ -236,6 +296,16 @@
       ],
       "system_claims_gpt35": [
         "Charlie's sister passed her last university exam.",
+        "The last university exam was passed by Charlie's sister.",
+        "Charlie and Frank will go out to celebrate tonight.",
+        "The celebration is for passing the last university exam."
+      ],
+      "system_claims_distilled_t5": [
+        "Charlie's sister passed her last university exam",
+        "Charlie and Frank will go out to celebrate that tonight"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "Charlie's sister passed her last university exam.",
         "Charlie and Frank will go out to celebrate tonight."
       ]
     },
@@ -250,6 +320,16 @@
       ],
       "system_claims_gpt35": [
         "Brett's cousin met his wife while playing a game together.",
+        "Andrew's favorite game is the Final Fantasy.",
+        "Brett and John haven't heard about it."
+      ],
+      "system_claims_distilled_t5": [
+        "Brett's cousin met his wife while playing a game together",
+        "Andrew's favorite game is the Final Fantasy",
+        "Brett and John haven't heard about it"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "Brett's cousin met his wife.",
         "Andrew's favorite game is the Final Fantasy.",
         "Brett and John haven't heard about it."
       ]
@@ -267,8 +347,18 @@
       "system_claims_gpt35": [
         "Anna got an awful stomachache at night.",
         "Anna doesn't know the cause of her stomachache.",
-        "Joanna will make hot tea for Anna.",
-        "The tea will contain fresh mint leaves."
+        "Joanna is Anna's mom.",
+        "Joanna will make Anna hot tea.",
+        "The hot tea will contain fresh mint leaves."
+      ],
+      "system_claims_distilled_t5": [
+        "Anna got an awful stomachache at night",
+        "Anna doesn't know its cause",
+        "Anna's mom Joanna will make her hot tea with some fresh mint leaves"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "Anna's stomachache was caused by a bad meal.",
+        "Her mom Joanna made Anna hot tea."
       ]
     }
   ]

@@ -10,12 +10,11 @@ from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModel, AutoModelForSeq2SeqLM, AutoModelForCausalLM
 import openai
 
-from src.config.prompt_templates import REFINED_CLAIM_PROMPT
+from src.claims.prompt_templates import REFINED_CLAIM_PROMPT
 
 
 @dataclass
 class ModelConfig:
-    provider: str  # e.g. "huggingface", "openai", "jan"
     model_name_or_path: str  # HF model name or path, OR engine name for Jan/OpenAI
 
     # For HF:

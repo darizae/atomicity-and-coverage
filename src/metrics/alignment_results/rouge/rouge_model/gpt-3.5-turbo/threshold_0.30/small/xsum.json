@@ -1,0 +1,45 @@
+[
+  {
+    "reference summary": "The main suspect in the most brutal massacre in recent Philippine history has gone on trial.",
+    "coverage": 1.0,
+    "atomicity": 0.3333333333333333,
+    "alignment_map_expanded": [
+      {
+        "system_claim_idx": 0,
+        "system_claim_text": "The main suspect has gone on trial.",
+        "matched_refs": [
+          {
+            "ref_idx": 0,
+            "ref_claim": "The main suspect in a massacre has gone on trial"
+          },
+          {
+            "ref_idx": 1,
+            "ref_claim": "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+          },
+          {
+            "ref_idx": 2,
+            "ref_claim": "The main suspect in the massacre in Philippine has gone on trial"
+          }
+        ]
+      },
+      {
+        "system_claim_idx": 1,
+        "system_claim_text": "The trial is for the most brutal massacre in recent Philippine history.",
+        "matched_refs": [
+          {
+            "ref_idx": 0,
+            "ref_claim": "The main suspect in a massacre has gone on trial"
+          },
+          {
+            "ref_idx": 1,
+            "ref_claim": "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+          },
+          {
+            "ref_idx": 2,
+            "ref_claim": "The main suspect in the massacre in Philippine has gone on trial"
+          }
+        ]
+      }
+    ]
+  }
+]
