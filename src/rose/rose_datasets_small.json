@@ -96,10 +96,10 @@
         "Average American ingests about 3,500 milligrams of salt per day."
       ],
       "system_claims_gpt35": [
-        "Current federal government guidelines dictate that people should limit their salt intake to 2,300 milligrams.",
-        "Scientists now believe a typical healthy person can consume as much as 6,000 milligrams of salt per day without significantly raising health risks.",
-        "The same skeptics also warn of the health risks associated with consuming less than 3,000 milligrams of salt.",
-        "The average American ingests about 3,500 milligrams of salt per day."
+        "Current federal government guidelines dictate people should limit their salt intake to 2,300 milligrams.",
+        "Scientists believe a typical healthy person can consume as much as 6,000 milligrams per day without significantly raising health risks.",
+        "The same skeptics warn of health risks associated with consuming less than 3,000 milligrams.",
+        "Average American ingests about 3,500 milligrams of salt per day."
       ]
     }
   ],
@@ -117,6 +117,15 @@
         "Kendall is 19 years old.",
         "The spread is in Vogue.",
         "This is Kendall's fifth time appearing in Vogue."
+      ],
+      "system_claims_gpt35": [
+        "The spread was shot by photographer Mario Testino.",
+        "Gigi Hadid stars in the spread.",
+        "Ansel Elgort stars in the spread.",
+        "Dylan Penn stars in the spread.",
+        "Hopper stars in the spread.",
+        "Kendall appeared in Vogue for the fifth time.",
+        "Kendall is 19 years old."
       ]
     },
     {
@@ -131,6 +140,14 @@
         "Pogba has also attracted interest from Manchester United",
         "Pogba has also attracted interest from Chelsea",
         "Pogba has also attracted interest from Manchester City"
+      ],
+      "system_claims_gpt35": [
+        "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'.",
+        "Paul Pogba is 22 years old.",
+        "Paul Pogba has seven goals in 22 Serie A appearances this season.",
+        "Paul Pogba has attracted interest from Manchester United.",
+        "Paul Pogba has attracted interest from Chelsea.",
+        "Paul Pogba has attracted interest from Manchester City."
       ]
     },
     {
@@ -147,6 +164,16 @@
         "Jonathan Pearce said 'you could have told us' .",
         "Jonathan Pearce took it in good spirits.",
         "Jonathan Pearce later laughed off the incident on air ."
+      ],
+      "system_claims_gpt35": [
+        "Jonathan Pearce was at the Emirates to commentate for Match of the Day.",
+        "The 55-year-old was preparing a piece to camera.",
+        "A sprinkler came on while Pearce was preparing a piece to camera.",
+        "Pearce was soaked when the sprinkler came on.",
+        "Pearce ran out of shot when he was soaked.",
+        "Pearce said 'you could have told us' when he ran out of shot.",
+        "Pearce took the incident in good spirits.",
+        "Pearce later laughed off the incident on air."
       ]
     }
   ],
@@ -158,6 +185,10 @@
         "The main suspect in a massacre has gone on trial",
         "The main suspect in the most brutal massacre in recent Philippine history has gone on trial",
         "The main suspect in the massacre in Philippine has gone on trial"
+      ],
+      "system_claims_gpt35": [
+        "The main suspect has gone on trial.",
+        "The trial is for the most brutal massacre in recent Philippine history."
       ]
     },
     {
@@ -168,6 +199,11 @@
         "The government says it will increase the levy on banks",
         "The government says it will increase the levy from 0.078% to 0.088%",
         "The government says it will increase the levy from 1 January"
+      ],
+      "system_claims_gpt35": [
+        "The government will increase the levy on banks.",
+        "The increase will be from 0.078% to 0.088%.",
+        "The increase will take effect from 1 January."
       ]
     },
     {
@@ -178,6 +214,10 @@
         "The controversial plans have been given the go ahead",
         "The controversial plans are for an eco-friendly \"Teletubbies\" house",
         "The controversial plans have been given the go ahead by Bolton Council."
+      ],
+      "system_claims_gpt35": [
+        "Footballer Gary Neville has controversial plans for an eco-friendly 'Teletubbies' house.",
+        "The plans have been given the go ahead by Bolton Council."
       ]
     }
   ],
@@ -193,6 +233,10 @@
         "Frank will go out",
         "Frank will go out to celebrate that",
         "Frank will go out tonight."
+      ],
+      "system_claims_gpt35": [
+        "Charlie's sister passed her last university exam.",
+        "Charlie and Frank will go out to celebrate tonight."
       ]
     },
     {
@@ -203,6 +247,11 @@
         "Andrew's favorite game is the Final Fantasy",
         "Brett hasn't heard about the Final Fantasy",
         "John hasn't heard about the Final Fantasy"
+      ],
+      "system_claims_gpt35": [
+        "Brett's cousin met his wife while playing a game together.",
+        "Andrew's favorite game is the Final Fantasy.",
+        "Brett and John haven't heard about it."
       ]
     },
     {
@@ -214,6 +263,12 @@
         "Anna doesn't know its cause.",
         "Anna's mom Joanna will make her hot tea",
         "The hot tea will be served with some fresh mint leaves."
+      ],
+      "system_claims_gpt35": [
+        "Anna got an awful stomachache at night.",
+        "Anna doesn't know the cause of her stomachache.",
+        "Joanna will make hot tea for Anna.",
+        "The tea will contain fresh mint leaves."
       ]
     }
   ]
