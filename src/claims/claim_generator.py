@@ -1,5 +1,6 @@
 import importlib
 import json
+import os
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from typing import List, Type, Optional
@@ -194,14 +195,13 @@ class OpenAIClaimGenerator(BaseClaimGenerator):
     def __init__(self, config):
         super().__init__()
         self.config = config
-        # set your openai.api_key
         if config.openai_api_key:
             openai.api_key = config.openai_api_key
         else:
-            # Possibly raise an error or rely on environment variable
-            pass
-
-        # The "model_name_or_path" is the "engine" you want to call, e.g. "gpt-3.5-turbo"
+            openai_api_key_env = os.getenv("OPENAI_API_KEY")
+            if not openai_api_key_env:
+                raise ValueError("OpenAI API key not found in config or in the environment.")
+            openai.api_key = openai_api_key_env
 
     def generate_claims(self, texts: List[str]) -> List[List[str]]:
         all_claims = []
