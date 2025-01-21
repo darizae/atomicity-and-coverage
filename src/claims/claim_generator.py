@@ -1,47 +1,97 @@
 import importlib
 import json
-from typing import List, Type
+from abc import abstractmethod, ABC
+from dataclasses import dataclass
+from typing import List, Type, Optional
 
 import requests
 from tqdm import tqdm
+from transformers import AutoTokenizer, AutoModel, AutoModelForSeq2SeqLM, AutoModelForCausalLM
+import openai
 
 from src.config.prompt_templates import REFINED_CLAIM_PROMPT
 
 
+@dataclass
 class ModelConfig:
-    def __init__(self, model_name: str, tokenizer_class_path: str, model_class_path: str,
-                 device: str = "cpu", batch_size: int = 32, max_length: int = 512, truncation: bool = True):
-        self.model_name = model_name
-        self.tokenizer_class_path = tokenizer_class_path
-        self.model_class_path = model_class_path
-        self.device = device
-        self.batch_size = batch_size
-        self.max_length = max_length
-        self.truncation = truncation
+    provider: str  # e.g. "huggingface", "openai", "jan"
+    model_name_or_path: str  # HF model name or path, OR engine name for Jan/OpenAI
+
+    # For HF:
+    tokenizer_class: Optional[str] = None
+    model_class: Optional[str] = None
+
+    # For Jan or OpenAI:
+    endpoint_url: Optional[str] = None
+    openai_api_key: Optional[str] = None  # for real openai calls
+
+    # Common generation params:
+    device: str = "cpu"
+    batch_size: int = 32
+    max_length: int = 512
+    truncation: bool = True
+    temperature: float = 0.0
 
 
-class BaseClaimGenerator:
-    def __init__(self, config: ModelConfig):
+class BaseClaimGenerator(ABC):
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def generate_claims(self, texts: List[str]) -> List[List[str]]:
+        """
+        Must return a list of lists, where each sub-list represents
+        the claims extracted from the corresponding text in 'texts'.
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def build_claim_extraction_prompt(text: str) -> str:
+        return REFINED_CLAIM_PROMPT.format(SOURCE_TEXT=text)
+
+    @staticmethod
+    def parse_json_output(output_str: str) -> List[str]:
+        """
+        Parse a single JSON string with a top-level "claims" field, e.g.:
+           {"claims":["claim 1", "claim 2"]}
+        Return the list of claims, or [] on error.
+        """
+        try:
+            data = json.loads(output_str.strip())
+            claims = data.get("claims", [])
+            return claims if isinstance(claims, list) else []
+        except json.JSONDecodeError:
+            return []
+
+    @staticmethod
+    def chunked(iterable, size):
+        for i in range(0, len(iterable), size):
+            yield iterable[i: i + size]
+
+
+class BaseHuggingFaceGenerator(BaseClaimGenerator, ABC):
+    def __init__(self, config):
+        super().__init__()
         self.config = config
         self.device = config.device
-        self.model, self.tokenizer = self.load_model_and_tokenizer(config)
+        self.tokenizer, self.model = self._load_model_and_tokenizer(config)
 
-    def generate_claims(self, texts: List[str]) -> List[List[str]]:
-        raise NotImplementedError("Subclasses must implement generate_claims")
+    def _load_model_and_tokenizer(self, config):
+        # If you want dynamic import:
+        if config.tokenizer_class and config.model_class:
+            tokenizer_cls = self._import_class(config.tokenizer_class)
+            model_cls = self._import_class(config.model_class)
+        else:
+            # fallback to AutoX
+            tokenizer_cls = AutoTokenizer
+            model_cls = AutoModel  # or AutoModelForSeq2SeqLM or something
 
-    def load_model_and_tokenizer(self, config: ModelConfig):
-        """Dynamically loads and initializes the model and tokenizer."""
-        tokenizer_cls = self._import_class(config.tokenizer_class_path)
-        model_cls = self._import_class(config.model_class_path)
+        tokenizer = tokenizer_cls.from_pretrained(config.model_name_or_path)
+        model = model_cls.from_pretrained(config.model_name_or_path)
 
-        tokenizer = tokenizer_cls.from_pretrained(config.model_name)
-        model = model_cls.from_pretrained(config.model_name).to(config.device)
-        return model, tokenizer
-
-    def _generate(self, inputs):
-        """Handles text generation and decoding."""
-        outputs = self.model.generate(**inputs)
-        return self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        # Move to device
+        model.to(self.device)
+        return tokenizer, model
 
     @staticmethod
     def _import_class(class_path: str) -> Type:
@@ -49,145 +99,161 @@ class BaseClaimGenerator:
         module = importlib.import_module(module_name)
         return getattr(module, cls_name)
 
-    @staticmethod
-    def _chunked(iterable, size):
-        for i in range(0, len(iterable), size):
-            yield iterable[i:i + size]
-
-    @staticmethod
-    def build_claim_extraction_prompt(text: str) -> str:
-        return REFINED_CLAIM_PROMPT.format(SOURCE_TEXT=text)
+    def _generate_single_batch(self, inputs):
+        """Implement generation logic in child classes.
+           Return list of raw strings (decoded)."""
+        raise NotImplementedError
 
 
-class Seq2SeqClaimGenerator(BaseClaimGenerator):
-    """Claim generator using sequence-to-sequence models (T5, BART, etc.)."""
-
-    def generate_claims(self, texts: List[str]) -> List[List[str]]:
-        predictions = []
-        for batch in tqdm(self._chunked(texts, self.config.batch_size),
-                          desc=f"Generating claims with {self.config.model_name} [Seq2Seq]"):
-            inputs = self.tokenizer(batch, return_tensors="pt", padding=True,
-                                    truncation=self.config.truncation,
-                                    max_length=self.config.max_length).to(self.device)
-            decoded = self._generate(inputs)
-            print(f"Decoded outputs: {decoded}")
-            predictions.extend([text.split(". ") for text in decoded])
-        return predictions
-
-
-class CausalLMClaimGenerator(BaseClaimGenerator):
-    """Claim generator using autoregressive causal language models."""
-
-    def __init__(self, config: ModelConfig):
+class HuggingFaceSeq2SeqGenerator(BaseHuggingFaceGenerator):
+    def __init__(self, config):
         super().__init__(config)
-        self.tokenizer.padding_side = "left"
-        self.tokenizer.pad_token = self.tokenizer.eos_token or self.tokenizer.pad_token
-        self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
-        self.model.config.pad_token_id = self.tokenizer.pad_token_id
+        # If needed, re-initialize with the correct auto class
+        if not isinstance(self.model, AutoModelForSeq2SeqLM):
+            # Force correct model class:
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(config.model_name_or_path).to(self.device)
 
     def generate_claims(self, texts: List[str]) -> List[List[str]]:
-        predictions = []
-        for batch in tqdm(self._chunked(texts, self.config.batch_size),
-                          desc=f"Generating claims with {self.config.model_name} [CausalLM]"):
-            prompts = [self.build_claim_extraction_prompt(t) for t in batch]
-            inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to(self.device)
-            decoded = self._generate(inputs)
-            predictions.extend(self._parse_json_outputs(decoded))
-        return predictions
+        all_claims = []
+        for batch in tqdm(self.chunked(texts, self.config.batch_size),
+                          desc=f"Generating (Seq2Seq) with {self.config.model_name_or_path}"):
+            # Prepare
+            inputs = self.tokenizer(
+                batch,
+                return_tensors="pt",
+                padding=True,
+                truncation=self.config.truncation,
+                max_length=self.config.max_length
+            ).to(self.device)
+
+            # Generate
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=128,  # or a param you want
+                temperature=self.config.temperature
+            )
+
+            # Decode
+            decoded = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
+
+            for d in decoded:
+                claims = self.parse_text_output(d)
+                all_claims.append(claims)
+
+        return all_claims
 
     @staticmethod
-    def _parse_json_outputs(decoded_outputs: List[str]) -> List[List[str]]:
-        print(f"Decoded outputs: {decoded_outputs}")
-        parsed_claims = []
-        for output in decoded_outputs:
-            try:
-                data = json.loads(output.strip())
-                claims = data.get("claims", [])
-                parsed_claims.append(claims if isinstance(claims, list) else [])
-            except json.JSONDecodeError:
-                parsed_claims.append([])
-        return parsed_claims
+    def parse_text_output(output_str: str) -> List[str]:
+        lines = [line.strip() for line in output_str.split(".") if line.strip()]
+        return lines
 
 
-class APIClaimGenerator(BaseClaimGenerator):
-    """
-    Generic API-based claim generator that can talk to either OpenAI
-    or a local Jan-based endpoint, depending on config.type.
-    """
+class HuggingFaceCausalGenerator(BaseHuggingFaceGenerator):
+    def __init__(self, config):
+        super().__init__(config)
+        # Force the correct model class if needed
+        if not isinstance(self.model, AutoModelForCausalLM):
+            self.model = AutoModelForCausalLM.from_pretrained(config.model_name_or_path).to(self.device)
 
-    def __init__(self, config: ModelConfig):
-        self.config = config
-        self.device = config.device
-        # No local model, so skip:
-        self.model = None
-        self.tokenizer = None
+        # Many causal LMs need a pad token set:
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+            self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
     def generate_claims(self, texts: List[str]) -> List[List[str]]:
-        predictions = []
-        for batch in tqdm(self._chunked(texts, self.config.batch_size),
-                          desc=f"Generating claims with {self.config.model_name} [API]"):
-            # Build the prompts or messages
-            prompts_text = [self.build_claim_extraction_prompt(t) for t in batch]
+        all_claims = []
+        for batch in tqdm(self.chunked(texts, self.config.batch_size),
+                          desc=f"Generating (Causal) with {self.config.model_name_or_path}"):
+            # Build prompts
+            prompts = [self.build_claim_extraction_prompt(t) for t in batch]
 
-            # If using an OpenAI/Jan "chat" format, build messages:
-            # Typically you might do one request per text for simplicity:
-            for prompt in prompts_text:
-                # We'll do a single user message
-                messages = [{"role": "user", "content": prompt}]
-                response_json = self._send_api_request(messages)
-                claims_for_this_text = self._parse_api_response(response_json)
-                predictions.append(claims_for_this_text)
+            inputs = self.tokenizer(
+                prompts,
+                return_tensors="pt",
+                padding=True,
+                truncation=self.config.truncation,
+                max_length=self.config.max_length
+            ).to(self.device)
 
-        return predictions
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=256,
+                temperature=self.config.temperature
+            )
+            decoded = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
 
-    def _send_api_request(self, prompts: List[dict]) -> dict:
+            for d in decoded:
+                claims = self.parse_json_output(d)
+                all_claims.append(claims)
 
-        YOUR_OPENAI_API_KEY = "placeholder"
+        return all_claims
 
-        """
-        Actually sends a request to either the local Jan server or the OpenAI endpoint,
-        depending on config.type. We'll do a single request with multiple prompt messages
-        if your endpoint supports it. Otherwise, loop prompts one-by-one.
-        """
-        # Distinguish endpoints
-        api_url = self.config.model_name  # e.g., "http://127.0.0.1:1337/v1/chat/completions"
-        headers = {"Content-Type": "application/json"}
 
-        if self.config.type == "openai":
-            # Real OpenAI
-            headers["Authorization"] = f"Bearer {YOUR_OPENAI_API_KEY}"
+class OpenAIClaimGenerator(BaseClaimGenerator):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+        # set your openai.api_key
+        if config.openai_api_key:
+            openai.api_key = config.openai_api_key
         else:
-            # Possibly no auth needed for local Jan, or some local token
+            # Possibly raise an error or rely on environment variable
             pass
 
-        # For OpenAI/Jan, the JSON structure is typically:
-        payload = {
-            "model": "llama3.2-1b-instruct",  # or any local model alias
-            "messages": prompts,
-            "temperature": 0.0
-        }
+        # The "model_name_or_path" is the "engine" you want to call, e.g. "gpt-3.5-turbo"
 
-        # If you need multiple completions in one request, you can do that,
-        # or else do a single prompt at a time. For debugging, single prompt is simpler.
-
-        response = requests.post(api_url, headers=headers, json=payload)
-        response.raise_for_status()
-        return response.json()
-
-    def _parse_api_response(self, response_data: dict) -> List[List[str]]:
-        """
-        Interpret the response. For an OpenAI/Jan chat completion:
-          response_data["choices"][0]["message"]["content"]
-        should contain the text we need. Then parse JSON from that text.
-        """
+    def generate_claims(self, texts: List[str]) -> List[List[str]]:
         all_claims = []
-        choices = response_data.get("choices", [])
-        for choice in choices:
-            content = choice["message"]["content"]
-            try:
-                data = json.loads(content)
-                claims = data.get("claims", [])
-                all_claims.append(claims if isinstance(claims, list) else [])
-            except json.JSONDecodeError:
-                all_claims.append([])
+        for batch in tqdm(self.chunked(texts, self.config.batch_size),
+                          desc=f"Generating (OpenAI) with {self.config.model_name_or_path}"):
+            for text in batch:
+                prompt = self.build_claim_extraction_prompt(text)
+
+                # ChatCompletion call
+                response = openai.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.7
+                )
+                content = response.choices[0].message.content
+                claims = self.parse_json_output(content)
+                all_claims.append(claims)
+
+        return all_claims
+
+
+class JanLocalClaimGenerator(BaseClaimGenerator):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+
+    def generate_claims(self, texts: List[str]) -> List[List[str]]:
+        all_claims = []
+        for batch in tqdm(self.chunked(texts, self.config.batch_size),
+                          desc=f"Generating (Jan) with {self.config.model_name_or_path}"):
+            for text in batch:
+                prompt = self.build_claim_extraction_prompt(text)
+                payload = {
+                    "model": self.config.model_name_or_path,  # the engine name in Jan
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": self.config.temperature
+                }
+                headers = {"Content-Type": "application/json"}
+
+                resp = requests.post(self.config.endpoint_url, json=payload, headers=headers)
+                resp.raise_for_status()
+
+                data = resp.json()
+                # for chat completions, we expect something like:
+                # data["choices"][0]["message"]["content"]
+                choices = data.get("choices", [])
+                if not choices:
+                    all_claims.append([])
+                    continue
+
+                content = choices[0]["message"]["content"]
+                claims = self.parse_json_output(content)
+                all_claims.append(claims)
+
         return all_claims

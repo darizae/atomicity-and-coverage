@@ -18,15 +18,18 @@
       "system_claims_distilled_t5": [
         "Juan Arango escaped punishment from the referee for biting Jesus Zavela",
         "He could face a retrospective punishment for the incident",
-        "Arango had earlier scored a free kick in his team's 4-3 defeat."
+        "Arango had earlier scored a free kick in his team's 4-3 defeat"
       ],
-      "system_claims_jan_local": [
-        [
-          "Juan Arango escaped punishment.",
-          "The referee punished Juan Arango for biting Jesus Zavela.",
-          "Biting Jesus Zavela is punishable by punishment.",
-          "Arango could face a retrospective punishment."
-        ]
+      "system_claims_llama3.2-1b-instruct": [
+        "Juan Arango escaped punishment.",
+        "The referee punished Juan Arango for biting Jesus Zavela.",
+        "Biting Jesus Zavela is punishable by punishment.",
+        "Arango could face a retrospective punishment."
+      ],
+      "system_claims_gpt35": [
+        "Juan Arango escaped punishment from the referee for biting Jesus Zavela.",
+        "He could face a retrospective punishment for the incident.",
+        "Arango had earlier scored a free kick in his team's 4-3 defeat."
       ]
     },
     {
@@ -50,15 +53,20 @@
         "The 22-year-old is out on loan at Championship side Nottingham Forest",
         "Tim Sherwood is keen to asses Gardner ahead of next season",
         "The midfielder would prefer a move back to Forest if Villa doesn't wok out",
-        "CLICK HERE for all the latest Aston Villa news."
+        "CLICK HERE for all the latest Aston Villa news"
       ],
-      "system_claims_jan_local": [
-        [
-          "Gary Gardner will report to Aston Villa.",
-          "Aston Villa is out on loan at Nottingham Forest.",
-          "Tim Sherwood wants to assess Gary Gardner ahead of next season.",
-          "Gardner prefers a move back to Nottingham Forest if Aston Villa doesn't work out."
-        ]
+      "system_claims_llama3.2-1b-instruct": [
+        "Gary Gardner will report to Aston Villa.",
+        "Aston Villa is out on loan at Nottingham Forest.",
+        "Tim Sherwood wants to assess Gary Gardner ahead of next season.",
+        "Gardner prefers a move back to Nottingham Forest if Aston Villa doesn't work out."
+      ],
+      "system_claims_gpt35": [
+        "Gary Gardner confirms he'll report to Aston Villa for pre-season training.",
+        "The 22-year-old is out on loan at Championship side Nottingham Forest.",
+        "Tim Sherwood is keen to assess Gardner ahead of next season.",
+        "The midfielder would prefer a move back to Forest if Villa doesn't work out.",
+        "CLICK HERE for all the latest Aston Villa news."
       ]
     },
     {
@@ -79,15 +87,19 @@
         "Current federal government guidelines dictate the people should limit their salt intake to 2,300 milligrams",
         "Scientists now believe a typical healthy person can consume as much as 6,000 milligrams per day without significantly raising health risks",
         "The same skeptics also warn of the health risks associated with consuming less than 3,000 milligrams",
+        "Average American ingests about 3,500 milligrams of salt per day"
+      ],
+      "system_claims_llama3.2-1b-instruct": [
+        "Current federal government guidelines dictate that people should limit their salt intake to 2,300 milligrams.",
+        "Scientists now believe a typical healthy person can consume as much as 6,000 milligrams per day without significantly raising health risks.",
+        "The same skeptics also warn of the health risks associated with consuming less than 3,000 milligrams.",
         "Average American ingests about 3,500 milligrams of salt per day."
       ],
-      "system_claims_jan_local": [
-        [
-          "Current federal government guidelines dictate that people should limit their salt intake to 2,300 milligrams.",
-          "Scientists now believe a typical healthy person can consume as much as 6,000 milligrams per day without significantly raising health risks.",
-          "The same skeptics also warn of the health risks associated with consuming less than 3,000 milligrams.",
-          "Average American ingests about 3,500 milligrams of salt per day."
-        ]
+      "system_claims_gpt35": [
+        "Current federal government guidelines dictate that people should limit their salt intake to 2,300 milligrams.",
+        "Scientists now believe a typical healthy person can consume as much as 6,000 milligrams of salt per day without significantly raising health risks.",
+        "The same skeptics also warn of the health risks associated with consuming less than 3,000 milligrams of salt.",
+        "The average American ingests about 3,500 milligrams of salt per day."
       ]
     }
   ],
@@ -146,21 +158,6 @@
         "The main suspect in a massacre has gone on trial",
         "The main suspect in the most brutal massacre in recent Philippine history has gone on trial",
         "The main suspect in the massacre in Philippine has gone on trial"
-      ],
-      "system_claims_distilled_t5": [
-        "The main suspect in the most brutal massacre in recent Philippine history has gone on trial."
-      ],
-      "system_claims_jan_local": [
-        [
-          "The main suspect was tried.",
-          "The suspect went on trial."
-        ]
-      ],
-      "system_claims_llama3.2-1b-instruct": [
-        [
-          "The main suspect was tried.",
-          "The suspect went on trial."
-        ]
       ]
     },
     {
@@ -171,23 +168,6 @@
         "The government says it will increase the levy on banks",
         "The government says it will increase the levy from 0.078% to 0.088%",
         "The government says it will increase the levy from 1 January"
-      ],
-      "system_claims_distilled_t5": [
-        "The government says it will increase the levy on banks from 0.078% to 0.088% from 1 January."
-      ],
-      "system_claims_jan_local": [
-        [
-          "The government increased the levy on banks.",
-          "Banks will be subject to a new rate of 0.088% from 1 January.",
-          "The increase is effective from 1 January."
-        ]
-      ],
-      "system_claims_llama3.2-1b-instruct": [
-        [
-          "The government increased the levy on banks.",
-          "Banks will be subject to a new rate of 0.088% from 1 January.",
-          "The increase is effective from 1 January."
-        ]
       ]
     },
     {
@@ -198,23 +178,6 @@
         "The controversial plans have been given the go ahead",
         "The controversial plans are for an eco-friendly \"Teletubbies\" house",
         "The controversial plans have been given the go ahead by Bolton Council."
-      ],
-      "system_claims_distilled_t5": [
-        "Footballer Gary Neville's controversial plans for an eco-friendly 'Teletubbies' house have been given the go ahead by Bolton Council."
-      ],
-      "system_claims_jan_local": [
-        [
-          "Gary Neville's plans were approved.",
-          "The plans were given the go ahead by Bolton Council.",
-          "Bolton Council gave approval to Gary Neville's plans."
-        ]
-      ],
-      "system_claims_llama3.2-1b-instruct": [
-        [
-          "Gary Neville's plans were approved.",
-          "The plans were given the go ahead by Bolton Council.",
-          "Bolton Council gave approval to Gary Neville's plans."
-        ]
       ]
     }
   ],
