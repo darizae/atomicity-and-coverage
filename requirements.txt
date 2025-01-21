@@ -16,6 +16,7 @@ multivolumefile==0.2.3
 networkx==3.4.2
 matplotlib==3.10.0
 numpy==2.2.1
+openai==1.59.9
 pandas==2.2.3
 propcache==0.2.1
 protobuf==5.29.3
@@ -45,3 +46,4 @@ zstandard==0.23.0
 pytest~=8.3.4
 rouge-score>=0.0.4
 requests~=2.32.3
+openai~=1.59.9
