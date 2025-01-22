@@ -209,11 +209,12 @@ class HuggingFaceCausalGenerator(BaseHuggingFaceGenerator):
         """
         print("Using regex parsing for LLaMa2 output.")
         pattern = r'(\{"claims"\s*:\s*\[.*?\]\})'
-        match = re.search(pattern, output_str, flags=re.DOTALL)
-        if not match:
+        json_matches = re.findall(pattern, output_str, flags=re.DOTALL)
+        if not json_matches:
+            print("[DEBUG parse_json_output] No match found with pattern:", pattern)
             return []
 
-        json_str = match.group(1)
+        json_str = json_matches[-1]
 
         # Remove trailing commas before the closing bracket: ",]" => "]"
         json_str = re.sub(r',\s*\]', ']', json_str)
