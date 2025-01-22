@@ -179,7 +179,8 @@ class HuggingFaceCausalGenerator(BaseHuggingFaceGenerator):
             outputs = self.model.generate(
                 **inputs,
                 max_new_tokens=256,
-                temperature=self.config.temperature
+                temperature=self.config.temperature,
+                do_sample=(self.config.temperature > 0.0)
             )
             decoded = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
 
@@ -191,9 +192,36 @@ class HuggingFaceCausalGenerator(BaseHuggingFaceGenerator):
                 print(d)
 
                 claims = self.parse_json_output(d)
+
+                print("--- DEBUG CLAIMS AFTER PARSING ---")
+                print(claims)
+
                 all_claims.append(claims)
 
         return all_claims
+
+
+        def parse_json_output(output_str: str) -> List[str]:
+            """
+            Extract the first JSON object containing a top-level "claims" key.
+            Fix trailing commas before parsing.
+            """
+            pattern = r'(\{"claims"\s*:\s*\[.*?\]\})'
+            match = re.search(pattern, output_str, flags=re.DOTALL)
+            if not match:
+                return []
+            
+            json_str = match.group(1)
+            
+            # Remove trailing commas before the closing bracket: ",]" => "]"
+            json_str = re.sub(r',\s*\]', ']', json_str)
+            
+            try:
+                data = json.loads(json_str)
+                claims = data.get("claims", [])
+                return claims if isinstance(claims, list) else []
+            except json.JSONDecodeError:
+                return []
 
 
 class OpenAIClaimGenerator(BaseClaimGenerator):

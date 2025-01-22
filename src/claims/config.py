@@ -30,7 +30,7 @@ def get_claim_generation_model_config(model_key: str) -> ClaimGenerationModelCon
         )
     elif model_key == "llama2_7b":
         config = ClaimGenerationModelConfig(
-            name="/works/data0/jiang/model/huggingface/llama-7b-hf",
+            name="/works/data0/danielarizae/models/llama-2-7b-chat-hf",
             generator_cls=HuggingFaceCausalGenerator,
             type="local",
             tokenizer_class="transformers.LlamaTokenizer",
