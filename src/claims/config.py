@@ -28,7 +28,7 @@ def get_claim_generation_model_config(model_key: str) -> ClaimGenerationModelCon
             tokenizer_class="transformers.T5Tokenizer",
             model_class="transformers.T5ForConditionalGeneration"
         )
-    elif model_key == "llama2_7b_local":
+    elif model_key == "llama2_7b":
         config = ClaimGenerationModelConfig(
             name="/works/data0/jiang/model/huggingface/llama-7b-hf",
             generator_cls=HuggingFaceCausalGenerator,
