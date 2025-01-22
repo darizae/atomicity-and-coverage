@@ -5,7 +5,7 @@ CLAIM_GEN_MODEL = "gpt-3.5-turbo"
 
 
 def main():
-    # Define the experiments you want to run
+    # Define the experiments to run
     # Only these four parameters vary: method, threshold, claim_gen_key, small_test
 
     experiment_configs = [
@@ -29,7 +29,6 @@ def main():
             "threshold": 0.9,
             "claim_gen_key": CLAIM_GEN_MODEL,
         },
-        # Add more experiments if you like
     ]
 
     for i, exp_conf in enumerate(experiment_configs, start=1):
@@ -41,7 +40,7 @@ def main():
             "--threshold", str(exp_conf["threshold"]),
             "--claim_gen_key", exp_conf["claim_gen_key"]
         ]
-        # If small_test is True, we add the flag (no value needed)
+
         if SMALL_TEST:
             cmd.append("--small_test")
 
