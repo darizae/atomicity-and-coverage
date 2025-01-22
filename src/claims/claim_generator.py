@@ -185,18 +185,8 @@ class HuggingFaceCausalGenerator(BaseHuggingFaceGenerator):
             )
             decoded = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
 
-            # DEBUG: Print out prompts and raw outputs
             for i, d in enumerate(decoded):
-                print("\n--- DEBUG PROMPT ---")
-                print(prompts[i])
-                print("--- DEBUG MODEL OUTPUT ---")
-                print(d)
-
                 claims = self.parse_json_output(d)
-
-                print("--- DEBUG CLAIMS AFTER PARSING ---")
-                print(claims)
-
                 all_claims.append(claims)
 
         return all_claims
@@ -207,7 +197,6 @@ class HuggingFaceCausalGenerator(BaseHuggingFaceGenerator):
         Extract the first JSON object containing a top-level "claims" key.
         Fix trailing commas before parsing.
         """
-        print("Using regex parsing for LLaMa2 output.")
         pattern = r'(\{"claims"\s*:\s*\[.*?\]\})'
         json_matches = re.findall(pattern, output_str, flags=re.DOTALL)
         if not json_matches:
