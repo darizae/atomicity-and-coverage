@@ -15,11 +15,23 @@
         "Arango's team suffered a defeat",
         "Arango's team suffered a 4-3 defeat"
       ],
-      "system_claims_t5": [
+      "system_claims_gpt-3.5-turbo": [
+        "Juan Arango escaped punishment for biting Jesus Zavela.",
+        "He could face retrospective punishment for the incident.",
+        "Arango scored a free kick in his team's 4-3 defeat."
+      ],
+      "system_claims_distilled_t5": [
         "Juan Arango escaped punishment from the referee for biting Jesus Zavela",
         "He could face a retrospective punishment for the incident",
-        "Arango had earlier scored a free kick in his team's 4-3 defeat."
-      ]
+        "Arango had earlier scored a free kick in his team's 4-3 defeat"
+      ],
+      "system_claims_llama3_1b": [
+        "Juan Arango escaped punishment.",
+        "The referee punished Juan Arango for biting Jesus Zavela.",
+        "Biting Jesus Zavela is punishable by punishment.",
+        "Arango could face a retrospective punishment."
+      ],
+      "system_claims_llama2_7b": []
     },
     {
       "source": "Tim Sherwood will welcome Gary Gardner back into his first team squad during pre-season to assess closely whether the 22-year-old can cut it for Aston Villa in the Premier League. Gardner has enjoyed a successful loan spell at Nottingham Forest and scored a superb free-kick in front of the Villa manager during the defeat to Watford at the City Ground. Sherwood is keen to see Gardner, a former England Under-21 player, train day-to-day before making up his mind and he has spoken previously about his desire for homegrown players to make an impact at the club. Gary Gardner (left) will report to Aston Villa for pre-season training to be assessed by Tim Sherwood . The Villa boss has inspired the club since being appointed and helped lead them to an FA Cup final . Gardner, born in Solihull, joined Villa's academy aged seven and last year was rewarded with a new contract that expires in June 2016 despite suffering serious knee injuries. 'I will go back to Villa in the summer and we will see what happens,' he said. 'When I am back there in training, it will be my chance to impress. Tim Sherwood will not have seen much of me in training, because I have not been there. 'Villa are the main club, I have been there since I was seven and it is the team I support. But Forest have been fantastic to me. It is definitely the second team in my heart. 'If I was made available for loan again next season, if it does not work out at Villa, Forest would be top of my list, definitely. It is the best loan move I have had.' Gardner scored a stunning free-kick against Watford with Sherwood in attendance at the City Ground .",
@@ -37,13 +49,27 @@
         "The midfielder would prefer a move back if Villa doesn't work out.",
         "CLICK HERE for all the latest Aston Villa news."
       ],
-      "system_claims_t5": [
+      "system_claims_gpt-3.5-turbo": [
+        "Gary Gardner confirms he'll report to Aston Villa for pre-season training.",
+        "The 22-year-old is out on loan at Championship side Nottingham Forest.",
+        "Tim Sherwood is keen to assess Gardner ahead of next season.",
+        "The midfielder would prefer a move back to Forest if Villa doesn't work out.",
+        "All the latest Aston Villa news can be found by clicking here."
+      ],
+      "system_claims_distilled_t5": [
         "Gary Gardner confirms he'll report to Aston Villa for pre-season training",
         "The 22-year-old is out on loan at Championship side Nottingham Forest",
         "Tim Sherwood is keen to asses Gardner ahead of next season",
         "The midfielder would prefer a move back to Forest if Villa doesn't wok out",
-        "CLICK HERE for all the latest Aston Villa news."
-      ]
+        "CLICK HERE for all the latest Aston Villa news"
+      ],
+      "system_claims_llama3_1b": [
+        "Gary Gardner will report to Aston Villa.",
+        "Aston Villa is out on loan at Nottingham Forest.",
+        "Tim Sherwood wants to assess Gary Gardner ahead of next season.",
+        "Gardner prefers a move back to Nottingham Forest if Aston Villa doesn't work out."
+      ],
+      "system_claims_llama2_7b": []
     },
     {
       "source": "For years medical experts have warned about the dangers of too much salt, but now new research is questioning conventional wisdom and warning instead of the dangers of too little salt . For years medical experts have warned about the dangers of too much salt, but new research is now questioning conventional wisdom and warning instead of the dangers of too little salt. Both federal government regulations and the American Heart Association have for decades warned that excess salt contributes to the deaths of tens of thousands of Americans each year. As the federal government prepares its influential Dietary Guidelines for 2015, some scientists are now saying that the average American salt consumption rate carries no risk. The guidelines currently dictate the people should limit their intake to 2,300 milligrams, with an even stricter 1,500 milligram limit for African Americans and people over 50. In February the  Dietary Guidelines Advisory Committee recommended keeping the larger limit, although it withdrew support for the stricter limit for African Americans and people over 50, reports The Washington Post. 'There is no longer any valid basis for the current salt guidelines,' said Andrew Mente, a professor at McMaster University in Ontario and one of the researchers involved in a major study published last year by the New England Journal of Medicine. 'So why are we still scaring people about salt?' While experts on both sides agree that eating too much salt - especially for people with high blood pressure - can be dangerous there is much disagreement over what constitutes too much. The average American ingests about 3,500 milligrams of salt per day - the amount of sodium in a teaspoon of salt - and so under the current dietary guidelines Americans are indeed endangering themselves. Even within the American Heart Association, one of the organizations promoting the current salt limits, there is disagreement with at least one former president claiming that there is no evidence that reducing salt consumption can lower blood pressure . Salt skeptics however believe most Americans are fine. In their view, a typical healthy person can consume as much as 6,000 milligrams per day without significantly raising health risks. The skeptics also warn of the dangers of consuming too little - they say that below 3,000 milligrams also raises health risks. The PURE study published last August by the New England Journal of Medicine found that people who conform to the recommended limits (2,300 milligrams) actually have more heart trouble. They found that low sodium may stimulate the production of renin, a hormone that may have harmful effects on blood vessels. Even within the American Heart Association, one of the organizations promoting the current salt limits, there is disagreement. 'The totality of the evidence strongly suggests that Americans should be lowering their sodium intake,' said Elliott Antman, the president of the American Heart Association. 'Everyone agrees that current sodium intake is too high.' But Suzanne Oparil, a former president of the American Heart Association, told the Post that there is no evidence that reducing salt consumption can lower blood pressure. A spokesperson for the Department of Health and Human Services has said that the federal guidelines are considering comments from the public and the advice of its science panel.",
@@ -59,12 +85,25 @@
         "The same skeptics warn the health risks associated with consuming less then 3,000 miligrams.",
         "Average American ingests about 3,500 miligrams of salt per day."
       ],
-      "system_claims_t5": [
+      "system_claims_gpt-3.5-turbo": [
+        "Federal government guidelines dictate that people should limit their salt intake to 2,300 milligrams.",
+        "Scientists believe a typical healthy person can consume as much as 6,000 milligrams of salt per day without significantly raising health risks.",
+        "The skeptics warn of health risks associated with consuming less than 3,000 milligrams of salt.",
+        "The average American ingests about 3,500 milligrams of salt per day."
+      ],
+      "system_claims_distilled_t5": [
         "Current federal government guidelines dictate the people should limit their salt intake to 2,300 milligrams",
         "Scientists now believe a typical healthy person can consume as much as 6,000 milligrams per day without significantly raising health risks",
         "The same skeptics also warn of the health risks associated with consuming less than 3,000 milligrams",
+        "Average American ingests about 3,500 milligrams of salt per day"
+      ],
+      "system_claims_llama3_1b": [
+        "Current federal government guidelines dictate that people should limit their salt intake to 2,300 milligrams.",
+        "Scientists now believe a typical healthy person can consume as much as 6,000 milligrams per day without significantly raising health risks.",
+        "The same skeptics also warn of the health risks associated with consuming less than 3,000 milligrams.",
         "Average American ingests about 3,500 milligrams of salt per day."
-      ]
+      ],
+      "system_claims_llama2_7b": []
     }
   ],
   "cnndm_validation": [
@@ -81,7 +120,30 @@
         "Kendall is 19 years old.",
         "The spread is in Vogue.",
         "This is Kendall's fifth time appearing in Vogue."
-      ]
+      ],
+      "system_claims_gpt-3.5-turbo": [
+        "The spread was shot by photographer Mario Testino.",
+        "Gigi Hadid stars in the spread.",
+        "Ansel Elgort stars in the spread.",
+        "Dylan Penn stars in the spread.",
+        "Hopper stars in the spread.",
+        "Kendall appeared in the pages of Vogue five times.",
+        "This is Kendall's fifth time appearing in the pages of Vogue."
+      ],
+      "system_claims_distilled_t5": [
+        "The spread was shot by photographer Mario Testino",
+        "The spread also stars Gigi Hadid, Ansel Elgort, Dylan Penn and her younger brother Hopper",
+        "Kendall is 19 years old",
+        "Kendall's fifth time appearing in the pages of Vogue"
+      ],
+      "system_claims_llama3_1b": [
+        "The spread was shot by photographer Mario Testino.",
+        "Gigi Hadid stars in The spread.",
+        "Mario Testino also stars Gigi Hadid.",
+        "Kendall appears in The spread for the fifth time.",
+        "19-year-old Kendall is featured in Vogue."
+      ],
+      "system_claims_llama2_7b": []
     },
     {
       "source": "Zinedine Zidane joined in the clamour for the highly-rated midfielder Paul Pogba by claiming it is 'only logical' that Real Madrid want him on board at the Bernabeu. The France international, who is currently nursing a hamstring injury, extended his contract with the Old Lady until the end of the 2018-19 season back in October, however he has been consistently linked with a move away from Turin. The 22-year-old has attracted interest from a number of top European clubs, with Manchester United, Paris Saint-Germain, Barcelona and Madrid all being tipped as potential suitors. Real Madrid Castilla coach Zinedine Zidane is not shocked by his club's interest in compatriot Paul Pogba . Pogba has been a key figure for Juventus this season and is a much sought after talent throughout Europe . Keen on a return to the Premier League, Pogba is reported to be part of a £100million summer wishlist at former club United and is also understood to have been closely monitored by Manchester City and Chelsea. With so much attention surrounding the young star - who has netted seven goals in 22 Serie A appearances this season - Zidane feels such interest should not come as a surprise to those aware of his talents. Juventus midfielder and former United player Pogba is also on Louis van Gaal's radar at Old Trafford . 'When we are talking about a player like Pogba, it is only logical Real Madrid are interested in signing him,' Zidane told French channel Canal+. 'He is a player with immense potential, who still has an important margin for improvement. 'He is still young and has an exciting future ahead of him. 'Where Pogba will play next season? I don't know the answer to that question. You will have to ask him.'",
@@ -95,7 +157,23 @@
         "Pogba has also attracted interest from Manchester United",
         "Pogba has also attracted interest from Chelsea",
         "Pogba has also attracted interest from Manchester City"
-      ]
+      ],
+      "system_claims_gpt-3.5-turbo": [
+        "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'.",
+        "The 22-year-old has seven goals in 22 Serie A appearances this season.",
+        "Pogba has attracted interest from Manchester United, Chelsea, and Manchester City."
+      ],
+      "system_claims_distilled_t5": [
+        "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'",
+        "The 22-year-old has seven goals in 22 Serie A appearances this season",
+        "Pogba has attracted interest from Manchester United, Chelsea and Manchester City"
+      ],
+      "system_claims_llama3_1b": [
+        "Zinedine Zidane said interest in Juventus star Paul Pogba is only logical.",
+        "Paul Pogba has seven goals in 22 Serie A appearances this season.",
+        "Pogba has also attracted interest from Manchester United, Chelsea and Manchester City."
+      ],
+      "system_claims_llama2_7b": []
     },
     {
       "source": "Match of the Day commentator Jonathan Pearce got more than he bargained for at the Emirates on Sunday afternoon, when a rogue sprinkler soaked him ahead of kick-off. The 55-year-old BBC stalwart was preparing to present a piece to camera ahead of Arsenal's match with Everton, but got caught short when a sprinkler was turned on just seconds before he went on air. 'You could have told us', Pearce can be heard saying after he jumped out of shot - and out of reach of the water - but he appeared to take it in good spirits when he explained the reason for his soaking on air minutes later. Jonathan Pearce prepares to go on air to talk about Arsenal's game with Everton at the Emirates Stadium . Pearce is caught short when a sprinkler is turned on behind him and he gets a soaking . Pearce later laughed off the incident when he eventually made it onto air, saying it was 'very funny' 'Just as we were getting ready to do this piece,' Pearce explained, 'go on, have a laugh, have a laugh... the sprinkler came on behind me, and I'm absolutely drenched. So yeah, very funny, this Sunday lunchtime.' Pearce was at the Emirates to see Arsenal attempt to take three points against Everton, a result which would see them go third in the Premier League table, ahead of Manchester United. Louis van Gaal's side beat Sunderland 2-0 at Old Trafford on Saturday to go above the Gunners, but Arsenal could recapture third place with a win.",
@@ -111,7 +189,31 @@
         "Jonathan Pearce said 'you could have told us' .",
         "Jonathan Pearce took it in good spirits.",
         "Jonathan Pearce later laughed off the incident on air ."
-      ]
+      ],
+      "system_claims_gpt-3.5-turbo": [
+        "Jonathan Pearce was at the Emirates to commentate for Match of the Day.",
+        "The 55-year-old was preparing a piece to camera.",
+        "A sprinkler came on while Pearce was preparing a piece to camera.",
+        "Pearce was soaked by the sprinkler.",
+        "Pearce ran out of shot.",
+        "Pearce said 'you could have told us' after being soaked.",
+        "Pearce took the incident in good spirits.",
+        "Pearce later laughed off the incident on air."
+      ],
+      "system_claims_distilled_t5": [
+        "Jonathan Pearce was at the Emirates to commentate for Match of the Day",
+        "The 55-year-old was preparing a piece to camera when a sprinkler came on",
+        "Pearce was soaked and ran out of shot, saying 'you could have told us'",
+        "He took it in good spirits",
+        "He later laughed off the incident on air"
+      ],
+      "system_claims_llama3_1b": [
+        "Jonathan Pearce was at the Emirates.",
+        "The 55-year-old was preparing a piece to camera when a sprinkler came on.",
+        "Pearce was soaked and ran out of shot saying 'you could have told us'.",
+        "He took it in good spirits, later laughing off the incident on air."
+      ],
+      "system_claims_llama2_7b": []
     }
   ],
   "xsum": [
@@ -123,8 +225,19 @@
         "The main suspect in the most brutal massacre in recent Philippine history has gone on trial",
         "The main suspect in the massacre in Philippine has gone on trial"
       ],
-      "system_claims_t5": [
-        "The main suspect in the most brutal massacre in recent Philippine history has gone on trial."
+      "system_claims_gpt-3.5-turbo": [
+        "The main suspect has gone on trial.",
+        "The trial is for the most brutal massacre in recent Philippine history."
+      ],
+      "system_claims_distilled_t5": [
+        "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+      ],
+      "system_claims_llama3_1b": [
+        "The main suspect was tried.",
+        "The suspect went on trial."
+      ],
+      "system_claims_llama2_7b": [
+        "The main suspect in the most brutal massacre went on trial."
       ]
     },
     {
@@ -136,8 +249,25 @@
         "The government says it will increase the levy from 0.078% to 0.088%",
         "The government says it will increase the levy from 1 January"
       ],
-      "system_claims_t5": [
-        "The government says it will increase the levy on banks from 0.078% to 0.088% from 1 January."
+      "system_claims_gpt-3.5-turbo": [
+        "The government will increase the levy on banks.",
+        "The current levy rate is 0.078%.",
+        "The new levy rate will be 0.088%.",
+        "The increase will be effective from 1 January."
+      ],
+      "system_claims_distilled_t5": [
+        "The government says it will increase the levy on banks from 0",
+        "078% to 0",
+        "088% from 1 January"
+      ],
+      "system_claims_llama3_1b": [
+        "The government increased the levy on banks.",
+        "Banks will be subject to a new rate of 0.088% from 1 January.",
+        "The increase is effective from 1 January."
+      ],
+      "system_claims_llama2_7b": [
+        "The government will increase the levy on banks from 0.078% to 0.088%",
+        "The increase will take effect from 1 January."
       ]
     },
     {
@@ -149,8 +279,23 @@
         "The controversial plans are for an eco-friendly \"Teletubbies\" house",
         "The controversial plans have been given the go ahead by Bolton Council."
       ],
-      "system_claims_t5": [
-        "Footballer Gary Neville's controversial plans for an eco-friendly 'Teletubbies' house have been given the go ahead by Bolton Council."
+      "system_claims_gpt-3.5-turbo": [
+        "Footballer Gary Neville has controversial plans for an eco-friendly 'Teletubbies' house.",
+        "The plans have been given the go ahead by Bolton Council."
+      ],
+      "system_claims_distilled_t5": [
+        "Footballer Gary Neville's controversial plans for an eco-friendly 'Teletubbies' house have been given the go ahead by Bolton Council"
+      ],
+      "system_claims_llama3_1b": [
+        "Gary Neville's plans were approved.",
+        "The plans were given the go ahead by Bolton Council.",
+        "Bolton Council gave approval to Gary Neville's plans."
+      ],
+      "system_claims_llama2_7b": [
+        "Gary Neville has controversial plans for an eco-friendly house.",
+        "The house is intended to be eco-friendly.",
+        "Bolton Council has given the go ahead to Neville's plans.",
+        "Neville's plans are for an 'Teletubbies' house."
       ]
     }
   ],
@@ -166,7 +311,22 @@
         "Frank will go out",
         "Frank will go out to celebrate that",
         "Frank will go out tonight."
-      ]
+      ],
+      "system_claims_gpt-3.5-turbo": [
+        "Charlie's sister passed her last university exam.",
+        "The last university exam was passed by Charlie's sister.",
+        "Charlie and Frank will go out to celebrate tonight.",
+        "The celebration is for passing the last university exam."
+      ],
+      "system_claims_distilled_t5": [
+        "Charlie's sister passed her last university exam",
+        "Charlie and Frank will go out to celebrate that tonight"
+      ],
+      "system_claims_llama3_1b": [
+        "Charlie's sister passed her last university exam.",
+        "Charlie and Frank will go out to celebrate tonight."
+      ],
+      "system_claims_llama2_7b": []
     },
     {
       "source": "Brett: So what do u do there? Drive a tank all the time?\r\nJohn: Yes and no. U've got players from around the world and they have their tank squadrons and u battle them. Can be a lot of fun!\r\nAndrew: So what happens if someone is on a higher level than u? They basically destroy u!\r\nJohn: That's not a problem. The game doesn't allow higher ranked players o interact with players out of their range.\r\nBrett: What do u mean?\r\nJohn: If ur on lvl 5, a player on lvl 30 can't attack u. \r\nAndrew: Sensible. Unlike WoW.\r\nJohn: So what's WoW like?\r\nAndrew: Imagine having a character u rly like and u give it a lot of ur attention and get experience point, level up and so on. Someone who's played the game for like a year comes and kills u instantly.\r\nBrett: Not cool. \r\nJohn: Yeah. Y would they allow such a thing?\r\nAndrew: Well, open world, u can team up with anyone, do quests together, arrange fighting tactics and so on.\r\nBrett: Actually, my cousin met his wife there :)\r\nJohn: Rly?\r\nBrett: Yeah. They were playing together for some time, talking and at some point he invited her to a date. Turned out they lived very close to each other ;)\r\nAndrew: That's gr8! And how are they getting along now?\r\nBrett: Most fights are about who gets 2 play at a given moment ;) \r\nJohn: Lol\r\nAndrew: Well my favourite genre is RPGs :)\r\nJohn: Can u name a title, except WoW?\r\nAndrew: I can name a dozen, but one of my personal faves is the Final Fantasy series :)\r\nBrett: What's this one about?\r\nAndrew: Don't tell me u haven't heard about the greatest RPG series of all times?\r\nJohn: Well, I haven't.\r\nAndrew: I think I'll have to look for new friends... So embarrassing.\r\nBrett: C'mon! Tell us!\r\nAndrew: Fine... Usually u play a group of friends that have to resolve some kind of crisis. In the last part u play a prince whose kingdom has been destroyed and u try to well get revenge.\r\nBrett: Sounds boring. \r\nAndrew: Believe me, it's not!",
@@ -176,7 +336,23 @@
         "Andrew's favorite game is the Final Fantasy",
         "Brett hasn't heard about the Final Fantasy",
         "John hasn't heard about the Final Fantasy"
-      ]
+      ],
+      "system_claims_gpt-3.5-turbo": [
+        "Brett's cousin met his wife while playing a game together.",
+        "Andrew's favorite game is the Final Fantasy.",
+        "Brett and John haven't heard about Final Fantasy."
+      ],
+      "system_claims_distilled_t5": [
+        "Brett's cousin met his wife while playing a game together",
+        "Andrew's favorite game is the Final Fantasy",
+        "Brett and John haven't heard about it"
+      ],
+      "system_claims_llama3_1b": [
+        "Brett's cousin met his wife.",
+        "Andrew's favorite game is the Final Fantasy.",
+        "Brett and John haven't heard about it."
+      ],
+      "system_claims_llama2_7b": []
     },
     {
       "source": "Anna: Mum, I have a awful stomachache.\r\nJoanna: Oh, dear, when did you get it?\r\nAnna: At night, and it won’t stop:-(\r\nJoanna: Is it something you ate?\r\nAnna: Maybe. I'm not sure.\r\nJoanna: What did you have for breakfast?\r\nAnna: The usual, cereal with milk and a banana.\r\nJoanna: Maybe the milk was bad.\r\nAnna: It didn't smell bad.\r\nJoanna: Maybe the banana was bad.\r\nAnna: No, the banana was delicious.\r\nJoanna: Maybe you just need to go to the bathroom.\r\nAnna: No, that's not the problem.\r\nJoanna: Maybe it will go away in a little while.\r\nAnna: I wish it would :-(\r\nAnna: Hopefully. If not, maybe we should go and see a doctor.\r\nJoanna: Yeah, I think so...\r\nAnna: I’ll get you a hot tea with some fresh mint leaves. Hope it will help. \r\nJoanna: Please do, I’m in my room...\r\nAnna: Will be in ten minutes:-)",
@@ -187,7 +363,23 @@
         "Anna doesn't know its cause.",
         "Anna's mom Joanna will make her hot tea",
         "The hot tea will be served with some fresh mint leaves."
-      ]
+      ],
+      "system_claims_gpt-3.5-turbo": [
+        "Anna got an awful stomachache at night.",
+        "She doesn't know the cause of the stomachache.",
+        "Anna's mom Joanna will make her hot tea.",
+        "The hot tea will contain some fresh mint leaves."
+      ],
+      "system_claims_distilled_t5": [
+        "Anna got an awful stomachache at night",
+        "Anna doesn't know its cause",
+        "Anna's mom Joanna will make her hot tea with some fresh mint leaves"
+      ],
+      "system_claims_llama3_1b": [
+        "Anna's stomachache was caused by a bad meal.",
+        "Her mom Joanna made Anna hot tea."
+      ],
+      "system_claims_llama2_7b": []
     }
   ]
 }
