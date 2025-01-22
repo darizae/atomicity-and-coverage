@@ -1,41 +1,37 @@
 import subprocess
 
+from src.utils.timer import Timer
+
 SMALL_TEST = False
-CLAIM_GEN_MODEL = "gpt-3.5-turbo"
+CLAIM_GEN_MODELS = ["distilled_t5", "gpt-3.5-turbo", "llama2_7b"]
 
 
 def main():
     # Define the experiments to run
-    # Only these four parameters vary: method, threshold, claim_gen_key, small_test
+    experiment_configs = []
 
-    experiment_configs = [
-        {
-            "method": "rouge",
-            "threshold": 0.3,
-            "claim_gen_key": CLAIM_GEN_MODEL,
-        },
-        {
-            "method": "embedding",
-            "threshold": 0.7,
-            "claim_gen_key": CLAIM_GEN_MODEL,
-        },
-        {
-            "method": "embedding",
-            "threshold": 0.8,
-            "claim_gen_key": CLAIM_GEN_MODEL,
-        },
-        {
-            "method": "entailment",
-            "threshold": 0.9,
-            "claim_gen_key": CLAIM_GEN_MODEL,
-        },
-    ]
+    methods = ["rouge", "embedding", "entailment"]
+    thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+    for model in CLAIM_GEN_MODELS:
+        for method in methods:
+            if method == "rouge":
+                relevant_thresholds = [0.1, 0.2, 0.5, 0.7]
+            else:
+                relevant_thresholds = thresholds
+
+            for threshold in relevant_thresholds:
+                experiment_configs.append({
+                    "method": method,
+                    "threshold": threshold,
+                    "claim_gen_key": model,
+                })
 
     for i, exp_conf in enumerate(experiment_configs, start=1):
         print(f"\n[Experiment {i}] Params: {exp_conf}")
 
         cmd = [
-            "python", "src/metrics/run_alignment.py",
+            "python", "metrics/run_alignment.py",
             "--method", exp_conf["method"],
             "--threshold", str(exp_conf["threshold"]),
             "--claim_gen_key", exp_conf["claim_gen_key"]
