@@ -27,7 +27,7 @@ def main():
         {
             "method": "entailment",
             "threshold": 0.9,
-            "claim_gen_key": "distilled_t5",
+            "claim_gen_key": CLAIM_GEN_MODEL,
         },
         # Add more experiments if you like
     ]
@@ -36,7 +36,7 @@ def main():
         print(f"\n[Experiment {i}] Params: {exp_conf}")
 
         cmd = [
-            "python", "metrics/run_alignment.py",
+            "python", "src/metrics/run_alignment.py",
             "--method", exp_conf["method"],
             "--threshold", str(exp_conf["threshold"]),
             "--claim_gen_key", exp_conf["claim_gen_key"]
