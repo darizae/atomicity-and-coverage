@@ -183,7 +183,13 @@ class HuggingFaceCausalGenerator(BaseHuggingFaceGenerator):
             )
             decoded = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
 
-            for d in decoded:
+            # DEBUG: Print out prompts and raw outputs
+            for i, d in enumerate(decoded):
+                print("\n--- DEBUG PROMPT ---")
+                print(prompts[i])
+                print("--- DEBUG MODEL OUTPUT ---")
+                print(d)
+
                 claims = self.parse_json_output(d)
                 all_claims.append(claims)
 
