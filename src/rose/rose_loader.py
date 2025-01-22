@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import List, Optional
 from datasets import load_dataset
 
-from src.config import RosePaths, RosePathsSmall, DATASET_ALIASES
+from src.metrics.datasets_config import DATASET_ALIASES
+from src.utils.paths import RosePaths, RosePathsSmall
 
 
 class RoseDatasetLoader:
@@ -129,9 +130,9 @@ if __name__ == "__main__":
     loader = RoseDatasetLoader()
 
     # 1. Load the full datasets and save them
-    all_datasets = loader.load_all_datasets()
-    loader.save_datasets_compressed(RosePaths.compressed_dataset_path)
-    loader.save_datasets_json(RosePaths.dataset_path)
+    # all_datasets = loader.load_all_datasets()
+    # loader.save_datasets_compressed(RosePaths.compressed_dataset_path)
+    # loader.save_datasets_json(RosePaths.dataset_path)
 
     # 2. Load a SMALL version of each dataset (e.g., 3 entries) and save them
     all_datasets_small = loader.load_all_datasets(max_entries=3)

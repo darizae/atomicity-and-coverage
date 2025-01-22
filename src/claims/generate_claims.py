@@ -1,15 +1,10 @@
 import argparse
 from pathlib import Path
 
-from claim_generator import (
-    ModelConfig,
-    HuggingFaceSeq2SeqGenerator,
-    HuggingFaceCausalGenerator,
-    OpenAIClaimGenerator,
-    JanLocalClaimGenerator
-)
-
-from src.config import RosePathsSmall, RosePaths, CLAIM_GENERATION_MODELS, DATASET_ALIASES
+from src.claims.claim_generator import ModelConfig
+from src.claims.config import get_claim_generation_model_config
+from src.metrics.datasets_config import DATASET_ALIASES
+from src.utils.paths import RosePathsSmall, RosePaths
 from src.rose.rose_loader import RoseDatasetLoader
 from src.utils.timer import Timer
 
@@ -60,36 +55,14 @@ def initialize_model_generator(
     Given a model_key from CLAIM_GENERATION_MODELS, build a ModelConfig
     and instantiate the appropriate generator class.
     """
-    if model_key not in CLAIM_GENERATION_MODELS:
-        raise ValueError(f"Model key '{model_key}' not found in CLAIM_GENERATION_MODELS.")
+    model_info = get_claim_generation_model_config(model_key)
 
-    model_info = CLAIM_GENERATION_MODELS[model_key]
-    model_type = model_info.get("type", "seq2seq")
-
-    name_or_path = model_info["name"]
-    tokenizer_class = model_info.get("tokenizer_class")
-    model_class = model_info.get("model_class")
-    endpoint_url = model_info.get("endpoint_url", None)
-
-    # Decide provider from type
-    if model_type in ("seq2seq", "causal"):
-        provider = "huggingface"
-    elif model_type == "openai":
-        provider = "openai"
-    elif model_type == "local":
-        # We'll treat "local" as a Jan local endpoint
-        provider = "jan"
-    else:
-        raise NotImplementedError(f"Model type '{model_type}' is not supported.")
-
-    # Build the ModelConfig
     config = ModelConfig(
-        provider=provider,
-        model_name_or_path=name_or_path,
-        tokenizer_class=tokenizer_class,
-        model_class=model_class,
-        endpoint_url=endpoint_url,
-        openai_api_key=openai_api_key,  # pass it if present
+        model_name_or_path=model_info.name,
+        tokenizer_class=model_info.tokenizer_class,
+        model_class=model_info.model_class,
+        endpoint_url=model_info.endpoint_url,
+        openai_api_key=openai_api_key,
         device=device,
         batch_size=batch_size,
         max_length=max_length,
@@ -97,87 +70,40 @@ def initialize_model_generator(
         temperature=temperature,
     )
 
-    # Instantiate the right generator
-    if model_type == "seq2seq":
-        generator = HuggingFaceSeq2SeqGenerator(config)
-    elif model_type == "causal":
-        generator = HuggingFaceCausalGenerator(config)
-    elif model_type == "openai":
-        generator = OpenAIClaimGenerator(config)
-    elif model_type == "local":
-        generator = JanLocalClaimGenerator(config)
-    else:
-        raise NotImplementedError(f"Model type '{model_type}' not supported.")
+    generator_class = model_info.generator_cls
+    generator = generator_class(config)
 
     return generator, model_info
 
 
-def save_generated_claims(loader: RoseDatasetLoader, dataset_name: str,
-                          claims_field: str, claims, paths) -> None:
-    """
-    Insert the newly generated claims into the dataset, then
-    save (both compressed and JSON).
-    """
-    print(f"Saving claims for dataset '{dataset_name}' to field '{claims_field}'...")
-    loader.add_claims(dataset_name, claims_field, claims)
-    loader.save_datasets_compressed(paths.compressed_dataset_with_system_claims_path)
-    loader.save_datasets_json(paths.dataset_with_system_claims_path)
-    print("Save completed!")
-
-
-def process_dataset(
+def generate_and_save_claims_for_dataset(
+    loader: RoseDatasetLoader,
     dataset_name: str,
-    model_key: str,
-    device: str,
-    batch_size: int,
-    max_length: int,
-    truncation: bool,
-    small_test: bool,
-    temperature: float,
-    openai_api_key: str = None,
-) -> None:
-    """Generate claims for a single dataset using a specified model."""
-    timer = Timer()
-    timer.start()
-
-    # Device selection
-    device = check_or_select_device(device)
-    print(f"Using device: {device}")
-
-    # Pick which dataset paths (small or full)
-    paths = RosePathsSmall() if small_test else RosePaths()
-    print(f"Using {'small' if small_test else 'full'} dataset paths at: {paths.compressed_dataset_path}")
-
-    # Load
-    loader = load_datasets(paths.compressed_dataset_path)
+    generator,
+    model_info,
+    paths
+):
+    """Generate and save claims for a single dataset, using an already-initialized generator."""
     if dataset_name not in loader.datasets:
         raise KeyError(f"Dataset '{dataset_name}' not found in loaded datasets.")
 
-    # Initialize model/generator
-    print(f"Initializing model generator for '{model_key}'...")
-    generator, model_info = initialize_model_generator(
-        model_key=model_key,
-        device=device,
-        batch_size=batch_size,
-        max_length=max_length,
-        truncation=truncation,
-        temperature=temperature,
-        openai_api_key=openai_api_key,
-    )
-    print("Model generator initialized.")
+    timer = Timer()
+    timer.start()
 
-    # Get input texts
     dataset = loader.datasets[dataset_name]
     sources = [entry["reference"] for entry in dataset]
 
     # Generate
-    print(f"Generating claims for dataset '{dataset_name}'...")
+    print(f"Generating claims for dataset '{dataset_name}' using model '{model_info.name}'...")
     claims = generator.generate_claims(sources)
     print("Claim generation complete.")
 
     # Save
-    claims_field = model_info["claims_field"]
-    save_generated_claims(loader, dataset_name, claims_field, claims, paths)
+    print(f"Saving claims for dataset '{dataset_name}' to field '{model_info.claims_field}'...")
+    loader.add_claims(dataset_name, model_info.claims_field, claims)
+    loader.save_datasets_compressed(paths.compressed_dataset_with_system_claims_path)
+    loader.save_datasets_json(paths.dataset_with_system_claims_path)
+    print("Save completed!")
 
     # Log
     num_arrays = len(claims)
@@ -193,32 +119,50 @@ def main():
     args = get_args()
     truncation_flag = not args.no_truncation
 
+    # 1. Select device once
+    device = check_or_select_device(args.device)
+    print(f"Using device: {device}")
+
+    # 2. Decide paths (small vs. full) once
+    paths = RosePathsSmall() if args.small_test else RosePaths()
+    print(f"Using {'small' if args.small_test else 'full'} dataset paths at: {paths.compressed_dataset_path}")
+
+    # 3. Load all datasets once
+    loader = load_datasets(paths.compressed_dataset_path)
+
+    # 4. Initialize model/generator once
+    print(f"Initializing model generator for '{args.model_key}'...")
+    generator, model_info = initialize_model_generator(
+        model_key=args.model_key,
+        device=device,
+        batch_size=args.batch_size,
+        max_length=args.max_length,
+        truncation=truncation_flag,
+        temperature=args.temperature,
+        openai_api_key=args.openai_api_key,
+    )
+    print("Model generator initialized.")
+
+    # 5. Process either one dataset or all
     if args.dataset_name:
         print(f"Processing dataset: {args.dataset_name}")
-        process_dataset(
-            dataset_name=args.dataset_name,
-            model_key=args.model_key,
-            device=args.device,
-            batch_size=args.batch_size,
-            max_length=args.max_length,
-            truncation=truncation_flag,
-            small_test=args.small_test,
-            temperature=args.temperature,
-            openai_api_key=args.openai_api_key,
+        generate_and_save_claims_for_dataset(
+            loader,
+            args.dataset_name,
+            generator,
+            model_info,
+            paths
         )
     else:
         print("No specific dataset provided. Processing all known datasets...")
         for alias in DATASET_ALIASES.keys():
-            process_dataset(
-                dataset_name=alias,
-                model_key=args.model_key,
-                device=args.device,
-                batch_size=args.batch_size,
-                max_length=args.max_length,
-                truncation=truncation_flag,
-                small_test=args.small_test,
-                temperature=args.temperature,
-                openai_api_key=args.openai_api_key,
+            print(f"Processing dataset: {alias}")
+            generate_and_save_claims_for_dataset(
+                loader,
+                alias,
+                generator,
+                model_info,
+                paths
             )
 
 

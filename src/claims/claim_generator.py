@@ -1,6 +1,7 @@
 import importlib
 import json
 import os
+import re
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from typing import List, Type, Optional
@@ -10,12 +11,11 @@ from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModel, AutoModelForSeq2SeqLM, AutoModelForCausalLM
 import openai
 
-from src.config.prompt_templates import REFINED_CLAIM_PROMPT
+from src.claims.prompt_templates import REFINED_CLAIM_PROMPT
 
 
 @dataclass
 class ModelConfig:
-    provider: str  # e.g. "huggingface", "openai", "jan"
     model_name_or_path: str  # HF model name or path, OR engine name for Jan/OpenAI
 
     # For HF:
@@ -180,15 +180,40 @@ class HuggingFaceCausalGenerator(BaseHuggingFaceGenerator):
             outputs = self.model.generate(
                 **inputs,
                 max_new_tokens=256,
-                temperature=self.config.temperature
+                temperature=self.config.temperature,
+                do_sample=(self.config.temperature > 0.0)
             )
             decoded = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
 
-            for d in decoded:
+            for i, d in enumerate(decoded):
                 claims = self.parse_json_output(d)
                 all_claims.append(claims)
 
         return all_claims
+
+    @staticmethod
+    def parse_json_output(output_str: str) -> List[str]:
+        """
+        Extract the first JSON object containing a top-level "claims" key.
+        Fix trailing commas before parsing.
+        """
+        pattern = r'(\{"claims"\s*:\s*\[.*?\]\})'
+        json_matches = re.findall(pattern, output_str, flags=re.DOTALL)
+        if not json_matches:
+            print("[DEBUG parse_json_output] No match found with pattern:", pattern)
+            return []
+
+        json_str = json_matches[-1]
+
+        # Remove trailing commas before the closing bracket: ",]" => "]"
+        json_str = re.sub(r',\s*\]', ']', json_str)
+
+        try:
+            data = json.loads(json_str)
+            claims = data.get("claims", [])
+            return claims if isinstance(claims, list) else []
+        except json.JSONDecodeError:
+            return []
 
 
 class OpenAIClaimGenerator(BaseClaimGenerator):
