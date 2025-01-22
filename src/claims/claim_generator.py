@@ -1,6 +1,7 @@
 import importlib
 import json
 import os
+import re
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from typing import List, Type, Optional
@@ -200,28 +201,29 @@ class HuggingFaceCausalGenerator(BaseHuggingFaceGenerator):
 
         return all_claims
 
+    @staticmethod
+    def parse_json_output(output_str: str) -> List[str]:
+        """
+        Extract the first JSON object containing a top-level "claims" key.
+        Fix trailing commas before parsing.
+        """
+        print("Using regex parsing for LLaMa2 output.")
+        pattern = r'(\{"claims"\s*:\s*\[.*?\]\})'
+        match = re.search(pattern, output_str, flags=re.DOTALL)
+        if not match:
+            return []
 
-        def parse_json_output(output_str: str) -> List[str]:
-            """
-            Extract the first JSON object containing a top-level "claims" key.
-            Fix trailing commas before parsing.
-            """
-            pattern = r'(\{"claims"\s*:\s*\[.*?\]\})'
-            match = re.search(pattern, output_str, flags=re.DOTALL)
-            if not match:
-                return []
-            
-            json_str = match.group(1)
-            
-            # Remove trailing commas before the closing bracket: ",]" => "]"
-            json_str = re.sub(r',\s*\]', ']', json_str)
-            
-            try:
-                data = json.loads(json_str)
-                claims = data.get("claims", [])
-                return claims if isinstance(claims, list) else []
-            except json.JSONDecodeError:
-                return []
+        json_str = match.group(1)
+
+        # Remove trailing commas before the closing bracket: ",]" => "]"
+        json_str = re.sub(r',\s*\]', ']', json_str)
+
+        try:
+            data = json.loads(json_str)
+            claims = data.get("claims", [])
+            return claims if isinstance(claims, list) else []
+        except json.JSONDecodeError:
+            return []
 
 
 class OpenAIClaimGenerator(BaseClaimGenerator):
