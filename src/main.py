@@ -15,12 +15,7 @@ def main():
 
     for model in CLAIM_GEN_MODELS:
         for method in methods:
-            if method == "rouge":
-                relevant_thresholds = [0.1, 0.2, 0.5, 0.7]
-            else:
-                relevant_thresholds = thresholds
-
-            for threshold in relevant_thresholds:
+            for threshold in thresholds:
                 experiment_configs.append({
                     "method": method,
                     "threshold": threshold,
