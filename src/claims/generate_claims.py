@@ -1,15 +1,14 @@
 import argparse
 from pathlib import Path
 
+from device_selector import check_or_select_device
+from my_timer import Timer
+
 from src.claims.claim_generator import ModelConfig
 from src.claims.config import get_claim_generation_model_config
 from src.metrics.datasets_config import DATASET_ALIASES
 from src.utils.paths import RosePathsSmall, RosePaths
 from src.rose.rose_loader import RoseDatasetLoader
-from src.utils.timer import Timer
-
-from src.utils.device_selector import check_or_select_device
-
 
 def get_args():
     parser = argparse.ArgumentParser(description="Generate claims from datasets using a model.")

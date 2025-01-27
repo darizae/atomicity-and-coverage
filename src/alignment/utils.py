@@ -2,12 +2,13 @@ import json
 import os
 from typing import List, Dict, Any
 
+from device_selector import check_or_select_device
+
 from src.alignment.base_aligner import BaseAligner
 from src.alignment.config import AlignmentConfig, AlignmentMethods, get_embedding_model_definition, \
     EmbeddingModelConfig, get_entailment_model_definition, EntailmentModelConfig
 from src.metrics.datasets_config import DATASET_ALIASES, DatasetName
 from src.utils.paths import RosePathsSmall, RosePaths, get_alignment_results_path
-from src.utils.device_selector import check_or_select_device
 from src.rose.rose_loader import RoseDatasetLoader
 from src.metrics.atomicity_coverage import compute_atomicity, compute_coverage
 

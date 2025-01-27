@@ -1,7 +1,9 @@
 import argparse
+
+from my_timer import Timer
+
 from src.alignment.alignment_factory import create_aligner
 from src.alignment.utils import build_config, do_alignment
-from src.utils.timer import Timer
 
 
 def get_args():

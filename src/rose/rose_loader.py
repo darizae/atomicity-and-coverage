@@ -6,7 +6,7 @@ from typing import List, Optional
 from datasets import load_dataset
 
 from src.metrics.datasets_config import DATASET_ALIASES
-from src.utils.paths import RosePaths, RosePathsSmall
+from src.utils.paths import RosePathsSmall
 
 
 class RoseDatasetLoader:
