@@ -98,7 +98,7 @@ def main():
     )
 
     timer.stop()
-    print(f"Alignment processing completed in {timer.format_elapsed_time()}")
+    timer.print_elapsed_time()
 
 
 if __name__ == "__main__":

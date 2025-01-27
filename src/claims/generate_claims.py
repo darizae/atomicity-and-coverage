@@ -43,13 +43,13 @@ def load_datasets(compressed_path: Path) -> RoseDatasetLoader:
 
 
 def initialize_model_generator(
-    model_key: str,
-    device: str,
-    batch_size: int,
-    max_length: int,
-    truncation: bool,
-    temperature: float,
-    openai_api_key: str = None,
+        model_key: str,
+        device: str,
+        batch_size: int,
+        max_length: int,
+        truncation: bool,
+        temperature: float,
+        openai_api_key: str = None,
 ):
     """
     Given a model_key from CLAIM_GENERATION_MODELS, build a ModelConfig
@@ -77,11 +77,11 @@ def initialize_model_generator(
 
 
 def generate_and_save_claims_for_dataset(
-    loader: RoseDatasetLoader,
-    dataset_name: str,
-    generator,
-    model_info,
-    paths
+        loader: RoseDatasetLoader,
+        dataset_name: str,
+        generator,
+        model_info,
+        paths
 ):
     """Generate and save claims for a single dataset, using an already-initialized generator."""
     if dataset_name not in loader.datasets:
@@ -110,9 +110,9 @@ def generate_and_save_claims_for_dataset(
     num_total_claims = sum(len(c) for c in claims if isinstance(c, list))
     timer.stop()
 
+    timer.print_elapsed_time()
     print(f"Number of claim arrays generated: {num_arrays}")
     print(f"Total number of claims generated: {num_total_claims}")
-    print(f"Time taken: {timer.format_elapsed_time()}\n")
 
 
 def main():

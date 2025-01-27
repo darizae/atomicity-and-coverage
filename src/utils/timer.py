@@ -23,7 +23,6 @@ class Timer:
             raise RuntimeError("Timer has not been started.")
         self.end_time = time.time()
         elapsed_time = self._compute_elapsed_time(self.start_time, self.end_time)
-        print(f"Timer stopped: {self.format_elapsed_time()}")
         return elapsed_time
 
     def lap(self) -> Tuple[int, int, float]:
@@ -60,6 +59,9 @@ class Timer:
             return "Timer has not started."
         end_time = self.end_time if self.end_time else time.time()
         return self._format_time(*self._compute_elapsed_time(self.start_time, end_time))
+
+    def print_elapsed_time(self) -> str:
+        print(f"Processing completed in {self.format_elapsed_time()}")
 
     @staticmethod
     def _compute_elapsed_time(start: float, end: float) -> Tuple[int, int, float]:

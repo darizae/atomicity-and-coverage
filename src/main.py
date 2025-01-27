@@ -1,7 +1,5 @@
 import subprocess
 
-from src.utils.timer import Timer
-
 SMALL_TEST = False
 CLAIM_GEN_MODELS = ["distilled_t5", "gpt-3.5-turbo", "llama2_7b"]
 
