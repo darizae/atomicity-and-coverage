@@ -136,7 +136,7 @@ if __name__ == "__main__":
 
     # 2. Load a SMALL version of each dataset (e.g., 3 entries) and save them
     all_datasets_small = loader.load_all_datasets(max_entries=3)
-    loader.save_datasets_compressed(RosePathsSmall.compressed_dataset_path)
+    loader.save_datasets_compressed(RosePathsSmall.dataset_path)
     loader.save_datasets_json(RosePathsSmall.dataset_path)
 
     print("Done generating both full and small datasets.")

@@ -136,7 +136,7 @@ def do_alignment(
 def _load_dataset(small_test: bool = False):
     # Determine the path based on dataset subset
     paths = RosePathsSmall() if small_test else RosePaths()
-    dataset_path = paths.compressed_dataset_path
+    dataset_path = paths.dataset_path
 
     loader = RoseDatasetLoader()
     if not os.path.exists(dataset_path):

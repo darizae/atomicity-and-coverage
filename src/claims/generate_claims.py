@@ -124,10 +124,10 @@ def main():
 
     # 2. Decide paths (small vs. full) once
     paths = RosePathsSmall() if args.small_test else RosePaths()
-    print(f"Using {'small' if args.small_test else 'full'} dataset paths at: {paths.compressed_dataset_path}")
+    print(f"Using {'small' if args.small_test else 'full'} dataset paths at: {paths.dataset_path}")
 
     # 3. Load all datasets once
-    loader = load_datasets(paths.compressed_dataset_path)
+    loader = load_datasets(paths.dataset_path)
 
     # 4. Initialize model/generator once
     print(f"Initializing model generator for '{args.model_key}'...")
