@@ -15,6 +15,45 @@
           "Arango had a defeat.",
           "Arango's team suffered a defeat",
           "Arango's team suffered a 4-3 defeat"
+        ],
+        "deduped_0.1_select_longest": [
+          "Arango could face a retrospective punishment for the incident"
+        ],
+        "deduped_0.2_select_longest": [
+          "Arango could face a retrospective punishment for the incident"
+        ],
+        "deduped_0.3_select_longest": [
+          "Arango could face a retrospective punishment for the incident"
+        ],
+        "deduped_0.4_select_longest": [
+          "Arango could face a retrospective punishment for the incident"
+        ],
+        "deduped_0.5_select_longest": [
+          "Arango could face a retrospective punishment for the incident"
+        ],
+        "deduped_0.6_select_longest": [
+          "Arango could face a retrospective punishment for the incident"
+        ],
+        "deduped_0.7_select_longest": [
+          "Juan Arango escaped punishment from the referee",
+          "Juan Arango bit Jesus Zavela.",
+          "Arango could face a retrospective punishment for the incident"
+        ],
+        "deduped_0.8_select_longest": [
+          "Juan Arango escaped punishment from the referee",
+          "Juan Arango bit Jesus Zavela.",
+          "Arango could face a retrospective punishment for the incident",
+          "Arango had eariler scored a free kick.",
+          "Arango's team suffered a 4-3 defeat"
+        ],
+        "deduped_0.9_select_longest": [
+          "Juan Arango escaped punishment.",
+          "Juan Arango bit Jesus Zavela.",
+          "Juan Arango escaped punishment from the referee",
+          "Arango could face a retrospective punishment for the incident",
+          "Arango had eariler scored a free kick.",
+          "Arango scored for his team.",
+          "Arango's team suffered a 4-3 defeat"
         ]
       },
       "record_id": "cnndm_test_0",
@@ -50,6 +89,57 @@
           "Gary Gardner is out on loan at Nottingham Forest.",
           "Gary Gardner is at the Championship side.",
           "Tim Sherwood is keen to asses Gardner.",
+          "Tim Sherwood is keen to asses Gardner ahead of next season.",
+          "The midfielder would prefer a move back to Forest.",
+          "The midfielder would prefer a move back if Villa doesn't work out.",
+          "CLICK HERE for all the latest Aston Villa news."
+        ],
+        "deduped_0.1_select_longest": [
+          "The midfielder would prefer a move back if Villa doesn't work out."
+        ],
+        "deduped_0.2_select_longest": [
+          "The midfielder would prefer a move back if Villa doesn't work out."
+        ],
+        "deduped_0.3_select_longest": [
+          "The midfielder would prefer a move back if Villa doesn't work out."
+        ],
+        "deduped_0.4_select_longest": [
+          "The midfielder would prefer a move back if Villa doesn't work out."
+        ],
+        "deduped_0.5_select_longest": [
+          "The midfielder would prefer a move back if Villa doesn't work out."
+        ],
+        "deduped_0.6_select_longest": [
+          "Gary Gardner will report to Aston Villa for pre-season training.",
+          "Tim Sherwood is keen to asses Gardner ahead of next season.",
+          "The midfielder would prefer a move back if Villa doesn't work out.",
+          "CLICK HERE for all the latest Aston Villa news."
+        ],
+        "deduped_0.7_select_longest": [
+          "Gary Gardner will report to Aston Villa for pre-season training.",
+          "Gary Gardner is out on loan at Nottingham Forest.",
+          "Tim Sherwood is keen to asses Gardner ahead of next season.",
+          "The midfielder would prefer a move back to Forest.",
+          "The midfielder would prefer a move back if Villa doesn't work out.",
+          "CLICK HERE for all the latest Aston Villa news."
+        ],
+        "deduped_0.8_select_longest": [
+          "Gary Gardner will report to Aston Villa for pre-season training.",
+          "Gary Gardner is 22 years old.",
+          "Gary Gardner is out on loan at Nottingham Forest.",
+          "Gary Gardner is at the Championship side.",
+          "Tim Sherwood is keen to asses Gardner ahead of next season.",
+          "The midfielder would prefer a move back to Forest.",
+          "The midfielder would prefer a move back if Villa doesn't work out.",
+          "CLICK HERE for all the latest Aston Villa news."
+        ],
+        "deduped_0.9_select_longest": [
+          "Gary Gardner confirms he'll report to Aston Villa.",
+          "Gary Gardner will report to Aston Villa for pre-season training.",
+          "Gary Gardner is 22 years old.",
+          "Gary Gardner is out on loan.",
+          "Gary Gardner is out on loan at Nottingham Forest.",
+          "Gary Gardner is at the Championship side.",
           "Tim Sherwood is keen to asses Gardner ahead of next season.",
           "The midfielder would prefer a move back to Forest.",
           "The midfielder would prefer a move back if Villa doesn't work out.",
@@ -95,6 +185,50 @@
           "The same skeptics also warn of the health risks.",
           "The same skeptics warn the health risks associated with consuming less then 3,000 miligrams.",
           "Average American ingests about 3,500 miligrams of salt per day."
+        ],
+        "deduped_0.1_select_longest": [
+          "Scientists believe a typical healthy person can consume 6,000 miligrams per day without significantly raising health risks."
+        ],
+        "deduped_0.2_select_longest": [
+          "Scientists believe a typical healthy person can consume 6,000 miligrams per day without significantly raising health risks."
+        ],
+        "deduped_0.3_select_longest": [
+          "Scientists believe a typical healthy person can consume 6,000 miligrams per day without significantly raising health risks."
+        ],
+        "deduped_0.4_select_longest": [
+          "Scientists believe a typical healthy person can consume 6,000 miligrams per day without significantly raising health risks."
+        ],
+        "deduped_0.5_select_longest": [
+          "Scientists believe a typical healthy person can consume 6,000 miligrams per day without significantly raising health risks."
+        ],
+        "deduped_0.6_select_longest": [
+          "Current federal goverment guidelines dictate the people.",
+          "Current federal government guidelines dictate the people about their salt intake.",
+          "Scientists believe a typical healthy person can consume 6,000 miligrams per day without significantly raising health risks."
+        ],
+        "deduped_0.7_select_longest": [
+          "Current federal goverment guidelines dictate the people.",
+          "Current federal government guidelines dictate the people about their salt intake.",
+          "Scientists believe a typical healthy person can consume 6,000 miligrams per day without significantly raising health risks.",
+          "The same skeptics also warn of the health risks."
+        ],
+        "deduped_0.8_select_longest": [
+          "Current federal goverment guidelines dictate the people.",
+          "Current federal government guidelines dictate the people about their salt intake.",
+          "Scientists believe a typical healthy person can consume 6,000 miligrams per day without significantly raising health risks.",
+          "The same skeptics also warn of the health risks.",
+          "The same skeptics warn the health risks associated with consuming less then 3,000 miligrams.",
+          "Average American ingests about 3,500 miligrams of salt per day."
+        ],
+        "deduped_0.9_select_longest": [
+          "Current federal goverment guidelines dictate the people.",
+          "Current federal government guidelines dictate the people about their salt intake.",
+          "The guidelines dictate the people should limit their salt intake.",
+          "People are dictated to limit their salt intake to 2,300 miligrams.",
+          "Scientists believe a typical healthy person can consume 6,000 miligrams per day without significantly raising health risks.",
+          "The same skeptics also warn of the health risks.",
+          "The same skeptics warn the health risks associated with consuming less then 3,000 miligrams.",
+          "Average American ingests about 3,500 miligrams of salt per day."
         ]
       },
       "record_id": "cnndm_test_2",
@@ -127,6 +261,68 @@
       "reference": "The spread, which was shot by photographer Mario Testino, also stars Gigi Hadid, Ansel Elgort, Dylan Penn and her younger brother Hopper .\nThis is 19-year-old Kendall's fifth time appearing in the pages of Vogue .",
       "reference_acus": {
         "original": [
+          "The spread was shot by photographer Mario Testino.",
+          "The spread stars Gigi Hadid.",
+          "The spread stars Ansel Elgort.",
+          "The spread stars Dylan Penn.",
+          "The spread stars Hopper.",
+          "Hopper is Dynal Penn's younger brother.",
+          "Kendall is 19 years old.",
+          "The spread is in Vogue.",
+          "This is Kendall's fifth time appearing in Vogue."
+        ],
+        "deduped_0.1_select_longest": [
+          "The spread was shot by photographer Mario Testino."
+        ],
+        "deduped_0.2_select_longest": [
+          "The spread was shot by photographer Mario Testino."
+        ],
+        "deduped_0.3_select_longest": [
+          "The spread was shot by photographer Mario Testino."
+        ],
+        "deduped_0.4_select_longest": [
+          "The spread was shot by photographer Mario Testino.",
+          "This is Kendall's fifth time appearing in Vogue."
+        ],
+        "deduped_0.5_select_longest": [
+          "The spread was shot by photographer Mario Testino.",
+          "The spread stars Ansel Elgort.",
+          "Hopper is Dynal Penn's younger brother.",
+          "This is Kendall's fifth time appearing in Vogue."
+        ],
+        "deduped_0.6_select_longest": [
+          "The spread was shot by photographer Mario Testino.",
+          "The spread stars Gigi Hadid.",
+          "The spread stars Ansel Elgort.",
+          "The spread stars Dylan Penn.",
+          "Hopper is Dynal Penn's younger brother.",
+          "Kendall is 19 years old.",
+          "The spread is in Vogue.",
+          "This is Kendall's fifth time appearing in Vogue."
+        ],
+        "deduped_0.7_select_longest": [
+          "The spread was shot by photographer Mario Testino.",
+          "The spread stars Gigi Hadid.",
+          "The spread stars Ansel Elgort.",
+          "The spread stars Dylan Penn.",
+          "The spread stars Hopper.",
+          "Hopper is Dynal Penn's younger brother.",
+          "Kendall is 19 years old.",
+          "The spread is in Vogue.",
+          "This is Kendall's fifth time appearing in Vogue."
+        ],
+        "deduped_0.8_select_longest": [
+          "The spread was shot by photographer Mario Testino.",
+          "The spread stars Gigi Hadid.",
+          "The spread stars Ansel Elgort.",
+          "The spread stars Dylan Penn.",
+          "The spread stars Hopper.",
+          "Hopper is Dynal Penn's younger brother.",
+          "Kendall is 19 years old.",
+          "The spread is in Vogue.",
+          "This is Kendall's fifth time appearing in Vogue."
+        ],
+        "deduped_0.9_select_longest": [
           "The spread was shot by photographer Mario Testino.",
           "The spread stars Gigi Hadid.",
           "The spread stars Ansel Elgort.",
@@ -178,6 +374,43 @@
           "Pogba has also attracted interest from Manchester United",
           "Pogba has also attracted interest from Chelsea",
           "Pogba has also attracted interest from Manchester City"
+        ],
+        "deduped_0.1_select_longest": [
+          "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'"
+        ],
+        "deduped_0.2_select_longest": [
+          "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'"
+        ],
+        "deduped_0.3_select_longest": [
+          "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'"
+        ],
+        "deduped_0.4_select_longest": [
+          "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'"
+        ],
+        "deduped_0.5_select_longest": [
+          "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'"
+        ],
+        "deduped_0.6_select_longest": [
+          "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'",
+          "Paul Pogba has seven goals in 22 Serie A appearances"
+        ],
+        "deduped_0.7_select_longest": [
+          "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'",
+          "Paul Pogba has seven goals in 22 Serie A appearances",
+          "Paul Pogba is 22-year-old",
+          "Pogba has also attracted interest from Manchester United"
+        ],
+        "deduped_0.8_select_longest": [
+          "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'",
+          "Paul Pogba has seven goals in 22 Serie A appearances",
+          "Paul Pogba is 22-year-old",
+          "Pogba has also attracted interest from Manchester United"
+        ],
+        "deduped_0.9_select_longest": [
+          "Zinedine Zidane said interest in Juventus star Paul Pogba is 'only logical'",
+          "Paul Pogba has seven goals in 22 Serie A appearances",
+          "Paul Pogba is 22-year-old",
+          "Pogba has also attracted interest from Manchester United"
         ]
       },
       "record_id": "cnndm_validation_1",
@@ -205,6 +438,66 @@
       "reference": "Jonathan Pearce was at the Emirates to commentate for Match of the Day .\nThe 55-year-old was preparing a piece to camera when a sprinkler came on .\nPearce was soaked and ran out of shot, saying 'you could have told us'\nHe took it in good spirits, later laughing off the incident on air .",
       "reference_acus": {
         "original": [
+          "Jonathan Pearce was at the Emirates.",
+          "Jonathan Pearce was commentating the Match of the Day .",
+          "Jonathan Pearce is 55 years old.",
+          "Jonathan Pearce was preparing a piece to camera.",
+          "A sprinkler came on.",
+          "Jonathan Pearce was soaked.",
+          "Jonathan Pearce ran out of shot.",
+          "Jonathan Pearce said 'you could have told us' .",
+          "Jonathan Pearce took it in good spirits.",
+          "Jonathan Pearce later laughed off the incident on air ."
+        ],
+        "deduped_0.1_select_longest": [
+          "Jonathan Pearce was commentating the Match of the Day ."
+        ],
+        "deduped_0.2_select_longest": [
+          "Jonathan Pearce was commentating the Match of the Day ."
+        ],
+        "deduped_0.3_select_longest": [
+          "Jonathan Pearce was commentating the Match of the Day ."
+        ],
+        "deduped_0.4_select_longest": [
+          "Jonathan Pearce was commentating the Match of the Day .",
+          "A sprinkler came on."
+        ],
+        "deduped_0.5_select_longest": [
+          "Jonathan Pearce was commentating the Match of the Day .",
+          "A sprinkler came on."
+        ],
+        "deduped_0.6_select_longest": [
+          "Jonathan Pearce was commentating the Match of the Day .",
+          "Jonathan Pearce was preparing a piece to camera.",
+          "A sprinkler came on.",
+          "Jonathan Pearce ran out of shot.",
+          "Jonathan Pearce said 'you could have told us' ."
+        ],
+        "deduped_0.7_select_longest": [
+          "Jonathan Pearce was at the Emirates.",
+          "Jonathan Pearce was commentating the Match of the Day .",
+          "Jonathan Pearce is 55 years old.",
+          "Jonathan Pearce was preparing a piece to camera.",
+          "A sprinkler came on.",
+          "Jonathan Pearce was soaked.",
+          "Jonathan Pearce ran out of shot.",
+          "Jonathan Pearce said 'you could have told us' .",
+          "Jonathan Pearce took it in good spirits.",
+          "Jonathan Pearce later laughed off the incident on air ."
+        ],
+        "deduped_0.8_select_longest": [
+          "Jonathan Pearce was at the Emirates.",
+          "Jonathan Pearce was commentating the Match of the Day .",
+          "Jonathan Pearce is 55 years old.",
+          "Jonathan Pearce was preparing a piece to camera.",
+          "A sprinkler came on.",
+          "Jonathan Pearce was soaked.",
+          "Jonathan Pearce ran out of shot.",
+          "Jonathan Pearce said 'you could have told us' .",
+          "Jonathan Pearce took it in good spirits.",
+          "Jonathan Pearce later laughed off the incident on air ."
+        ],
+        "deduped_0.9_select_longest": [
           "Jonathan Pearce was at the Emirates.",
           "Jonathan Pearce was commentating the Match of the Day .",
           "Jonathan Pearce is 55 years old.",
@@ -255,6 +548,34 @@
           "The main suspect in a massacre has gone on trial",
           "The main suspect in the most brutal massacre in recent Philippine history has gone on trial",
           "The main suspect in the massacre in Philippine has gone on trial"
+        ],
+        "deduped_0.1_select_longest": [
+          "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+        ],
+        "deduped_0.2_select_longest": [
+          "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+        ],
+        "deduped_0.3_select_longest": [
+          "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+        ],
+        "deduped_0.4_select_longest": [
+          "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+        ],
+        "deduped_0.5_select_longest": [
+          "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+        ],
+        "deduped_0.6_select_longest": [
+          "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+        ],
+        "deduped_0.7_select_longest": [
+          "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+        ],
+        "deduped_0.8_select_longest": [
+          "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
+        ],
+        "deduped_0.9_select_longest": [
+          "The main suspect in a massacre has gone on trial",
+          "The main suspect in the most brutal massacre in recent Philippine history has gone on trial"
         ]
       },
       "record_id": "xsum_0",
@@ -283,6 +604,35 @@
           "The government says it will increase the levy",
           "The government says it will increase the levy on banks",
           "The government says it will increase the levy from 0.078% to 0.088%",
+          "The government says it will increase the levy from 1 January"
+        ],
+        "deduped_0.1_select_longest": [
+          "The government says it will increase the levy from 0.078% to 0.088%"
+        ],
+        "deduped_0.2_select_longest": [
+          "The government says it will increase the levy from 0.078% to 0.088%"
+        ],
+        "deduped_0.3_select_longest": [
+          "The government says it will increase the levy from 0.078% to 0.088%"
+        ],
+        "deduped_0.4_select_longest": [
+          "The government says it will increase the levy from 0.078% to 0.088%"
+        ],
+        "deduped_0.5_select_longest": [
+          "The government says it will increase the levy from 0.078% to 0.088%"
+        ],
+        "deduped_0.6_select_longest": [
+          "The government says it will increase the levy from 0.078% to 0.088%"
+        ],
+        "deduped_0.7_select_longest": [
+          "The government says it will increase the levy from 0.078% to 0.088%"
+        ],
+        "deduped_0.8_select_longest": [
+          "The government says it will increase the levy from 0.078% to 0.088%"
+        ],
+        "deduped_0.9_select_longest": [
+          "The government says it will increase the levy from 0.078% to 0.088%",
+          "The government says it will increase the levy on banks",
           "The government says it will increase the levy from 1 January"
         ]
       },
@@ -315,6 +665,44 @@
       "reference": "Footballer Gary Neville's controversial plans for an eco-friendly \"Teletubbies\" house have been given the go ahead by Bolton Council.",
       "reference_acus": {
         "original": [
+          "Footballer Gary Neville had controversial plans have been given the go ahead",
+          "The controversial plans have been given the go ahead",
+          "The controversial plans are for an eco-friendly \"Teletubbies\" house",
+          "The controversial plans have been given the go ahead by Bolton Council."
+        ],
+        "deduped_0.1_select_longest": [
+          "Footballer Gary Neville had controversial plans have been given the go ahead"
+        ],
+        "deduped_0.2_select_longest": [
+          "Footballer Gary Neville had controversial plans have been given the go ahead"
+        ],
+        "deduped_0.3_select_longest": [
+          "Footballer Gary Neville had controversial plans have been given the go ahead"
+        ],
+        "deduped_0.4_select_longest": [
+          "Footballer Gary Neville had controversial plans have been given the go ahead"
+        ],
+        "deduped_0.5_select_longest": [
+          "Footballer Gary Neville had controversial plans have been given the go ahead",
+          "The controversial plans are for an eco-friendly \"Teletubbies\" house"
+        ],
+        "deduped_0.6_select_longest": [
+          "Footballer Gary Neville had controversial plans have been given the go ahead",
+          "The controversial plans have been given the go ahead by Bolton Council.",
+          "The controversial plans are for an eco-friendly \"Teletubbies\" house"
+        ],
+        "deduped_0.7_select_longest": [
+          "Footballer Gary Neville had controversial plans have been given the go ahead",
+          "The controversial plans have been given the go ahead by Bolton Council.",
+          "The controversial plans are for an eco-friendly \"Teletubbies\" house"
+        ],
+        "deduped_0.8_select_longest": [
+          "Footballer Gary Neville had controversial plans have been given the go ahead",
+          "The controversial plans have been given the go ahead",
+          "The controversial plans are for an eco-friendly \"Teletubbies\" house",
+          "The controversial plans have been given the go ahead by Bolton Council."
+        ],
+        "deduped_0.9_select_longest": [
           "Footballer Gary Neville had controversial plans have been given the go ahead",
           "The controversial plans have been given the go ahead",
           "The controversial plans are for an eco-friendly \"Teletubbies\" house",
@@ -357,6 +745,43 @@
           "Frank will go out",
           "Frank will go out to celebrate that",
           "Frank will go out tonight."
+        ],
+        "deduped_0.1_select_longest": [
+          "Charlie's sister has passed her last university exam"
+        ],
+        "deduped_0.2_select_longest": [
+          "Charlie's sister has passed her last university exam"
+        ],
+        "deduped_0.3_select_longest": [
+          "Charlie's sister has passed her last university exam"
+        ],
+        "deduped_0.4_select_longest": [
+          "Charlie's sister has passed her last university exam"
+        ],
+        "deduped_0.5_select_longest": [
+          "Charlie's sister has passed her last university exam",
+          "Charlie will go out to celebrate that"
+        ],
+        "deduped_0.6_select_longest": [
+          "Charlie's sister has passed her last university exam",
+          "Charlie will go out to celebrate that"
+        ],
+        "deduped_0.7_select_longest": [
+          "Charlie's sister has passed her last university exam",
+          "Charlie will go out to celebrate that",
+          "Frank will go out to celebrate that"
+        ],
+        "deduped_0.8_select_longest": [
+          "Charlie's sister has passed her last university exam",
+          "Charlie will go out to celebrate that",
+          "Frank will go out to celebrate that"
+        ],
+        "deduped_0.9_select_longest": [
+          "Charlie's sister has passed her last university exam",
+          "Charlie will go out tonight.",
+          "Charlie will go out to celebrate that",
+          "Frank will go out tonight.",
+          "Frank will go out to celebrate that"
         ]
       },
       "record_id": "samsum_0",
@@ -383,6 +808,45 @@
       "reference": "Brett's cousin met his wife while playing a game together. Andrew's favorite game is the Final Fantasy. Brett and John haven't heard about it.",
       "reference_acus": {
         "original": [
+          "Brett's cousin met his wife while playing a game together",
+          "Andrew's favorite game is the Final Fantasy",
+          "Brett hasn't heard about the Final Fantasy",
+          "John hasn't heard about the Final Fantasy"
+        ],
+        "deduped_0.1_select_longest": [
+          "Brett's cousin met his wife while playing a game together"
+        ],
+        "deduped_0.2_select_longest": [
+          "Brett's cousin met his wife while playing a game together"
+        ],
+        "deduped_0.3_select_longest": [
+          "Brett's cousin met his wife while playing a game together"
+        ],
+        "deduped_0.4_select_longest": [
+          "Brett's cousin met his wife while playing a game together"
+        ],
+        "deduped_0.5_select_longest": [
+          "Brett's cousin met his wife while playing a game together",
+          "Andrew's favorite game is the Final Fantasy"
+        ],
+        "deduped_0.6_select_longest": [
+          "Brett's cousin met his wife while playing a game together",
+          "Andrew's favorite game is the Final Fantasy",
+          "Brett hasn't heard about the Final Fantasy"
+        ],
+        "deduped_0.7_select_longest": [
+          "Brett's cousin met his wife while playing a game together",
+          "Andrew's favorite game is the Final Fantasy",
+          "Brett hasn't heard about the Final Fantasy",
+          "John hasn't heard about the Final Fantasy"
+        ],
+        "deduped_0.8_select_longest": [
+          "Brett's cousin met his wife while playing a game together",
+          "Andrew's favorite game is the Final Fantasy",
+          "Brett hasn't heard about the Final Fantasy",
+          "John hasn't heard about the Final Fantasy"
+        ],
+        "deduped_0.9_select_longest": [
           "Brett's cousin met his wife while playing a game together",
           "Andrew's favorite game is the Final Fantasy",
           "Brett hasn't heard about the Final Fantasy",
@@ -415,6 +879,47 @@
       "reference_acus": {
         "original": [
           "Anna got an awful stomachache",
+          "Anna got an awful stomachache at night",
+          "Anna doesn't know its cause.",
+          "Anna's mom Joanna will make her hot tea",
+          "The hot tea will be served with some fresh mint leaves."
+        ],
+        "deduped_0.1_select_longest": [
+          "The hot tea will be served with some fresh mint leaves."
+        ],
+        "deduped_0.2_select_longest": [
+          "The hot tea will be served with some fresh mint leaves."
+        ],
+        "deduped_0.3_select_longest": [
+          "The hot tea will be served with some fresh mint leaves."
+        ],
+        "deduped_0.4_select_longest": [
+          "The hot tea will be served with some fresh mint leaves."
+        ],
+        "deduped_0.5_select_longest": [
+          "Anna got an awful stomachache at night",
+          "Anna's mom Joanna will make her hot tea",
+          "The hot tea will be served with some fresh mint leaves."
+        ],
+        "deduped_0.6_select_longest": [
+          "Anna got an awful stomachache at night",
+          "Anna doesn't know its cause.",
+          "Anna's mom Joanna will make her hot tea",
+          "The hot tea will be served with some fresh mint leaves."
+        ],
+        "deduped_0.7_select_longest": [
+          "Anna got an awful stomachache at night",
+          "Anna doesn't know its cause.",
+          "Anna's mom Joanna will make her hot tea",
+          "The hot tea will be served with some fresh mint leaves."
+        ],
+        "deduped_0.8_select_longest": [
+          "Anna got an awful stomachache at night",
+          "Anna doesn't know its cause.",
+          "Anna's mom Joanna will make her hot tea",
+          "The hot tea will be served with some fresh mint leaves."
+        ],
+        "deduped_0.9_select_longest": [
           "Anna got an awful stomachache at night",
           "Anna doesn't know its cause.",
           "Anna's mom Joanna will make her hot tea",
