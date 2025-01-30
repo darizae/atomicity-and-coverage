@@ -36,7 +36,7 @@ def get_args():
 def load_datasets(compressed_path: Path) -> RoseDatasetLoader:
     loader = RoseDatasetLoader()
     print("Loading datasets...")
-    loader.load_datasets_compressed(compressed_path)
+    loader.load_datasets_json(compressed_path)
     print("Datasets loaded!")
     return loader
 
@@ -99,8 +99,7 @@ def generate_and_save_claims_for_dataset(
 
     # Save
     print(f"Saving claims for dataset '{dataset_name}' to field '{model_info.claims_field}'...")
-    loader.add_claims(dataset_name, model_info.claims_field, claims)
-    loader.save_datasets_compressed(paths.compressed_dataset_with_system_claims_path)
+    loader.add_system_claims(dataset_name, model_info.claims_field, claims)
     loader.save_datasets_json(paths.dataset_with_system_claims_path)
     print("Save completed!")
 

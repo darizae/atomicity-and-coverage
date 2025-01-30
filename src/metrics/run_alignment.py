@@ -74,6 +74,18 @@ def get_args():
         help="Which claims from which claim generation model to use. Must be one of: distilled_t5, etc."
     )
 
+    parser.add_argument(
+        "--dedup_threshold",
+        type=float,
+        default=None
+    )
+
+    parser.add_argument(
+        "--dedup_strategy",
+        type=str,
+        default=None
+    )
+
     return parser.parse_args()
 
 
@@ -96,7 +108,9 @@ def main():
     do_alignment(
         aligner=aligner,
         small_test=args.small_test,
-        config=config
+        config=config,
+        dedup_threshold=args.dedup_threshold,
+        dedup_strategy=args.dedup_strategy
     )
 
     timer.stop()

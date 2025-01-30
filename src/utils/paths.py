@@ -85,6 +85,12 @@ def get_alignment_results_path(
 
     # Build the full directory path
     dir_path = method_dir / model_key / claim_gen_dir / threshold_dir / test_dir
+
+    if config.dedup_threshold is not None and config.dedup_strategy is not None:
+        dir_path = dir_path / f"dedup_{config.dedup_threshold}_{config.dedup_strategy}"
+    else:
+        dir_path = dir_path / f"original"
+
     dir_path.mkdir(parents=True, exist_ok=True)
 
     # Choose filename. If dataset_name is None, we might do "combined.json".

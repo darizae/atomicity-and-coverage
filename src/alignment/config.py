@@ -101,4 +101,6 @@ class AlignmentConfig:
     cache_path: Optional[str] = None
     claim_gen_key: str = "distilled_t5"
     dataset_name: Optional[str] = None
+    dedup_threshold: Optional[float] = None
+    dedup_strategy: Optional[str] = None
 

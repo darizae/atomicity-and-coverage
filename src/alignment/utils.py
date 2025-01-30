@@ -21,62 +21,48 @@ def build_config(args) -> AlignmentConfig:
     dataset_name = DATASET_ALIASES.get(raw_dataset_name, raw_dataset_name)
     device = check_or_select_device(args.device)
     claim_gen_key = args.claim_gen_key or default_config.claim_gen_key
+    threshold = args.threshold if args.threshold is not None else default_config.threshold
+
+    config_params = {
+        "method": method,
+        "threshold": threshold,
+        "device": device,
+        "claim_gen_key": claim_gen_key,
+        "dataset_name": dataset_name,
+        "dedup_threshold": args.dedup_threshold,
+        "dedup_strategy": args.dedup_strategy
+    }
 
     if method == AlignmentMethods.EMBEDDING:
-        # 1) Get the typed definition
         definition = get_embedding_model_definition(args.embedding_model_key)
-
-        # 2) Decide threshold (override if user-specified)
         threshold = args.threshold if args.threshold is not None else definition.threshold
 
-        # 3) Build your final EmbeddingModelConfig
-        embedding_config = EmbeddingModelConfig(
-            model_name=definition.model_name,
-            cache_file=definition.cache_file,
-            threshold=threshold,
-        )
-
-        # 4) Populate the main AlignmentConfig
-        config = AlignmentConfig(
-            method=method,
-            threshold=threshold,
-            device=device,
-            embedding_config=embedding_config,
-            cache_path=definition.cache_file,
-            claim_gen_key=claim_gen_key,
-            dataset_name=dataset_name
-        )
+        config_params.update({
+            "threshold": threshold,
+            "embedding_config": EmbeddingModelConfig(
+                model_name=definition.model_name,
+                cache_file=definition.cache_file,
+                threshold=threshold,
+            ),
+            "cache_path": definition.cache_file
+        })
 
     elif method == AlignmentMethods.ENTAILMENT:
         definition = get_entailment_model_definition(args.entailment_model_key)
         threshold = args.threshold if args.threshold is not None else definition.threshold
 
-        entailment_config = EntailmentModelConfig(
-            model_name=definition.model_name,
-            cache_file=definition.cache_file,
-            threshold=threshold
-        )
-
-        config = AlignmentConfig(
-            method=method,
-            threshold=threshold,
-            device=device,
-            entailment_config=entailment_config,
-            cache_path=definition.cache_file,
-            claim_gen_key=claim_gen_key,
-            dataset_name=dataset_name
-        )
+        config_params.update({
+            "threshold": threshold,
+            "entailment_config": EntailmentModelConfig(
+                model_name=definition.model_name,
+                cache_file=definition.cache_file,
+                threshold=threshold,
+            ),
+            "cache_path": definition.cache_file
+        })
 
     elif method == AlignmentMethods.ROUGE:
-        threshold = args.threshold if args.threshold is not None else default_config.threshold
-
-        config = AlignmentConfig(
-            method=method,
-            threshold=threshold,
-            device=device,
-            claim_gen_key=claim_gen_key,
-            dataset_name=dataset_name
-        )
+        pass
 
     else:
         raise ValueError(
@@ -84,13 +70,15 @@ def build_config(args) -> AlignmentConfig:
             f"Options: '{AlignmentMethods.EMBEDDING}', '{AlignmentMethods.ENTAILMENT}', '{AlignmentMethods.ROUGE}'."
         )
 
-    return config
+    return AlignmentConfig(**config_params)
 
 
 def do_alignment(
         aligner: BaseAligner,
         small_test: bool,
-        config: AlignmentConfig
+        config: AlignmentConfig,
+        dedup_threshold: float = None,
+        dedup_strategy: str = None
 ) -> None:
     """
     Handles either a single dataset or all datasets. If dataset_name is provided, we process that
@@ -115,7 +103,9 @@ def do_alignment(
             dataset_name,
             aligner,
             config,
-            small_test=small_test
+            small_test=small_test,
+            dedup_threshold=dedup_threshold,
+            dedup_strategy=dedup_strategy
         )
         save_results(config, results, dataset_name, small_test=small_test)
     else:
@@ -124,7 +114,9 @@ def do_alignment(
             all_datasets,
             aligner,
             config,
-            small_test=small_test
+            small_test=small_test,
+            dedup_threshold=dedup_threshold,
+            dedup_strategy=dedup_strategy
         )
         save_all_results(config, combined_results, small_test=small_test)
 
@@ -141,41 +133,53 @@ def _load_dataset(small_test: bool = False):
     loader = RoseDatasetLoader()
     if not os.path.exists(dataset_path):
         raise FileNotFoundError(f"Dataset file {dataset_path} not found.")
-    loader.load_datasets_compressed(dataset_path)
+    loader.load_datasets_json(dataset_path)
 
     return loader.datasets if not small_test else {k: v[:1] for k, v in loader.datasets.items()}
 
 
-def _process_dataset(dataset, aligner, config):
-    results = []
+def _process_dataset(
+        dataset,
+        aligner,
+        config,
+        dedup_threshold: float = None,
+        dedup_strategy: str = None,
+):
+    """
+    :param dedup_threshold: e.g. 0.3
+    :param dedup_strategy: e.g. "select_longest"
+    :returns: a list of results dict
+    """
 
-    system_claims_key = f"system_claims_{config.claim_gen_key}"
+    dedup_key = ""
+    results = []
+    claim_gen_key = config.claim_gen_key  # e.g. "distilled_t5"
 
     for record in dataset:
-        # Grab system claims using the dynamic key
-        system_claims = record.get(system_claims_key, [])
-        reference_acus = record.get("reference_acus", [])
+        system_claims = (
+            record.get("system_claims", {}).get(claim_gen_key, [])
+        )
+
+        if dedup_threshold is not None and dedup_strategy is not None:
+            # Construct the correct key, e.g. "deduped_0.3_select_longest"
+            dedup_key = f"deduped_{dedup_threshold}_{dedup_strategy}"
+            reference_acus = record.get("reference_acus", {}).get(dedup_key, [])
+        else:
+            # Use original references by default
+            reference_acus = record.get("reference_acus", {}).get("original", [])
 
         if not system_claims or not reference_acus:
-            # If either is empty, skip this record
             continue
 
-        # 1) Get the raw alignment map (indexes only)
         alignment_map = aligner.align(system_claims, reference_acus)
-
-        # 2) Expand it to a human-readable structure
-        alignment_map_expanded = expand_alignment_map(system_claims, reference_acus, alignment_map)
-
-        # 3) Compute coverage & atomicity from the raw alignment_map
         coverage = compute_coverage(alignment_map, len(reference_acus))
         atomicity = compute_atomicity(alignment_map, len(system_claims))
 
-        # 4) Save final record results
         results.append({
-            "reference summary": record.get("reference", ""),
+            "record_id": record.get("record_id", ""),
             "coverage": coverage,
             "atomicity": atomicity,
-            "alignment_map_expanded": alignment_map_expanded
+            "reference_key": dedup_key if dedup_threshold else "original"
         })
 
     return results
@@ -185,7 +189,9 @@ def process_all_datasets(
         datasets: List[str],
         aligner,
         config: AlignmentConfig,
-        small_test: bool = False
+        small_test: bool = False,
+        dedup_threshold: float = None,
+        dedup_strategy: str = None
 ) -> Dict[str, List[Dict[str, Any]]]:
     """
     Process all datasets and aggregate results into a single structure.
@@ -203,7 +209,7 @@ def process_all_datasets(
     for dataset_name in datasets:
         print(f"Processing dataset: {dataset_name}")
         dataset = _load_dataset(small_test=small_test).get(dataset_name, [])
-        results = _process_dataset(dataset, aligner, config)
+        results = _process_dataset(dataset, aligner, config, dedup_threshold, dedup_strategy)
         combined_results[dataset_name] = results
         print(f"Finished processing dataset: {dataset_name}")
     return combined_results
@@ -213,7 +219,9 @@ def process_single_dataset(
         dataset_name: str,
         aligner,
         config: AlignmentConfig,
-        small_test: bool = False
+        small_test: bool = False,
+        dedup_threshold: float = None,
+        dedup_strategy: str = None
 ) -> List[Dict[str, Any]]:
     """
     Process a single dataset.
@@ -229,7 +237,8 @@ def process_single_dataset(
     """
     print(f"Processing single dataset: {dataset_name}")
     dataset = _load_dataset(small_test=small_test).get(dataset_name, [])
-    return _process_dataset(dataset, aligner, config)
+    results = _process_dataset(dataset, aligner, config, dedup_threshold, dedup_strategy)
+    return results
 
 
 def save_results(
@@ -272,9 +281,9 @@ def save_all_results(
 
 
 def expand_alignment_map(
-    system_claims: List[str],
-    reference_acus: List[str],
-    alignment_map: Dict[int, List[int]]
+        system_claims: List[str],
+        reference_acus: List[str],
+        alignment_map: Dict[int, List[int]]
 ) -> List[Dict[str, Any]]:
     """
     Convert the raw alignment map {system_idx: [ref_idx, ...]}
@@ -295,4 +304,3 @@ def expand_alignment_map(
             "matched_refs": matched_refs
         })
     return expanded
-
