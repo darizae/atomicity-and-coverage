@@ -6,13 +6,33 @@ from typing import List, Optional
 from datasets import load_dataset
 
 from src.metrics.datasets_config import DATASET_ALIASES
-from src.utils.paths import RosePathsSmall
+from src.utils.paths import RosePathsSmall, RosePaths
 
 
 class RoseDatasetLoader:
     """
-    A loader for the RoSE dataset and its subsets with functionality
-    to save and load compressed and regular JSON datasets.
+    A loader for the RoSE dataset subsets, with the following structure
+    per record:
+
+        {
+          "source": <source text>,
+          "reference": <reference (summary) text>,
+          "reference_acus": {
+            "original": [...],  # The original ACUs from the dataset
+            # For each threshold+strategy combination, we store:
+            # "deduped_0.7_longest": [<deduplicated claims>],
+            # "deduped_0.7_shortest": [<deduplicated claims>],
+            # etc.
+          },
+          "system_claims": {
+            "gpt-3.5-turbo": [...],
+            "distilled_t5": [...],
+            ...
+          }
+        }
+
+    Each dataset (e.g., cnndm_test, xsum) is stored in self.datasets[subset_name]
+    as a list of such records.
     """
 
     def __init__(self):
@@ -22,64 +42,64 @@ class RoseDatasetLoader:
         """
         Loads all configured datasets into memory, optionally limiting the number of entries.
 
-        Args:
-            max_entries (int, optional): If provided, only load up to this many entries
-                                         per dataset for testing.
+        :param max_entries: If set, only load up to this many entries per subset (for testing).
+        :return: A dict like { "cnndm_test": [ { ... }, ... ], "xsum": [...], ... }
         """
         for alias, dataset_name in DATASET_ALIASES.items():
             print(f"Loading dataset: {alias}...")
-            dataset = load_dataset("Salesforce/rose", dataset_name, trust_remote_code=True)["data"]
+            dataset = load_dataset(
+                "Salesforce/rose",
+                dataset_name,
+                trust_remote_code=True
+            )["data"]
 
-            # Structure the data, optionally slicing if max_entries is specified
+            # Optionally slice to max_entries
             if max_entries is not None:
                 dataset = dataset.select(range(min(max_entries, len(dataset))))
 
-            structured_data = [
-                {
+            # Structure each record
+            structured_data = []
+            for entry in dataset:
+                record = {
                     "source": entry["source"],
                     "reference": entry["reference"],
-                    "reference_acus": entry["reference_acus"],
+                    "reference_acus": {
+                        "original": entry["reference_acus"]
+                    }
                 }
-                for entry in dataset
-            ]
+                structured_data.append(record)
 
             self.datasets[alias] = structured_data
+
         return self.datasets
 
-    def get_dataset(self, name):
+    def get_dataset(self, name: str):
         """
-        Fetches a specific dataset by name.
+        Fetch a specific subset by name (e.g. 'cnndm_test').
 
-        Args:
-            name (str): The name of the dataset to fetch.
-
-        Returns:
-            list: The requested dataset.
+        :param name: The name of the subset to fetch.
+        :return: A list of records for that subset.
         """
         if name not in self.datasets:
-            raise ValueError(f"Dataset '{name}' has not been loaded. Use 'load_all_datasets()' first.")
+            raise ValueError(f"Dataset '{name}' not loaded. Call load_all_datasets() first.")
         return self.datasets[name]
 
     def save_datasets_compressed(self, filepath: Path):
         """
-        Saves all datasets to a compressed file in gzip format.
+        Saves all loaded datasets to a gzip-compressed JSON file.
 
-        Args:
-            filepath (str): The path to the compressed file.
+        :param filepath: Path to .gz file.
         """
         with gzip.open(filepath, "wt", encoding="utf-8") as f:
             json.dump(self.datasets, f)
-        print(f"Datasets saved to {filepath} in compressed format.")
+        print(f"Datasets saved (compressed) to {filepath}.")
 
     def load_datasets_compressed(self, filepath: Path):
         """
-        Loads datasets from a compressed gzip file.
+        Loads datasets from a gzip-compressed JSON file into self.datasets.
 
-        Args:
-            filepath (str): The path to the compressed file.
-
-        Returns:
-            dict: The loaded datasets.
+        :param filepath: Path to .gz file.
+        :return: The loaded datasets dict.
         """
         print(f"Current working directory: {os.getcwd()}")
         with gzip.open(filepath, "rt", encoding="utf-8") as f:
@@ -91,22 +111,18 @@ class RoseDatasetLoader:
         """
         Saves all datasets to a regular (non-compressed) JSON file.
 
-        Args:
-            filepath (str): The path to the JSON file.
+        :param filepath: Path to .json file.
         """
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(self.datasets, f, ensure_ascii=False, indent=2)
-        print(f"Datasets saved to {filepath} in JSON format.")
+        print(f"Datasets saved (uncompressed) to {filepath}.")
 
     def load_datasets_json(self, filepath: Path):
         """
-        Loads datasets from a regular (non-compressed) JSON file.
+        Loads datasets from a .json file into self.datasets.
 
-        Args:
-            filepath (str): The path to the JSON file.
-
-        Returns:
-            dict: The loaded datasets.
+        :param filepath: Path to .json file.
+        :return: The loaded datasets dict.
         """
         print(f"Current working directory: {os.getcwd()}")
         with open(filepath, "r", encoding="utf-8") as f:
@@ -114,29 +130,71 @@ class RoseDatasetLoader:
         print(f"Datasets loaded from {filepath}.")
         return self.datasets
 
-    def add_claims(self, dataset_name: str, claims_field: str, claims: List[List[str]]):
+    def add_system_claims(self, dataset_name: str, model_name: str, claims: List[List[str]]):
         """
-        Add system-generated claims to a specific dataset.
+        Add system-generated claims to a specific dataset, grouped under 'system_claims[model_name]'.
+
+        :param dataset_name: e.g. 'cnndm_test'
+        :param model_name: e.g. 'gpt-3.5-turbo', 'distilled_t5', etc.
+        :param claims: A list of claim-lists, one per record.
         """
         if dataset_name not in self.datasets:
             raise ValueError(f"Dataset '{dataset_name}' not found. Load it first.")
 
         dataset = self.datasets[dataset_name]
+        if len(dataset) != len(claims):
+            raise ValueError(
+                f"Mismatch: dataset '{dataset_name}' has {len(dataset)} records but "
+                f"provided claims has {len(claims)} sets."
+            )
+
         for i, entry in enumerate(dataset):
-            entry[claims_field] = claims[i]
+            if "system_claims" not in entry:
+                entry["system_claims"] = {}
+            entry["system_claims"][model_name] = claims[i]
+
+    def add_deduped_reference_acus(
+        self,
+        dataset_name: str,
+        threshold: float,
+        strategy: str,
+        deduped_claims_per_record: List[List[str]]
+    ):
+        """
+        Store deduplicated reference ACUs for each record in a dataset,
+        under a key like 'deduped_{threshold}_{strategy}'.
+
+        :param dataset_name: e.g. 'cnndm_test'
+        :param threshold:  e.g. 0.7
+        :param strategy:   e.g. 'longest'
+        :param deduped_claims_per_record: A list of lists of strings,
+                                          parallel to the dataset records.
+        """
+        if dataset_name not in self.datasets:
+            raise ValueError(f"Dataset '{dataset_name}' not found. Load it first.")
+
+        dataset = self.datasets[dataset_name]
+        if len(dataset) != len(deduped_claims_per_record):
+            raise ValueError(
+                f"Mismatch: dataset '{dataset_name}' has {len(dataset)} records but "
+                f"provided deduped_claims has {len(deduped_claims_per_record)} lists."
+            )
+
+        threshold_str = f"{threshold:.2f}".rstrip("0").rstrip(".")
+        dedup_key = f"deduped_{threshold_str}_{strategy}"
+
+        for i, entry in enumerate(dataset):
+            ref_acus = entry.setdefault("reference_acus", {})
+            ref_acus[dedup_key] = deduped_claims_per_record[i]
 
 
 if __name__ == "__main__":
     loader = RoseDatasetLoader()
 
-    # 1. Load the full datasets and save them
-    # all_datasets = loader.load_all_datasets()
-    # loader.save_datasets_compressed(RosePaths.compressed_dataset_path)
-    # loader.save_datasets_json(RosePaths.dataset_path)
+    all_datasets = loader.load_all_datasets()
+    loader.save_datasets_json(RosePaths.dataset_path)
 
-    # 2. Load a SMALL version of each dataset (e.g., 3 entries) and save them
     all_datasets_small = loader.load_all_datasets(max_entries=3)
-    loader.save_datasets_compressed(RosePathsSmall.compressed_dataset_path)
     loader.save_datasets_json(RosePathsSmall.dataset_path)
 
-    print("Done generating both full and small datasets.")
+    print("Done generating small version of the RoSE dataset.")
