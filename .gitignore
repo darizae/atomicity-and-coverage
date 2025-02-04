@@ -19,3 +19,5 @@ Thumbs.db
 
 # Optionally ignore logs
 *.log
+
+src/notebooks/all_experiments_results.json
