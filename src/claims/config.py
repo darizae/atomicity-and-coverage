@@ -5,9 +5,6 @@ from src.claims.claim_generator import BaseClaimGenerator, HuggingFaceSeq2SeqGen
     OpenAIClaimGenerator, JanLocalClaimGenerator
 
 
-SG_PREFIX = "system_claims_"
-
-
 @dataclass
 class ClaimGenerationModelConfig:
     name: str
@@ -52,5 +49,5 @@ def get_claim_generation_model_config(model_key: str) -> ClaimGenerationModelCon
     else:
         raise ValueError(f"Unknown model key: {model_key}")
 
-    config.claims_field = f"{SG_PREFIX}{model_key}"
+    config.claims_field = model_key
     return config

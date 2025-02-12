@@ -141,7 +141,7 @@ def _load_dataset(small_test: bool = False):
     loader = RoseDatasetLoader()
     if not os.path.exists(dataset_path):
         raise FileNotFoundError(f"Dataset file {dataset_path} not found.")
-    loader.load_datasets_compressed(dataset_path)
+    loader.load_datasets_json(dataset_path)
 
     return loader.datasets if not small_test else {k: v[:1] for k, v in loader.datasets.items()}
 
@@ -149,7 +149,7 @@ def _load_dataset(small_test: bool = False):
 def _process_dataset(dataset, aligner, config):
     results = []
 
-    system_claims_key = f"system_claims_{config.claim_gen_key}"
+    system_claims_key = f"{config.claim_gen_key}"
 
     for record in dataset:
         # Grab system claims using the dynamic key
