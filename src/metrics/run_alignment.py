@@ -74,6 +74,13 @@ def get_args():
         help="Which claims from which claim generation model to use. Must be one of: distilled_t5, etc."
     )
 
+    parser.add_argument(
+        "--reference_claims_key",
+        type=str,
+        default="reference_acus_deduped_0.7_select_longest",
+        help="Which claims from which claim generation model to use. Default is best deduped RoSE."
+    )
+
     return parser.parse_args()
 
 

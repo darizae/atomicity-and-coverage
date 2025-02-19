@@ -1,15 +1,22 @@
 import subprocess
 
 SMALL_TEST = False
-CLAIM_GEN_MODELS = ["distilled_t5", "gpt-3.5-turbo", "llama2_7b"]
+CLAIM_GEN_MODELS = [
+    "gpt_maximize_atomicity",
+    "gpt_maximize_coverage",
+    "gpt_granularity_low",
+    "gpt_granularity_high",
+    "kg_based_claims"
+]
 
 
 def main():
     # Define the experiments to run
     experiment_configs = []
 
-    methods = ["rouge", "embedding", "entailment"]
-    thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    methods = ["entailment"]
+    # thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    thresholds = [0.7]
 
     for model in CLAIM_GEN_MODELS:
         for method in methods:

@@ -21,6 +21,7 @@ def build_config(args) -> AlignmentConfig:
     dataset_name = DATASET_ALIASES.get(raw_dataset_name, raw_dataset_name)
     device = check_or_select_device(args.device)
     claim_gen_key = args.claim_gen_key or default_config.claim_gen_key
+    reference_claims_key = args.reference_claims_key or default_config.reference_claims_key
 
     if method == AlignmentMethods.EMBEDDING:
         # 1) Get the typed definition
@@ -44,6 +45,7 @@ def build_config(args) -> AlignmentConfig:
             embedding_config=embedding_config,
             cache_path=definition.cache_file,
             claim_gen_key=claim_gen_key,
+            reference_claims_key=reference_claims_key,
             dataset_name=dataset_name
         )
 
@@ -64,6 +66,7 @@ def build_config(args) -> AlignmentConfig:
             entailment_config=entailment_config,
             cache_path=definition.cache_file,
             claim_gen_key=claim_gen_key,
+            reference_claims_key=reference_claims_key,
             dataset_name=dataset_name
         )
 
@@ -75,6 +78,7 @@ def build_config(args) -> AlignmentConfig:
             threshold=threshold,
             device=device,
             claim_gen_key=claim_gen_key,
+            reference_claims_key=reference_claims_key,
             dataset_name=dataset_name
         )
 
@@ -150,24 +154,24 @@ def _process_dataset(dataset, aligner, config):
     results = []
 
     system_claims_key = f"{config.claim_gen_key}"
+    reference_claims_key = f"{config.reference_claims_key}"
 
     for record in dataset:
         # Grab system claims using the dynamic key
         system_claims = record.get(system_claims_key, [])
-        reference_acus = record.get("reference_acus", [])
+        reference_claims = record.get(reference_claims_key, [])
 
-        if not system_claims or not reference_acus:
-            # If either is empty, skip this record
-            continue
+        if not system_claims or not reference_claims:
+            raise ValueError(f"Either system or reference claims are missing.")
 
         # 1) Get the raw alignment map (indexes only)
-        alignment_map = aligner.align(system_claims, reference_acus)
+        alignment_map = aligner.align(system_claims, reference_claims)
 
         # 2) Expand it to a human-readable structure
-        alignment_map_expanded = expand_alignment_map(system_claims, reference_acus, alignment_map)
+        alignment_map_expanded = expand_alignment_map(system_claims, reference_claims, alignment_map)
 
         # 3) Compute coverage & atomicity from the raw alignment_map
-        coverage = compute_coverage(alignment_map, len(reference_acus))
+        coverage = compute_coverage(alignment_map, len(reference_claims))
         atomicity = compute_atomicity(alignment_map, len(system_claims))
 
         # 4) Save final record results
