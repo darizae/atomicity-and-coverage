@@ -5,8 +5,6 @@ from my_timer import Timer
 from src.alignment.alignment_factory import create_aligner
 from src.alignment.utils import build_config, do_alignment
 
-REFERENCE_ACUS_KEY = "reference_acus_deduped_0.9_select_longest"
-
 
 def get_args():
     """
@@ -79,7 +77,7 @@ def get_args():
     parser.add_argument(
         "--reference_claims_key",
         type=str,
-        default=REFERENCE_ACUS_KEY,
+        default="reference_acus_deduped_0.9_select_longest",
         help="Which claims from which claim generation model to use. Default is best deduped RoSE."
     )
 
