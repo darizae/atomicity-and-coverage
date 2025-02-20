@@ -25,6 +25,7 @@ class EmbeddingAligner(BaseModelAligner):
         self.model = SentenceTransformer(model_name, device=device)
 
         self.cache = EmbeddingCache(cache_path)
+        self._processed_count = 0
 
     def _encode_items(
         self,
@@ -78,6 +79,10 @@ class EmbeddingAligner(BaseModelAligner):
                 txt = to_encode[i]
                 self.cache.set_embedding(txt, emb)
                 embeddings[actual_idx] = emb
+
+        self._processed_count += len(texts)
+        if self._processed_count % 100 == 0:
+            self.cache.save_cache()
 
         return embeddings
 

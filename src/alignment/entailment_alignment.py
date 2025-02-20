@@ -22,7 +22,8 @@ class EntailmentAligner(BaseModelAligner):
         super().__init__(threshold, device, cache_path)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(device)
-        self.cache = NLIPredictionCache(cache_path)
+        self.cache = NLIPredictionCache(cache_path, save_every=200)
+        self._processed_count = 0
 
     def _encode_items(
         self,
@@ -50,9 +51,13 @@ class EntailmentAligner(BaseModelAligner):
         """
         prob_entail = self.cache.get_entailment_probability(sys_rep, ref_rep)
         if prob_entail is None:
-            # Not in cache => let's compute it directly (or batch).
             prob_entail = self._infer_entailment(sys_rep, ref_rep)
             self.cache.set_entailment_probability(sys_rep, ref_rep, prob_entail)
+
+        self._processed_count += 1
+        if self._processed_count % 100 == 0:
+            self.cache.save_cache()
+
         return prob_entail
 
     def _infer_entailment(self, premise: str, hypothesis: str) -> float:

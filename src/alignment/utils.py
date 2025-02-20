@@ -156,7 +156,7 @@ def _process_dataset(dataset, aligner, config):
     system_claims_key = f"{config.claim_gen_key}"
     reference_claims_key = f"{config.reference_claims_key}"
 
-    for record in dataset:
+    for i, record in enumerate(dataset):
         # Grab system claims using the dynamic key
         system_claims = record.get(system_claims_key, [])
         reference_claims = record.get(reference_claims_key, [])
@@ -181,6 +181,13 @@ def _process_dataset(dataset, aligner, config):
             "atomicity": atomicity,
             "alignment_map_expanded": alignment_map_expanded
         })
+
+        record_id = dataset[0]["record_id"]
+        print(f"Processed {record_id}")
+
+        if i % 200 == 0:
+            print(f"Processed {i} records. Saving cache...")
+            aligner.save_alignment_cache()
 
     return results
 
