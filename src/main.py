@@ -2,6 +2,7 @@ import subprocess
 
 SMALL_TEST = False
 CLAIM_GEN_MODELS = [
+    "gpt_default",
     "gpt_maximize_atomicity",
     "gpt_maximize_coverage",
     "gpt_granularity_low",
@@ -34,7 +35,8 @@ def main():
             "python", "metrics/run_alignment.py",
             "--method", exp_conf["method"],
             "--threshold", str(exp_conf["threshold"]),
-            "--claim_gen_key", exp_conf["claim_gen_key"]
+            "--claim_gen_key", exp_conf["claim_gen_key"],
+            # "--small_test"
         ]
 
         if SMALL_TEST:
