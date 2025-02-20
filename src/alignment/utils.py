@@ -185,7 +185,7 @@ def _process_dataset(dataset, aligner, config):
         record_id = dataset[0]["record_id"]
         print(f"Processed {record_id}")
 
-        if i % 200 == 0:
+        if i % 500 == 0:
             print(f"Processed {i} records. Saving cache...")
             aligner.save_alignment_cache()
 

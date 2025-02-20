@@ -81,7 +81,7 @@ class EmbeddingAligner(BaseModelAligner):
                 embeddings[actual_idx] = emb
 
         self._processed_count += len(texts)
-        if self._processed_count % 100 == 0:
+        if self._processed_count % 500 == 0:
             self.cache.save_cache()
 
         return embeddings
