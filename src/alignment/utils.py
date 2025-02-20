@@ -2,6 +2,7 @@ import json
 import os
 from typing import List, Dict, Any
 
+import numpy as np
 from device_selector import check_or_select_device
 
 from src.alignment.base_aligner import BaseAligner
@@ -278,7 +279,8 @@ def save_results(
     )
 
     with output_path.open("w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
+        safe_results = convert_numpy_types(results)
+        json.dump(safe_results, f, indent=2)
     print(f"[save_results] Results saved to {output_path}")
 
 
@@ -297,7 +299,8 @@ def save_all_results(
     )
 
     with output_path.open("w", encoding="utf-8") as f:
-        json.dump(all_results, f, indent=2)
+        safe_results = convert_numpy_types(all_results)
+        json.dump(safe_results, f, indent=2)
     print(f"[save_all_results] Combined results saved to {output_path}")
 
 
@@ -325,4 +328,21 @@ def expand_alignment_map(
             "matched_refs": matched_refs
         })
     return expanded
+
+
+def convert_numpy_types(obj):
+    """
+    Recursively convert any np.int64, np.float32, etc.
+    into native Python int/float so that json.dump doesn't fail.
+    """
+    if isinstance(obj, dict):
+        return {k: convert_numpy_types(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_numpy_types(x) for x in obj]
+    elif isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    else:
+        return obj
 
