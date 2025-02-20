@@ -75,6 +75,7 @@ class AlignmentMethods:
     ROUGE: str = "rouge"
     EMBEDDING: str = "embedding"
     ENTAILMENT: str = "entailment"
+    ENTAILMENT_BIPARTITE: str = "entailment_bipartite"
 
 
 @dataclass
@@ -88,7 +89,7 @@ class EmbeddingModelConfig:
 class EntailmentModelConfig:
     model_name: str
     cache_file: str
-    threshold: float
+    threshold: Optional[float] = None
 
 
 @dataclass

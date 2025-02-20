@@ -82,10 +82,29 @@ def build_config(args) -> AlignmentConfig:
             dataset_name=dataset_name
         )
 
+    elif method == AlignmentMethods.ENTAILMENT_BIPARTITE:
+        definition = get_entailment_model_definition(args.entailment_model_key)
+        entailment_config = EntailmentModelConfig(
+            model_name=definition.model_name,
+            cache_file=definition.cache_file,
+            threshold=args.threshold
+        )
+
+        config = AlignmentConfig(
+            method=method,
+            device=device,
+            threshold=entailment_config.threshold,
+            entailment_config=entailment_config,
+            cache_path=definition.cache_file,
+            claim_gen_key=claim_gen_key,
+            reference_claims_key=reference_claims_key,
+            dataset_name=dataset_name
+        )
+
     else:
         raise ValueError(
             f"Unknown method: {method}. "
-            f"Options: '{AlignmentMethods.EMBEDDING}', '{AlignmentMethods.ENTAILMENT}', '{AlignmentMethods.ROUGE}'."
+            f"Options: '{AlignmentMethods.EMBEDDING}', '{AlignmentMethods.ENTAILMENT}', '{AlignmentMethods.ROUGE}', '{AlignmentMethods.ENTAILMENT_BIPARTITE}'"
         )
 
     return config

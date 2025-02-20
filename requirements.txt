@@ -49,3 +49,5 @@ pytest~=8.3.4
 rouge-score>=0.0.4
 requests~=2.32.3
 openai~=1.59.9
+
+scipy~=1.15.1

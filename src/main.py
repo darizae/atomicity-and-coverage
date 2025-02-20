@@ -1,6 +1,7 @@
 import subprocess
 
-SMALL_TEST = False
+SMALL_TEST = True
+
 CLAIM_GEN_MODELS = [
     "gpt_default",
     "gpt_maximize_atomicity",
@@ -15,9 +16,10 @@ def main():
     # Define the experiments to run
     experiment_configs = []
 
-    methods = ["entailment"]
+    # methods = ["entailment"]
+    methods = ["entailment_bipartite"]
     # thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    thresholds = [0.7]
+    thresholds = [0.5]
 
     for model in CLAIM_GEN_MODELS:
         for method in methods:
@@ -35,8 +37,7 @@ def main():
             "python", "metrics/run_alignment.py",
             "--method", exp_conf["method"],
             "--threshold", str(exp_conf["threshold"]),
-            "--claim_gen_key", exp_conf["claim_gen_key"],
-            # "--small_test"
+            "--claim_gen_key", exp_conf["claim_gen_key"]
         ]
 
         if SMALL_TEST:
