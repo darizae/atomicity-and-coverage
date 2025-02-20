@@ -1,3 +1,4 @@
+from .bipartite_embedding_alignment import BipartiteEmbeddingAligner
 from .bipartite_entailment_alignment import BipartiteEntailmentAligner
 from .config import AlignmentConfig, AlignmentMethods
 from .rouge_alignment import RougeAligner
@@ -43,6 +44,16 @@ def create_aligner(config: AlignmentConfig):
                 model_name=config.entailment_config.model_name,
                 # The threshold might be a "floor" in bipartite approach
                 threshold=config.entailment_config.threshold,
+                device=config.device,
+                cache_path=config.cache_path
+            )
+
+        case AlignmentMethods.EMBEDDING_BIPARTITE:
+            if not config.embedding_config or not config.embedding_config.model_name:
+                raise ValueError("BipartiteEmbeddingAligner requires an embedding model.")
+            return BipartiteEmbeddingAligner(
+                model_name=config.embedding_config.model_name,
+                threshold=config.embedding_config.threshold,
                 device=config.device,
                 cache_path=config.cache_path
             )

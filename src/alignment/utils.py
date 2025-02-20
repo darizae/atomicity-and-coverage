@@ -102,6 +102,25 @@ def build_config(args) -> AlignmentConfig:
             dataset_name=dataset_name
         )
 
+    elif method == AlignmentMethods.EMBEDDING_BIPARTITE:
+        definition = get_embedding_model_definition(args.embedding_model_key)
+        embedding_config = EmbeddingModelConfig(
+            model_name=definition.model_name,
+            cache_file=definition.cache_file,
+            threshold=args.threshold
+        )
+
+        config = AlignmentConfig(
+            method=method,
+            device=device,
+            threshold=embedding_config.threshold,
+            embedding_config=embedding_config,
+            cache_path=definition.cache_file,
+            claim_gen_key=claim_gen_key,
+            reference_claims_key=reference_claims_key,
+            dataset_name=dataset_name
+        )
+
     else:
         raise ValueError(
             f"Unknown method: {method}. "

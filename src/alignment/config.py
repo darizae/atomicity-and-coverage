@@ -76,6 +76,7 @@ class AlignmentMethods:
     EMBEDDING: str = "embedding"
     ENTAILMENT: str = "entailment"
     ENTAILMENT_BIPARTITE: str = "entailment_bipartite"
+    EMBEDDING_BIPARTITE: str = "embedding_bipartite"
 
 
 @dataclass
