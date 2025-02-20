@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from src.metrics.run_alignment import REFERENCE_ACUS_KEY
 from src.utils.paths import AlignmentPaths
 
 ALIGNMENT_PATHS = AlignmentPaths()
@@ -102,6 +101,6 @@ class AlignmentConfig:
     entailment_config: Optional[EntailmentModelConfig] = None
     cache_path: Optional[str] = None
     claim_gen_key: str = "distilled_t5"
-    reference_claims_key: str = REFERENCE_ACUS_KEY
+    reference_claims_key: str = "reference_acus_deduped_0.9_select_longest"
     dataset_name: Optional[str] = None
 
