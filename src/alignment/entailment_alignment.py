@@ -5,6 +5,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from .base_aligner import BaseModelAligner
 from .entailment_cache import NLIPredictionCache
+from ..main import SAVE_EVERY
 
 
 class EntailmentAligner(BaseModelAligner):
@@ -22,7 +23,7 @@ class EntailmentAligner(BaseModelAligner):
         super().__init__(threshold, device, cache_path)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(device)
-        self.cache = NLIPredictionCache(cache_path, save_every=500)
+        self.cache = NLIPredictionCache(cache_path, save_every=SAVE_EVERY)
         self._processed_count = 0
 
     def _encode_items(
@@ -55,7 +56,7 @@ class EntailmentAligner(BaseModelAligner):
             self.cache.set_entailment_probability(sys_rep, ref_rep, prob_entail)
 
         self._processed_count += 1
-        if self._processed_count % 500 == 0:
+        if self._processed_count % SAVE_EVERY == 0:
             self.cache.save_cache()
 
         return prob_entail

@@ -2,6 +2,8 @@ import subprocess
 
 SMALL_TEST = False
 
+SAVE_EVERY = 500000
+
 CLAIM_GEN_MODELS = [
     "gpt_default",
     "gpt_maximize_atomicity",
@@ -39,7 +41,7 @@ def main():
             "--method", exp_conf["method"],
             "--threshold", str(exp_conf["threshold"]),
             "--claim_gen_key", exp_conf["claim_gen_key"],
-            # "--dataset_name", "xsum"
+            "--dataset_name", "xsum"
         ]
 
         if SMALL_TEST:

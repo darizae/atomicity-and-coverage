@@ -8,6 +8,7 @@ from device_selector import check_or_select_device
 from src.alignment.base_aligner import BaseAligner
 from src.alignment.config import AlignmentConfig, AlignmentMethods, get_embedding_model_definition, \
     EmbeddingModelConfig, get_entailment_model_definition, EntailmentModelConfig
+from src.main import SAVE_EVERY
 from src.metrics.datasets_config import DATASET_ALIASES, DatasetName
 from src.utils.paths import RosePathsSmall, RosePaths, get_alignment_results_path
 from src.rose.rose_loader import RoseDatasetLoader
@@ -224,7 +225,7 @@ def _process_dataset(dataset, aligner, config):
         record_id = dataset[i]["record_id"]
         print(f"Processed {record_id}")
 
-        if i % 500 == 0 and i != 0:
+        if i % SAVE_EVERY == 0 and i != 0:
             print(f"Processed {i} records. Saving cache...")
             aligner.save_alignment_cache()
 

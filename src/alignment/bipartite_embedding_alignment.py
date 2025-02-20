@@ -6,6 +6,7 @@ from sentence_transformers import SentenceTransformer
 
 from .base_aligner import BaseModelAligner
 from .embeddings_cache import EmbeddingCache
+from ..main import SAVE_EVERY
 
 
 class BipartiteEmbeddingAligner(BaseModelAligner):
@@ -110,7 +111,7 @@ class BipartiteEmbeddingAligner(BaseModelAligner):
                 embeddings[actual_idx] = emb
 
         self._processed_count += len(texts)
-        if self._processed_count % 500 == 0:
+        if self._processed_count % SAVE_EVERY == 0:
             self.cache.save_cache()
 
         return embeddings
