@@ -66,6 +66,12 @@ def get_alignment_results_path(
     elif config.method == "entailment":
         model_key = sanitize_filename(config.entailment_config.model_name)
         threshold = config.entailment_config.threshold
+    elif config.method == "entailment_bipartite":
+        model_key = sanitize_filename(config.entailment_config.model_name)
+        threshold = config.entailment_config.threshold
+    elif config.method == "embedding-bipartite":
+        model_key = sanitize_filename(config.embedding_config.model_name)
+        threshold = config.embedding_config.threshold
     else:
         # e.g. "rouge" has no model name
         model_key = "rouge_model"
