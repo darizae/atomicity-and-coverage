@@ -100,6 +100,6 @@ class AlignmentConfig:
     entailment_config: Optional[EntailmentModelConfig] = None
     cache_path: Optional[str] = None
     claim_gen_key: str = "distilled_t5"
-    reference_claims_key: str = "reference_acus_deduped_0.7_select_longest"
+    reference_claims_key: str = "reference_acus_deduped_0.9_select_longest"
     dataset_name: Optional[str] = None
 
